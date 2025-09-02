@@ -5,23 +5,41 @@ on:
   workflow_dispatch:
   pull_request:
     paths-ignore:
-      - '.github/workflows/publish_latest.yml'
-      - '.github/workflows/publish_release.yml'
       - 'doc/**'
       - 'CHANGELOG.rst'
   push:
     paths-ignore:
-      - '.github/workflows/publish_latest.yml'
-      - '.github/workflows/publish_release.yml'
       - 'doc/**'
       - 'CHANGELOG.rst'
 
 jobs:
-  build-and-test:
+  integration-tests:
     runs-on: ubuntu-latest
+    defaults: 
+      run:
+        shell: bash -l {0}
 
-    container: 
-      image: ghcr.io/cyclus/cyclus_24.04_apt/cyclus:latest
-    steps: 
-      - run: node --version 
-      - run: python --version
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniforge-variant: Mambaforge
+          miniforge-version: latest
+          activate-environment: areal-env
+          use-mamba: true
+
+      - name: Conda config
+        run: |
+          conda config --env --set pip_interop_enabled True 
+      
+      - name: Install dependencies
+        run: |
+          conda install -y cyclus
+
+      - name: Install Areal
+        run: |
+          python install.py
+
+      - name: Run unit tests
+        run: areal_unit_tests
