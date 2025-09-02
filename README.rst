@@ -1,7 +1,7 @@
 Areal: Advanced REactor Archetype Library
 ==================================
 
-Archetype library for use with `Cyclus <fuelcycle.org>`_` to 
+Archetype library for use with `Cyclus <fuelcycle.org>`_ to 
 model reactors beyond the `Cycamore Reactor archetype <https://fuelcycle.org/user/cycamoreagents.html#cycamore-reactor>`_.
 
 Dependencies:
