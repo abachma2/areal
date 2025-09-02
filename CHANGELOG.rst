@@ -6,7 +6,7 @@ Since last release:
 ===================
 
 **Added:**
-* README and other associated documentation (#1)
+* README and other associated documentation (#1, #2)
 
 
 **Changed:**

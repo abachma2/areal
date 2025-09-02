@@ -1,14 +1,16 @@
-AREAL: Advanced REactor Archetype Library
+Areal: Advanced REactor Archetype Library
 ==================================
 
-Archetype library for use with [Cyclus](fuelcycle.org) to 
-model reactors beyond the [Cycamore Reactor archetype](https://fuelcycle.org/user/cycamoreagents.html#cycamore-reactor).
+Archetype library for use with `Cyclus <fuelcycle.org>`_ to 
+model reactors beyond the `Cycamore Reactor archetype <https://fuelcycle.org/user/cycamoreagents.html#cycamore-reactor>`_.
 
 Dependencies:
 -------------
-|Package | Minimum Version |
-|--------|-----------------|
-|Cyclus  | 1.6             |
+====================   ==================
+Package                Minimum Version
+====================   ==================
+`Cyclus`               1.6
+====================   ==================
 
 Installation Instructions 
 -------------------------
@@ -30,4 +32,6 @@ Contributing
 4. Submit a pull request to the source code 
 5. Wait for approval and merging on the pull request. 
 
-For more information, please see the [Contributing Guidelines](CONTRIBUTING.rst)
+For more information, please see the `Contributing Guidelines <CONTRIBUTING.rst>`_.
+
+.. _`CONTRIBUTING`: CONTRIBUTING.rst
