@@ -22,3 +22,6 @@ jobs:
 
     container: 
       image: ghcr.io/cyclus/cyclus_24.04_apt/cyclus:latest
+    steps: 
+      - run: node --version 
+      - run: python --version
