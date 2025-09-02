@@ -41,13 +41,15 @@ jobs:
       - name: Checkout Areal
         uses: actions/checkout@v4
 
-      - name: Build and Test Areal
-        id: build-cymetric
+      - name: Build Cycamore
+        id: build-cycamore
         continue-on-error: true
         uses: docker/build-push-action@v5
         with:
-          cache-from: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci-layer-cache
           file: docker/Dockerfile
+          cache-from: type=registry,ref=ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:ci-layer-cache
+          tags: localhost:5000/cycamore:local
+          push: true
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
