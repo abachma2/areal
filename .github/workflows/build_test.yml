@@ -15,27 +15,42 @@ on:
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
-    defaults: 
-      run:
-        shell: bash -l {0}
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu_versions : [
+          20.04,
+          22.04,
+          24.04,
+        ]
+        pkg_mgr : [
+          apt,
+          conda,
+        ]
+        cycamore_tag: [
+          latest,
+          stable,
+        ]
 
     steps:
       - uses: actions/checkout@v3
-      - name: Setup Conda
-        uses: conda-incubator/setup-miniconda@v3
-        with: 
-          auto-update-conda: true
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Conda config
-        run: |
-          conda config --env --set pip_interop_enabled True 
-      
-      - name: Install dependencies and Areal
-        run: |
-          conda config --add channels conda-forge
-          conda install -y cyclus
-          python install.py
+      - name: Build and Test Cymetric
+        id: build-cymetric
+        continue-on-error: true
+        uses: docker/build-push-action@v5
+        with:
+          cache-from: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci-layer-cache
+          file: docker/Dockerfile
+          build-args: |
+            pkg_mgr=${{ matrix.pkg_mgr }}
+            ubuntu_version=${{ matrix.ubuntu_versions }}
+            cycamore_tag=${{ matrix.cycamore_tag }}
+      - name: Install Areal
+        run: python install.py
 
       - name: Run unit tests
         run: areal_unit_tests
