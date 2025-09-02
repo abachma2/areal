@@ -31,13 +31,10 @@ jobs:
         run: |
           conda config --env --set pip_interop_enabled True 
       
-      - name: Install dependencies
+      - name: Install dependencies and Areal
         run: |
           conda config --add channels conda-forge
           conda install -y cyclus
-
-      - name: Install Areal
-        run: |
           python install.py
 
       - name: Run unit tests
