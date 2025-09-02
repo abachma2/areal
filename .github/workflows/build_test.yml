@@ -37,23 +37,20 @@ jobs:
         uses: docker/setup-buildx-action@v3
         with:
           driver-opts: network=host
-      
+
       - name: Checkout Areal
         uses: actions/checkout@v4
 
-      - name: Build Cycamore
-        id: build-cycamore
+      - name: Build Areal
+        id: build-areal
         continue-on-error: true
         uses: docker/build-push-action@v5
         with:
           file: docker/Dockerfile
-          cache-from: type=registry,ref=ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:ci-layer-cache
-          tags: localhost:5000/cycamore:local
+          cache-from: type=registry,ref=ghcr.io/cyclus/areal_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/areal:ci-layer-cache
+          tags: localhost:5000/areal:local
           push: true
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
             cyclus_tag=${{ matrix.cyclus_tag }}
-
-      - name: Check cyclus 
-        run: cyclus --version
