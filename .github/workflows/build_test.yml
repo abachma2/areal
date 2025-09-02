@@ -33,6 +33,7 @@ jobs:
       
       - name: Install dependencies
         run: |
+          conda config --add channels conda-forge
           conda install -y cyclus
 
       - name: Install Areal
