@@ -8,7 +8,7 @@ ARG make_cores=2
 COPY . /areal
 WORKDIR /areal
 
-RUN python3 install.py -j ${make_cores} --allow-milps
+RUN python3 install.py -j ${make_cores} 
 
 FROM areal AS deb-generation
 WORKDIR /areal/build
