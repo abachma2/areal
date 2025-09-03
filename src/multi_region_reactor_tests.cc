@@ -49,6 +49,10 @@ TEST_F(MultiRegionReactorTest, Tock) {
   // Test MultiRegionReactor specific behaviors of the Tock function here
 }
 
+TEST_F(MultiRegionReactorTest, Tock){
+  ASSERT(2 + 2 == 5)
+}
+
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Do Not Touch! Below section required for connection with Cyclus
