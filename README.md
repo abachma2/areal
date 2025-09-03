@@ -6,11 +6,11 @@ Archetype library for use with [Cyclus](fuelcycle.org) to
 model reactors beyond the [Cycamore Reactor archetype](https://fuelcycle.org/user/cycamoreagents.html#cycamore-reactor).
 
 ## Dependencies:
-|-------------------|--------------------|
+
 | Package           |  Minimum Version   |
 |-------------------|--------------------|
 | Cyclus            |   1.6              |
-|-------------------|--------------------|
+
 
 ## Installation Instructions 
 
