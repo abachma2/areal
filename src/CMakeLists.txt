@@ -1,7 +1,13 @@
-### DO NOT DELETE THIS COMMENT: INSERT_ARCHETYPES_HERE ###
+CONFIGURE_FILE(areal_version.h.in "${CMAKE_CURRENT_SOURCE_DIR}/areal_version.h" @ONLY)
+
+SET(CYCLUS_CUSTOM_HEADERS "areal_version.h")
+
 USE_CYCLUS("areal" "multi_region_reactor")
 
-INSTALL_CYCLUS_MODULE("areal" "")
+
+INSTALL_CYCLUS_MODULE("areal" "" "NONE")
+
+SET(TestSource ${areal_TEST_CC} PARENT_SCOPE)
 
 # install header files
 FILE(GLOB h_files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
