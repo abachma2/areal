@@ -47,11 +47,10 @@ TEST_F(MultiRegionReactorTest, Tick) {
 TEST_F(MultiRegionReactorTest, Tock) {
   EXPECT_NO_THROW(facility->Tock());
   // Test MultiRegionReactor specific behaviors of the Tock function here
+  int result = 4;
+  EXPECT_EQ(5, result);
 }
 
-TEST_F(MultiRegionReactorTest, Tock){
-  ASSERT(2 + 2 == 5)
-}
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
