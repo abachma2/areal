@@ -47,8 +47,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           file: docker/Dockerfile
-          cache-from: type=registry,ref=ghcr.io/cyclus/areal_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/areal:ci-layer-cache
-          tags: localhost:5000/areal:local
+          cache-from: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci-layer-cache
+          tags: localhost:5000/cyclus:local
           push: true
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
