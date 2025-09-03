@@ -1,8 +1,10 @@
+# ------------------- Add all Concrete Agents ----------------------------
+
 CONFIGURE_FILE(areal_version.h.in "${CMAKE_CURRENT_SOURCE_DIR}/areal_version.h" @ONLY)
 
 SET(CYCLUS_CUSTOM_HEADERS "areal_version.h")
 
-USE_CYCLUS("areal" "multi_region_reactor")
+USE_CYCLUS("areal" "multiregionreactor")
 
 
 INSTALL_CYCLUS_MODULE("areal" "" "NONE")

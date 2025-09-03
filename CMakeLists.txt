@@ -10,7 +10,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION ${MINIMUM_CMAKE_VERSION})
 
 cyclus_require_out_of_source_build()
 
-# This project name is areal.
+# This project name is AREAL.
 PROJECT(AREAL VERSION 0.1.0)
 
 cyclus_require_cxx_support()
@@ -278,17 +278,17 @@ IF(NOT CYCLUS_DOC_ONLY)
 
 
     # Here's where we package it with CPack
-    SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Areal: Advanced REactor Archetype Library")
+    SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Areal: Advanced REactor Library.")
 
     # Here we set some components for installation with cpack
     SET(CPACK_COMPONENTS_ALL areal testing libraries data core)
     SET(CPACK_GENERATOR "DEB")
 
     # Organisation
-    SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Amanda M. Bachmann") #required
-    SET(CPACK_PACKAGE_VENDOR "Amanda M. Bachmann")
+    SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "CNERG, UW-Madison") #required
+    SET(CPACK_PACKAGE_VENDOR "CNERG, UW-Madison")
     SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
-    #SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.rst")
+    SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.rst")
 
     # Version
     SET(CPACK_PACKAGE_VERSION_MAJOR "${CMAKE_PROJECT_VERSION_MAJOR}")
@@ -310,7 +310,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(CPACK_DEBIAN_PACKAGE_SHLIBDEPS OFF)
     CONFIGURE_FILE(
       "${AREAL_SOURCE_DIR}/cmake/ArealCPackOptions.cmake.in"
-      "${AREAL_BINARY_DIR}/cmake/ArealCPackOptions.cmake" @ONLY
+      "${AREAL_BINARY_DIR}/cmake/ArealeCPackOptions.cmake" @ONLY
       )
     SET(CPACK_PROJECT_CONFIG_FILE "${AREAL_BINARY_DIR}/cmake/ArealCPackOptions.cmake")
     SET(CPACK_PACKAGE_EXECUTABLES "areal" "areal_unit_tests")
