@@ -161,9 +161,6 @@ class MultiRegionReactor : public cyclus::Facility,
   /// fully burnt state as defined by its outrecipe.
   void Transmute();
 
-  /// Records production of side products from the reactor
-  void RecordSideProduct(bool produce);
-
   /// Transmute the specified number of assemblies in the core to their
   /// fully burnt state as defined by their outrecipe.
   void Transmute(int n_assem);
@@ -226,45 +223,6 @@ class MultiRegionReactor : public cyclus::Facility,
            "the recipe specified here after being burned during a cycle.", \
   }
   std::vector<std::string> fuel_outrecipes;
-
-  ///////////// recipe changes ///////////
-  #pragma cyclus var { \
-    "default": [], \
-    "uilabel": "Time to Change Fresh/Spent Fuel Recipe", \
-    "doc": "A time step on which to change the input-output recipe pair for " \
-           "a requested fresh fuel.", \
-  }
-  std::vector<int> recipe_change_times;
-
-  #pragma cyclus var { \
-    "default": [], \
-    "uilabel": "Commodity for Changed Fresh/Spent Fuel Recipe", \
-    "doc": "The input commodity indicating fresh fuel for which recipes will " \
-           "be changed. Same order as and direct correspondence to the " \
-           "specified recipe change times.", \
-    "uitype": ["oneormore", "incommodity"], \
-  }
-  std::vector<std::string> recipe_change_commods;
-
-  #pragma cyclus var { \
-    "default": [], \
-    "uilabel": "New Recipe for Fresh Fuel", \
-    "doc": "The new input recipe to use for this recipe change." \
-           " Same order as and direct correspondence to the specified recipe " \
-           "change times.", \
-    "uitype": ["oneormore", "inrecipe"], \
-  }
-  std::vector<std::string> recipe_change_in;
-
-  #pragma cyclus var { \
-    "default": [], \
-    "uilabel": "New Recipe for Spent Fuel", \
-    "doc": "The new output recipe to use for this recipe change." \
-           " Same order as and direct correspondence to the specified recipe " \
-           "change times.", \
-    "uitype": ["oneormore", "outrecipe"], \
-  }
-  std::vector<std::string> recipe_change_out;
 
  //////////// inventory and core params ////////////
   #pragma cyclus var { \
@@ -363,28 +321,6 @@ class MultiRegionReactor : public cyclus::Facility,
   }
   std::string power_name;
 
-  /////////// hybrid params ///////////
-
-  #pragma cyclus var { \
-    "uilabel": "Side Product from Reactor Plant", \
-    "default": [], \
-    "doc": "Ordered vector of side product the reactor produces with power", \
-  }
-  std::vector<std::string> side_products;
-
-  #pragma cyclus var { \
-    "uilabel": "Quantity of Side Product from Reactor Plant", \
-    "default": [], \
-    "doc": "Ordered vector of the quantity of side product the reactor produces with power", \
-  }
-  std::vector<double> side_product_quantity;
-
-  #pragma cyclus var {"default": 1,\
-                      "internal": True,\
-                      "doc": "True if reactor is a hybrid system (produces side products)", \
-  }
-  bool hybrid_;
-
 
   /////////// Decommission transmutation behavior ///////////
   #pragma cyclus var {"default": 0, \
@@ -393,35 +329,6 @@ class MultiRegionReactor : public cyclus::Facility,
                              "If false, the archetype only transmutes half.", \
   }
   bool decom_transmute_all;
-
-
-  /////////// preference changes ///////////
-  #pragma cyclus var { \
-    "default": [], \
-    "uilabel": "Time to Change Fresh Fuel Preference", \
-    "doc": "A time step on which to change the request preference for a " \
-           "particular fresh fuel type.", \
-  }
-  std::vector<int> pref_change_times;
-
-  #pragma cyclus var { \
-    "default": [], \
-    "doc": "The input commodity for a particular fuel preference change.  " \
-           "Same order as and direct correspondence to the specified " \
-           "preference change times.", \
-    "uilabel": "Commodity for Changed Fresh Fuel Preference", \
-    "uitype": ["oneormore", "incommodity"], \
-  }
-  std::vector<std::string> pref_change_commods;
-
-  #pragma cyclus var { \
-    "default": [], \
-    "uilabel": "Changed Fresh Fuel Preference",                        \
-    "doc": "The new/changed request preference for a particular fresh fuel." \
-           " Same order as and direct correspondence to the specified " \
-           "preference change times.", \
-  }
-  std::vector<double> pref_change_values;
 
   #pragma cyclus var { \
     "default": True, \

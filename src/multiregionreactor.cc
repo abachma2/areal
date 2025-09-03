@@ -49,12 +49,6 @@ void MultiRegionReactor::InitFrom(cyclus::QueryableBackend* b) {
   namespace tk = cyclus::toolkit;
   tk::CommodityProducer::Add(tk::Commodity(power_name),
                              tk::CommodInfo(power_cap, power_cap));
-
-  for (int i = 0; i < side_products.size(); i++) {
-    tk::CommodityProducer::Add(tk::Commodity(side_products[i]),
-                               tk::CommodInfo(side_product_quantity[i],
-                                              side_product_quantity[i]));
-  }
 }
 
 void MultiRegionReactor::EnterNotify() {
@@ -73,42 +67,6 @@ void MultiRegionReactor::EnterNotify() {
     }
   }
 
-  // Test if any side products have been defined.
-  if (side_products.size() == 0){
-    hybrid_ = false;
-  }
-
-  // input consistency checking:
-  int n = recipe_change_times.size();
-  std::stringstream ss;
-  if (recipe_change_commods.size() != n) {
-    ss << "prototype '" << prototype() << "' has "
-       << recipe_change_commods.size()
-       << " recipe_change_commods vals, expected " << n << "\n";
-  }
-  if (recipe_change_in.size() != n) {
-    ss << "prototype '" << prototype() << "' has " << recipe_change_in.size()
-       << " recipe_change_in vals, expected " << n << "\n";
-  }
-  if (recipe_change_out.size() != n) {
-    ss << "prototype '" << prototype() << "' has " << recipe_change_out.size()
-       << " recipe_change_out vals, expected " << n << "\n";
-  }
-
-  n = pref_change_times.size();
-  if (pref_change_commods.size() != n) {
-    ss << "prototype '" << prototype() << "' has " << pref_change_commods.size()
-       << " pref_change_commods vals, expected " << n << "\n";
-  }
-  if (pref_change_values.size() != n) {
-    ss << "prototype '" << prototype() << "' has " << pref_change_values.size()
-       << " pref_change_values vals, expected " << n << "\n";
-  }
-
-  if (ss.str().size() > 0) {
-    throw ValueError(ss.str());
-  }
-  
   InitializePosition();
 }
 
@@ -164,40 +122,6 @@ void MultiRegionReactor::Tick() {
     Load();
   }
 
-  int t = context()->time();
-
-  // update preferences
-  for (int i = 0; i < pref_change_times.size(); i++) {
-    int change_t = pref_change_times[i];
-    if (t != change_t) {
-      continue;
-    }
-
-    std::string incommod = pref_change_commods[i];
-    for (int j = 0; j < fuel_incommods.size(); j++) {
-      if (fuel_incommods[j] == incommod) {
-        fuel_prefs[j] = pref_change_values[i];
-        break;
-      }
-    }
-  }
-
-  // update recipes
-  for (int i = 0; i < recipe_change_times.size(); i++) {
-    int change_t = recipe_change_times[i];
-    if (t != change_t) {
-      continue;
-    }
-
-    std::string incommod = recipe_change_commods[i];
-    for (int j = 0; j < fuel_incommods.size(); j++) {
-      if (fuel_incommods[j] == incommod) {
-        fuel_inrecipes[j] = recipe_change_in[i];
-        fuel_outrecipes[j] = recipe_change_out[i];
-        break;
-      }
-    }
-  }
 }
 
 std::set<cyclus::RequestPortfolio<Material>::Ptr> MultiRegionReactor::GetMatlRequests() {
@@ -375,11 +299,9 @@ void MultiRegionReactor::Tock() {
       core.count() == n_assem_core) {
     cyclus::toolkit::RecordTimeSeries<cyclus::toolkit::POWER>(this, power_cap);
     cyclus::toolkit::RecordTimeSeries<double>("supplyPOWER", this, power_cap);
-    RecordSideProduct(true);
   } else {
     cyclus::toolkit::RecordTimeSeries<cyclus::toolkit::POWER>(this, 0);
     cyclus::toolkit::RecordTimeSeries<double>("supplyPOWER", this, 0);
-    RecordSideProduct(false);
   }
 
   // "if" prevents starting cycle after initial deployment until core is full
@@ -532,28 +454,6 @@ void MultiRegionReactor::PushSpent(std::map<std::string, MatVec> leftover) {
     // undo reverse in PopSpent to make sure oldest assemblies come out first
     std::reverse(it->second.begin(), it->second.end());
     spent.Push(it->second);
-  }
-}
-
-void MultiRegionReactor::RecordSideProduct(bool produce){
-  if (hybrid_){
-    double value;
-    for (int i = 0; i < side_products.size(); i++) {
-      if (produce){
-          value = side_product_quantity[i];
-      }
-      else {
-          value = 0;
-      }
-
-      context()
-          ->NewDatum("MultiRegionReactorSideProducts")
-          ->AddVal("AgentId", id())
-          ->AddVal("Time", context()->time())
-          ->AddVal("Product", side_products[i])
-          ->AddVal("Value", value)
-          ->Record();
-    }
   }
 }
 
