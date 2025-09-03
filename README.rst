@@ -1,5 +1,6 @@
 Areal: Advanced REactor Archetype Library
 ==================================
+.. image:: https://github.com/abachma2/area/actions/workflows/build_test.yml/badge.svg?branch=main
 
 Archetype library for use with `Cyclus <fuelcycle.org>`_ to 
 model reactors beyond the `Cycamore Reactor archetype <https://fuelcycle.org/user/cycamoreagents.html#cycamore-reactor>`_.
