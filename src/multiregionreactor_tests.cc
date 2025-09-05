@@ -64,9 +64,9 @@ TEST(MultiRegionReactorTests, JustInTimeOrdering) {
      ""
      "  <cycle_time>1</cycle_time>  "
      "  <refuel_time>0</refuel_time>  "
-     "  <assem_size>300</assem_size>  "
-     "  <n_assem_core>1</n_assem_core>  "
-     "  <n_assem_batch>1</n_assem_batch>  "
+     "  <assem_size> <val>300</val> </assem_size>  "
+     "  <n_assem_region> <val>1</val> </n_assem_region>  "
+     "  <n_assem_batch> <val>1</val> </n_assem_batch>  "
      "  <n_regions>1</n_regions>  ";
 
   int simdur = 50;

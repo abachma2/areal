@@ -10,11 +10,6 @@ namespace areal {
 
 MultiRegionReactor::MultiRegionReactor(cyclus::Context* ctx)
     : cyclus::Facility(ctx),
-      n_assem_batch(0),
-      assem_size(0),
-      n_assem_core(0),
-      n_assem_spent(0),
-      n_assem_fresh(0),
       cycle_time(0),
       refuel_time(0),
       cycle_step(0),
@@ -81,10 +76,10 @@ void MultiRegionReactor::Tick() {
 
     if (context()->time() == exit_time() + 1) { // only need to transmute once
       if (decom_transmute_all == true) {
-        Transmute(ceil(static_cast<double>(n_assem_core)));
+        Transmute(ceil(static_cast<double>(n_assem_region[0])));
       }
       else {
-        Transmute(ceil(static_cast<double>(n_assem_core) / 2.0));
+        Transmute(ceil(static_cast<double>(n_assem_region[0]) / 2.0));
       }
     }
     while (core.count() > 0) {
@@ -95,7 +90,7 @@ void MultiRegionReactor::Tick() {
     // in case a cycle lands exactly on our last time step, we will need to
     // burn a batch from fresh inventory on this time step.  When retired,
     // this batch also needs to be discharged to spent fuel inventory.
-    while (fresh.count() > 0 && spent.space() >= assem_size) {
+    while (fresh.count() > 0 && spent.space() >= assem_size[0]) {
       spent.Push(fresh.Pop());
     }
     if(CheckDecommissionCondition()) {
@@ -126,7 +121,7 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> MultiRegionReactor::GetMatlReq
 
   // second min expression reduces assembles to amount needed until
   // retirement if it is near.
-  int n_assem_order = n_assem_core - core.count() + n_assem_fresh - fresh.count();
+  int n_assem_order = n_assem_region[0] - core.count() + n_assem_fresh[0] - fresh.count();
 
   if (exit_time() != -1) {
     // the +1 accounts for the fact that the reactor is alive and gets to
@@ -136,7 +131,7 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> MultiRegionReactor::GetMatlReq
     double n_cycles_left = static_cast<double>(t_left - t_left_cycle) /
                          static_cast<double>(cycle_time + refuel_time);
     n_cycles_left = ceil(n_cycles_left);
-    int n_need = std::max(0.0, n_cycles_left * n_assem_batch - n_assem_fresh + n_assem_core - core.count());
+    int n_need = std::max(0.0, n_cycles_left * n_assem_batch[0] - n_assem_fresh[0] + n_assem_region[0] - core.count());
     n_assem_order = std::min(n_assem_order, n_need);
   }
 
@@ -153,13 +148,13 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> MultiRegionReactor::GetMatlReq
       std::string commod = fuel_incommods[j];
       double pref = 1.0;
       cyclus::Composition::Ptr recipe = context()->GetRecipe(fuel_inrecipes[j]);
-      m = Material::CreateUntracked(assem_size, recipe);
+      m = Material::CreateUntracked(assem_size[0], recipe);
 
       Request<Material>* r = port->AddRequest(m, this, commod, pref, true);
       mreqs.push_back(r);
     }
     cyclus::toolkit::RecordTimeSeries<double>("demand"+fuel_incommods[0], this,
-                                          assem_size) ;
+                                          assem_size[0]) ;
 
     port->AddMutualReqs(mreqs);
     ports.insert(port);
@@ -191,7 +186,7 @@ void MultiRegionReactor::AcceptMatlTrades(const std::vector<
                         Material::Ptr> >::const_iterator trade;
 
   std::stringstream ss;
-  int nload = std::min((int)responses.size(), n_assem_core - core.count());
+  int nload = std::min((int)responses.size(), n_assem_region[0] - core.count());
   if (nload > 0) {
     ss << nload << " assemblies";
     Record("LOAD", ss.str());
@@ -202,7 +197,7 @@ void MultiRegionReactor::AcceptMatlTrades(const std::vector<
     Material::Ptr m = trade->second;
     index_res(m, commod);
 
-    if (core.count() < n_assem_core) {
+    if (core.count() < n_assem_region[0]) {
       core.Push(m);
     } else {
       fresh.Push(m);
@@ -275,17 +270,17 @@ void MultiRegionReactor::Tock() {
   // Check that irradiation and refueling periods are over, that 
   // the core is full and that fuel was successfully discharged in this refueling time.
   // If this is the case, then a new cycle will be initiated.
-  if (cycle_step >= cycle_time + refuel_time && core.count() == n_assem_core && discharged == true) {
+  if (cycle_step >= cycle_time + refuel_time && core.count() == n_assem_region[0] && discharged == true) {
     discharged = false;
     cycle_step = 0;
   }
 
-  if (cycle_step == 0 && core.count() == n_assem_core) {
+  if (cycle_step == 0 && core.count() == n_assem_region[0]) {
     Record("CYCLE_START", "");
   }
 
   if (cycle_step >= 0 && cycle_step < cycle_time &&
-      core.count() == n_assem_core) {
+      core.count() == n_assem_region[0]) {
     cyclus::toolkit::RecordTimeSeries<cyclus::toolkit::POWER>(this, power_cap);
     cyclus::toolkit::RecordTimeSeries<double>("supplyPOWER", this, power_cap);
   } else {
@@ -295,12 +290,12 @@ void MultiRegionReactor::Tock() {
 
   // "if" prevents starting cycle after initial deployment until core is full
   // even though cycle_step is its initial zero.
-  if (cycle_step > 0 || core.count() == n_assem_core) {
+  if (cycle_step > 0 || core.count() == n_assem_region[0]) {
     cycle_step++;
   }
 }
 
-void MultiRegionReactor::Transmute() { Transmute(n_assem_batch); }
+void MultiRegionReactor::Transmute() { Transmute(n_assem_batch[0]); }
 
 void MultiRegionReactor::Transmute(int n_assem) {
   MatVec old = core.PopN(std::min(n_assem, core.count()));
@@ -331,8 +326,8 @@ std::map<std::string, MatVec> MultiRegionReactor::PeekSpent() {
 }
 
 bool MultiRegionReactor::Discharge() {
-  int npop = std::min(n_assem_batch, core.count());
-  if (n_assem_spent - spent.count() < npop) {
+  int npop = std::min(n_assem_batch[0], core.count());
+  if (n_assem_spent[0] - spent.count() < npop) {
     Record("DISCHARGE", "failed");
     return false;  // not enough room in spent buffer
   }
@@ -358,7 +353,7 @@ bool MultiRegionReactor::Discharge() {
 }
 
 void MultiRegionReactor::Load() {
-  int n = std::min(n_assem_core - core.count(), fresh.count());
+  int n = std::min(n_assem_region[0] - core.count(), fresh.count());
   if (n == 0) {
     return;
   }
