@@ -40,9 +40,9 @@
         </fuel_outrecipes>
         <cycle_time>10</cycle_time>
         <refuel_time>1</refuel_time>
-        <assem_size>100</assem_size>
+        <assem_size> <val>100</val> </assem_size>
         <n_assem_region> <val>3</val> </n_assem_region>
-        <n_assem_batch>1</n_assem_batch>
+        <n_assem_batch> <val>1</val> </n_assem_batch>
         <power_cap>100</power_cap>
       </MultiRegionReactor>
     </config>
