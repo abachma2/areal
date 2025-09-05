@@ -67,7 +67,8 @@ TEST(MultiRegionReactorTests, JustInTimeOrdering) {
      "  <refuel_time>0</refuel_time>  "
      "  <assem_size>300</assem_size>  "
      "  <n_assem_core>1</n_assem_core>  "
-     "  <n_assem_batch>1</n_assem_batch>  ";
+     "  <n_assem_batch>1</n_assem_batch>  "
+     "  <n_regions>1</n_regions>  ";
 
   int simdur = 50;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
@@ -93,7 +94,8 @@ TEST(MultiRegionReactorTests, BatchSizes) {
      "  <refuel_time>0</refuel_time>  "
      "  <assem_size>1</assem_size>  "
      "  <n_assem_core>7</n_assem_core>  "
-     "  <n_assem_batch>3</n_assem_batch>  ";
+     "  <n_assem_batch>3</n_assem_batch>  "
+     "  <n_regions>1</n_regions>  ";
 
   int simdur = 50;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
@@ -120,7 +122,8 @@ TEST(MultiRegionReactorTests, RefuelTimes) {
      "  <refuel_time>3</refuel_time>  "
      "  <assem_size>1</assem_size>  "
      "  <n_assem_core>1</n_assem_core>  "
-     "  <n_assem_batch>1</n_assem_batch>  ";
+     "  <n_assem_batch>1</n_assem_batch>  "
+     "  <n_regions>1</n_regions>  ";
 
   int simdur = 49;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
@@ -151,7 +154,8 @@ TEST(MultiRegionReactorTests, DecomTimes) {
      "  <assem_size>1</assem_size>  "
      "  <n_assem_core>3</n_assem_core>  "
      "  <power_cap>1000</power_cap>  "
-     "  <n_assem_batch>1</n_assem_batch>  ";
+     "  <n_assem_batch>1</n_assem_batch>  "
+     "  <n_regions>1</n_regions>  ";
 
   int simdur = 12;
   int lifetime = 7;
@@ -190,7 +194,8 @@ TEST(MultiRegionReactorTests, DecomZeroRefuel) {
      "  <assem_size>1</assem_size>  "
      "  <n_assem_core>3</n_assem_core>  "
      "  <power_cap>1000</power_cap>  "
-     "  <n_assem_batch>1</n_assem_batch>  ";
+     "  <n_assem_batch>1</n_assem_batch>  "
+     "  <n_regions>1</n_regions>  ";
 
   int simdur = 8;
   int lifetime = 6;

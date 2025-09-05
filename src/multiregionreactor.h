@@ -184,7 +184,8 @@ class MultiRegionReactor : public cyclus::Facility,
   #pragma cyclus var { \
     "uitype": ["oneormore", "incommodity"], \
     "uilabel": "Fresh Fuel Commodity List", \
-    "doc": "Ordered list of input commodities on which to requesting fuel.", \
+    "doc": "Ordered list of input commodities on which to requesting fuel. " \
+    "One incommod per core region", \
   }
   std::vector<std::string> fuel_incommods;
 
@@ -192,7 +193,8 @@ class MultiRegionReactor : public cyclus::Facility,
     "uitype": ["oneormore", "inrecipe"], \
     "uilabel": "Fresh Fuel Recipe List", \
     "doc": "Fresh fuel recipes to request for each of the given fuel input " \
-           "commodities (same order).", \
+           "commodities (same order). " \
+           "One recipe per core region", \
   }
   std::vector<std::string> fuel_inrecipes;
 
@@ -202,7 +204,8 @@ class MultiRegionReactor : public cyclus::Facility,
     "doc": "The preference for each type of fresh fuel requested corresponding"\
            " to each input commodity (same order).  If no preferences are " \
            "specified, 1.0 is used for all fuel " \
-           "requests (default).", \
+           "requests (default). " \
+           "One fuel pref per region.", \
   }
   std::vector<double> fuel_prefs;
 
@@ -210,7 +213,8 @@ class MultiRegionReactor : public cyclus::Facility,
     "uitype": ["oneormore", "outcommodity"], \
     "uilabel": "Spent Fuel Commodity List", \
     "doc": "Output commodities on which to offer spent fuel originally " \
-           "received as each particular input commodity (same order)." \
+           "received as each particular input commodity (same order). " \
+           "One out commod per region.", \
   }
   std::vector<std::string> fuel_outcommods;
 
@@ -220,11 +224,19 @@ class MultiRegionReactor : public cyclus::Facility,
     "doc": "Spent fuel recipes corresponding to the given fuel input " \
            "commodities (same order)." \
            " Fuel received via a particular input commodity is transmuted to " \
-           "the recipe specified here after being burned during a cycle.", \
+           "the recipe specified here after being burned during a cycle. " \
+           "One recipe per region.", \
   }
   std::vector<std::string> fuel_outrecipes;
 
  //////////// inventory and core params ////////////
+  #pragma cyclus var { \
+    "doc": "Number of regions in core.", \
+    "uilabel": "number of regions.", \
+    "default": 1, \
+  }
+  int n_regions;
+
   #pragma cyclus var { \
     "doc": "Mass (kg) of a single assembly.", \
     "uilabel": "Assembly Mass", \
