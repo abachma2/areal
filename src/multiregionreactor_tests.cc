@@ -91,9 +91,9 @@ TEST(MultiRegionReactorTests, BatchSizes) {
      ""
      "  <cycle_time>1</cycle_time>  "
      "  <refuel_time>0</refuel_time>  "
-     "  <assem_size>1</assem_size>  "
-     "  <n_assem_core>7</n_assem_core>  "
-     "  <n_assem_batch>3</n_assem_batch>  "
+     "  <assem_size> <val>1</val> </assem_size>  "
+     "  <n_assem_region> <val>7</val> </n_assem_region>  "
+     "  <n_assem_batch> <val>3 </val></n_assem_batch>  "
      "  <n_regions>1</n_regions>  ";
 
   int simdur = 50;
@@ -119,9 +119,9 @@ TEST(MultiRegionReactorTests, RefuelTimes) {
      ""
      "  <cycle_time>4</cycle_time>  "
      "  <refuel_time>3</refuel_time>  "
-     "  <assem_size>1</assem_size>  "
-     "  <n_assem_core>1</n_assem_core>  "
-     "  <n_assem_batch>1</n_assem_batch>  "
+     "  <assem_size> <val>1</val> </assem_size>  "
+     "  <n_assem_region> <val>1</val> </n_assem_region>  "
+     "  <n_assem_batch> <val>1</val> </n_assem_batch>  "
      "  <n_regions>1</n_regions>  ";
 
   int simdur = 49;
@@ -150,10 +150,10 @@ TEST(MultiRegionReactorTests, DecomTimes) {
      ""
      "  <cycle_time>2</cycle_time>  "
      "  <refuel_time>2</refuel_time>  "
-     "  <assem_size>1</assem_size>  "
-     "  <n_assem_core>3</n_assem_core>  "
+     "  <assem_size> <val>1</val> </assem_size>  "
+     "  <n_assem_region> <val>3</val> </n_assem_region>  "
      "  <power_cap>1000</power_cap>  "
-     "  <n_assem_batch>1</n_assem_batch>  "
+     "  <n_assem_batch> <val>1</val> </n_assem_batch>  "
      "  <n_regions>1</n_regions>  ";
 
   int simdur = 12;
@@ -190,10 +190,10 @@ TEST(MultiRegionReactorTests, DecomZeroRefuel) {
      ""
      "  <cycle_time>2</cycle_time>  "
      "  <refuel_time>0</refuel_time>  "
-     "  <assem_size>1</assem_size>  "
-     "  <n_assem_core>3</n_assem_core>  "
+     "  <assem_size> <val>1</val> </assem_size>  "
+     "  <n_assem_region> <val>3</val> </n_assem_region>  "
      "  <power_cap>1000</power_cap>  "
-     "  <n_assem_batch>1</n_assem_batch>  "
+     "  <n_assem_batch> <val>1</val> </n_assem_batch>  "
      "  <n_regions>1</n_regions>  ";
 
   int simdur = 8;
@@ -224,9 +224,9 @@ TEST(MultiRegionReactorTests, OrderAtRefuelStart) {
      ""
      "  <cycle_time>4</cycle_time>  "
      "  <refuel_time>3</refuel_time>  "
-     "  <assem_size>1</assem_size>  "
-     "  <n_assem_core>1</n_assem_core>  "
-     "  <n_assem_batch>1</n_assem_batch>  ";
+     "  <assem_size> <val>1</val> </assem_size>  "
+     "  <n_assem_region> <val>1</val> </n_assem_region>  "
+     "  <n_assem_batch> <val>1</val> </n_assem_batch>  ";
 
   int simdur = 7;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
@@ -253,10 +253,10 @@ TEST(MultiRegionReactorTests, MultiFuelMix) {
      ""
      "  <cycle_time>1</cycle_time>  "
      "  <refuel_time>0</refuel_time>  "
-     "  <assem_size>1</assem_size>  "
-     "  <n_assem_fresh>3</n_assem_fresh>  "
-     "  <n_assem_core>3</n_assem_core>  "
-     "  <n_assem_batch>3</n_assem_batch>  ";
+     "  <assem_size> <val>1</val> </assem_size>  "
+     "  <n_assem_fresh> <val>3</val> </n_assem_fresh>  "
+     "  <n_assem_region> <val>3</val></n_assem_region>  "
+     "  <n_assem_batch> <val>3</val> </n_assem_batch>  ";
 
   // it is important that the sources have cumulative capacity greater than
   // the reactor can take on a single time step - to test that inventory
@@ -289,10 +289,10 @@ TEST(MultiRegionReactorTests, FullSpentInventory) {
      ""
      "  <cycle_time>1</cycle_time>  "
      "  <refuel_time>0</refuel_time>  "
-     "  <assem_size>1</assem_size>  "
-     "  <n_assem_core>1</n_assem_core>  "
-     "  <n_assem_batch>1</n_assem_batch>  "
-     "  <n_assem_spent>3</n_assem_spent>  ";
+     "  <assem_size> <val>1</val> </assem_size>  "
+     "  <n_assem_region> <val>1</val> </n_assem_region>  "
+     "  <n_assem_batch> <val>1</val> </n_assem_batch>  "
+     "  <n_assem_spent> <val>3</val> </n_assem_spent>  ";
 
   int simdur = 10;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
@@ -319,10 +319,10 @@ TEST(MultiRegionReactorTests, FullSpentInventoryShutdown) {
     ""
     " <cycle_time>1</cycle_time> "
     " <refuel_time>0</refuel_time> "
-    " <assem_size>1</assem_size> "
-    " <n_assem_core>1</n_assem_core> "
-    " <n_assem_batch>1</n_assem_batch> "
-    " <n_assem_spent>1</n_assem_spent> "
+    " <assem_size> <val>1</val> </assem_size> "
+    " <n_assem_region> <val>1</val> </n_assem_region> "
+    " <n_assem_batch> <val>1</val> </n_assem_batch> "
+    " <n_assem_spent> <val>1</val> </n_assem_spent> "
     " <power_cap>100</power_cap> ";
 
   int simdur = 3;
@@ -351,9 +351,9 @@ TEST(MultiRegionReactorTests, FuelShortage) {
      ""
      "  <cycle_time>7</cycle_time>  "
      "  <refuel_time>0</refuel_time>  "
-     "  <assem_size>1</assem_size>  "
-     "  <n_assem_core>3</n_assem_core>  "
-     "  <n_assem_batch>3</n_assem_batch>  ";
+     "  <assem_size> <val>1</val> </assem_size>  "
+     "  <n_assem_region> <val>3</val> </n_assem_region>  "
+     "  <n_assem_batch> <val>3</val> </n_assem_batch>  ";
 
   int simdur = 50;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
@@ -400,9 +400,9 @@ TEST(MultiRegionReactorTests, DischargedFuelTransmute) {
      ""
      "  <cycle_time>4</cycle_time>  "
      "  <refuel_time>3</refuel_time>  "
-     "  <assem_size>1</assem_size>  "
-     "  <n_assem_core>1</n_assem_core>  "
-     "  <n_assem_batch>1</n_assem_batch>  ";
+     "  <assem_size> <val>1</val> </assem_size>  "
+     "  <n_assem_region> <val>1</val> </n_assem_region>  "
+     "  <n_assem_batch> <val>1</val> </n_assem_batch>  ";
 
   int simdur = 7;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
@@ -434,9 +434,9 @@ TEST(MultiRegionReactorTests, SpentFuelProperCommodTracking) {
      ""
      "  <cycle_time>1</cycle_time>  "
      "  <refuel_time>0</refuel_time>  "
-     "  <assem_size>1</assem_size>  "
-     "  <n_assem_core>3</n_assem_core>  "
-     "  <n_assem_batch>3</n_assem_batch>  ";
+     "  <assem_size> <val>1</val> </assem_size>  "
+     "  <n_assem_region> <val>3</val> </n_assem_region>  "
+     "  <n_assem_batch> <val>3</val> </n_assem_batch>  ";
 
   int simdur = 7;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
@@ -476,10 +476,10 @@ TEST(MultiRegionReactorTests, Retire) {
      ""
      "  <cycle_time>7</cycle_time>  "
      "  <refuel_time>0</refuel_time>  "
-     "  <assem_size>300</assem_size>  "
-     "  <n_assem_fresh>1</n_assem_fresh>  "
-     "  <n_assem_core>3</n_assem_core>  "
-     "  <n_assem_batch>1</n_assem_batch>  "
+     "  <assem_size> <val>300</val> </assem_size>  "
+     "  <n_assem_fresh> <val>1</val> </n_assem_fresh>  "
+     "  <n_assem_region> <val>3</val> </n_assem_region>  "
+     "  <n_assem_batch> <val>1</val> </n_assem_batch>  "
      "  <power_cap>1</power_cap>  "
      "";
 
@@ -534,9 +534,9 @@ TEST(MultiRegionReactorTests, PositionInitialize) {
      ""
      "  <cycle_time>1</cycle_time>  "
      "  <refuel_time>0</refuel_time>  "
-     "  <assem_size>300</assem_size>  "
-     "  <n_assem_core>1</n_assem_core>  "
-     "  <n_assem_batch>1</n_assem_batch>  ";
+     "  <assem_size> <val>300</val> </assem_size>  "
+     "  <n_assem_region> <val>1</val> </n_assem_region>  "
+     "  <n_assem_batch> <val>1</val> </n_assem_batch>  ";
 
   int simdur = 50;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
@@ -559,9 +559,9 @@ TEST(MultiRegionReactorTests, PositionInitialize2) {
      ""
      "  <cycle_time>1</cycle_time>  "
      "  <refuel_time>0</refuel_time>  "
-     "  <assem_size>300</assem_size>  "
-     "  <n_assem_core>1</n_assem_core>  "
-     "  <n_assem_batch>1</n_assem_batch>  "
+     "  <assem_size> <val>300</val> </assem_size>  "
+     "  <n_assem_region> <val>1</val> </n_assem_region>  "
+     "  <n_assem_batch> <val>1</val> </n_assem_batch>  "
      "  <longitude>30.0</longitude>  "
      "  <latitude>30.0</latitude>  ";
 
