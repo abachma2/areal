@@ -59,13 +59,7 @@ void MultiRegionReactor::EnterNotify() {
   core.keep_packaging(keep_packaging);
   spent.keep_packaging(keep_packaging);
 
-  // If the user ommitted fuel_prefs, we set it to zeros for each fuel
-  // type.  Without this segfaults could occur - yuck.
-  if (fuel_prefs.size() == 0) {
-    for (int i = 0; i < fuel_outcommods.size(); i++) {
-      fuel_prefs.push_back(cyclus::kDefaultPref);
-    }
-  }
+  // Throw error if vectors do not have size n_regions
 
   InitializePosition();
 }
@@ -157,19 +151,14 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> MultiRegionReactor::GetMatlReq
     std::vector<Request<Material>*> mreqs;
     for (int j = 0; j < fuel_incommods.size(); j++) {
       std::string commod = fuel_incommods[j];
-      double pref = fuel_prefs[j];
+      double pref = 1.0;
       cyclus::Composition::Ptr recipe = context()->GetRecipe(fuel_inrecipes[j]);
       m = Material::CreateUntracked(assem_size, recipe);
 
       Request<Material>* r = port->AddRequest(m, this, commod, pref, true);
       mreqs.push_back(r);
     }
-
-    std::vector<double>::iterator result;
-    result = std::max_element(fuel_prefs.begin(), fuel_prefs.end());
-    int max_index = std::distance(fuel_prefs.begin(), result);
-
-    cyclus::toolkit::RecordTimeSeries<double>("demand"+fuel_incommods[max_index], this,
+    cyclus::toolkit::RecordTimeSeries<double>("demand"+fuel_incommods[0], this,
                                           assem_size) ;
 
     port->AddMutualReqs(mreqs);
@@ -410,14 +399,6 @@ std::string MultiRegionReactor::fuel_outrecipe(Material::Ptr m) {
     throw KeyError("areal::MultiRegionReactor - no outrecipe for material object");
   }
   return fuel_outrecipes[i];
-}
-
-double MultiRegionReactor::fuel_pref(Material::Ptr m) {
-  int i = res_indexes[m->obj_id()];
-  if (i >= fuel_prefs.size()) {
-    return 0;
-  }
-  return fuel_prefs[i];
 }
 
 void MultiRegionReactor::index_res(cyclus::Resource::Ptr m, std::string incommod) {

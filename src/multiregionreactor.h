@@ -141,7 +141,6 @@ class MultiRegionReactor : public cyclus::Facility,
   std::string fuel_outcommod(cyclus::Material::Ptr m);
   std::string fuel_inrecipe(cyclus::Material::Ptr m);
   std::string fuel_outrecipe(cyclus::Material::Ptr m);
-  double fuel_pref(cyclus::Material::Ptr m);
 
   bool retired() {
     return exit_time() != -1 && context()->time() > exit_time();
@@ -197,17 +196,6 @@ class MultiRegionReactor : public cyclus::Facility,
            "One recipe per core region", \
   }
   std::vector<std::string> fuel_inrecipes;
-
-  #pragma cyclus var { \
-    "default": [], \
-    "uilabel": "Fresh Fuel Preference List", \
-    "doc": "The preference for each type of fresh fuel requested corresponding"\
-           " to each input commodity (same order).  If no preferences are " \
-           "specified, 1.0 is used for all fuel " \
-           "requests (default). " \
-           "One fuel pref per region.", \
-  }
-  std::vector<double> fuel_prefs;
 
   #pragma cyclus var { \
     "uitype": ["oneormore", "outcommodity"], \
