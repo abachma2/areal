@@ -182,17 +182,9 @@ class MultiRegionReactor : public cyclus::Facility,
 
   /////// fuel specifications /////////
   #pragma cyclus var { \
-    "uitype": "number of regions in core", \
-    "uilabel": "Number of ", \
-    "doc": "Number of different regions in the reactor core.", \
-  }
-  int n_regions;
-
-  #pragma cyclus var { \
     "uitype": ["oneormore", "incommodity"], \
     "uilabel": "Fresh Fuel Commodity List", \
-    "doc": "Ordered list of input commodities on which to requesting fuel. One " \
-           "commodity name per core region.", \
+    "doc": "Ordered list of input commodities on which to requesting fuel.", \
   }
   std::vector<std::string> fuel_incommods;
 
@@ -200,16 +192,25 @@ class MultiRegionReactor : public cyclus::Facility,
     "uitype": ["oneormore", "inrecipe"], \
     "uilabel": "Fresh Fuel Recipe List", \
     "doc": "Fresh fuel recipes to request for each of the given fuel input " \
-           "commodities (same order). One recipe name per core region.", \
+           "commodities (same order).", \
   }
   std::vector<std::string> fuel_inrecipes;
+
+  #pragma cyclus var { \
+    "default": [], \
+    "uilabel": "Fresh Fuel Preference List", \
+    "doc": "The preference for each type of fresh fuel requested corresponding"\
+           " to each input commodity (same order).  If no preferences are " \
+           "specified, 1.0 is used for all fuel " \
+           "requests (default).", \
+  }
+  std::vector<double> fuel_prefs;
 
   #pragma cyclus var { \
     "uitype": ["oneormore", "outcommodity"], \
     "uilabel": "Spent Fuel Commodity List", \
     "doc": "Output commodities on which to offer spent fuel originally " \
-           "received as each particular input commodity (same order). " \
-           "One commodity name per core region.",
+           "received as each particular input commodity (same order)." \
   }
   std::vector<std::string> fuel_outcommods;
 
@@ -219,20 +220,19 @@ class MultiRegionReactor : public cyclus::Facility,
     "doc": "Spent fuel recipes corresponding to the given fuel input " \
            "commodities (same order)." \
            " Fuel received via a particular input commodity is transmuted to " \
-           "the recipe specified here after being burned during a cycle." \
-           " One recipe name per core region.", \
+           "the recipe specified here after being burned during a cycle.", \
   }
   std::vector<std::string> fuel_outrecipes;
 
  //////////// inventory and core params ////////////
   #pragma cyclus var { \
-    "doc": "Mass (kg) of a single assembly. One assembly size per core region.", \
+    "doc": "Mass (kg) of a single assembly.", \
     "uilabel": "Assembly Mass", \
     "uitype": "range", \
     "range": [1.0, 1e5], \
     "units": "kg", \
   }
-  std::vector<double> assem_size;
+  double assem_size;
 
   #pragma cyclus var { \
     "uilabel": "Number of Assemblies per Batch", \
@@ -244,12 +244,13 @@ class MultiRegionReactor : public cyclus::Facility,
   int n_assem_batch;
 
   #pragma cyclus var { \
-    "uilabel": "Number of Assemblies in each Region", \
+    "default": 3, \
+    "uilabel": "Number of Assemblies in Core", \
     "uitype": "range", \
     "range": [1,3], \
-    "doc": "Number of assemblies that constitute each region.", \
+    "doc": "Number of assemblies that constitute a full core.", \
   }
-  std::vector<int> n_assem_region;
+  int n_assem_core;
 
   #pragma cyclus var { \
     "default": 0, \
@@ -276,8 +277,7 @@ class MultiRegionReactor : public cyclus::Facility,
   #pragma cyclus var { \
     "default": 18, \
     "doc": "The duration of a full operational cycle (excluding refueling " \
-           "time) in time steps. The cycle length is assumed constant " \
-           "across all regions of the core", \
+           "time) in time steps.", \
     "uilabel": "Cycle Length", \
     "units": "time steps", \
   }

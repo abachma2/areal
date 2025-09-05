@@ -11,6 +11,8 @@ namespace areal {
 MultiRegionReactor::MultiRegionReactor(cyclus::Context* ctx)
     : cyclus::Facility(ctx),
       n_assem_batch(0),
+      assem_size(0),
+      n_assem_core(0),
       n_assem_spent(0),
       n_assem_fresh(0),
       cycle_time(0),
@@ -56,6 +58,14 @@ void MultiRegionReactor::EnterNotify() {
   fresh.keep_packaging(keep_packaging);
   core.keep_packaging(keep_packaging);
   spent.keep_packaging(keep_packaging);
+
+  // If the user ommitted fuel_prefs, we set it to zeros for each fuel
+  // type.  Without this segfaults could occur - yuck.
+  if (fuel_prefs.size() == 0) {
+    for (int i = 0; i < fuel_outcommods.size(); i++) {
+      fuel_prefs.push_back(cyclus::kDefaultPref);
+    }
+  }
 
   InitializePosition();
 }
@@ -119,48 +129,51 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> MultiRegionReactor::GetMatlReq
 
   std::set<RequestPortfolio<Material>::Ptr> ports;
   Material::Ptr m;
-  if (retired()){
-    return ports;
-  }
 
   // second min expression reduces assembles to amount needed until
   // retirement if it is near.
-  for (int region = 0; region < n_regions; region++){ 
-    // need to figure out a way to determine the number of each commodity type in core
-    int n_assem_order = n_assem_region[region] - core.count() + n_assem_fresh - fresh.count();
+  int n_assem_order = n_assem_core - core.count() + n_assem_fresh - fresh.count();
 
-    if (exit_time() != -1) {
-      // the +1 accounts for the fact that the reactor is alive and gets to
-      // operate during its exit_time time step.
-      int t_left = exit_time() - context()->time() + 1;
-      int t_left_cycle = cycle_time + refuel_time - cycle_step;
-      double n_cycles_left = static_cast<double>(t_left - t_left_cycle) /
-                          static_cast<double>(cycle_time + refuel_time);
-      n_cycles_left = ceil(n_cycles_left);
-      int n_need = std::max(0.0, n_cycles_left * n_assem_batch - n_assem_fresh + n_assem_core - core.count());
-      n_assem_order = std::min(n_assem_order, n_need);
-    }
+  if (exit_time() != -1) {
+    // the +1 accounts for the fact that the reactor is alive and gets to
+    // operate during its exit_time time step.
+    int t_left = exit_time() - context()->time() + 1;
+    int t_left_cycle = cycle_time + refuel_time - cycle_step;
+    double n_cycles_left = static_cast<double>(t_left - t_left_cycle) /
+                         static_cast<double>(cycle_time + refuel_time);
+    n_cycles_left = ceil(n_cycles_left);
+    int n_need = std::max(0.0, n_cycles_left * n_assem_batch - n_assem_fresh + n_assem_core - core.count());
+    n_assem_order = std::min(n_assem_order, n_need);
+  }
 
-    if (n_assem_order == 0) {
-      // only want to return empty ports if all regions are full
-      return ports;
-    } 
+  if (n_assem_order == 0) {
+    return ports;
+  } else if (retired()) {
+    return ports;
+  }
 
-    for (int i = 0; i < n_assem_order; i++) {
-      RequestPortfolio<Material>::Ptr port(new RequestPortfolio<Material>());
-    
-      std::string commod = fuel_incommods[region];
-    
-      cyclus::Composition::Ptr recipe = context()->GetRecipe(fuel_inrecipes[region]);
+  for (int i = 0; i < n_assem_order; i++) {
+    RequestPortfolio<Material>::Ptr port(new RequestPortfolio<Material>());
+    std::vector<Request<Material>*> mreqs;
+    for (int j = 0; j < fuel_incommods.size(); j++) {
+      std::string commod = fuel_incommods[j];
+      double pref = fuel_prefs[j];
+      cyclus::Composition::Ptr recipe = context()->GetRecipe(fuel_inrecipes[j]);
       m = Material::CreateUntracked(assem_size, recipe);
-          
 
-      cyclus::toolkit::RecordTimeSeries<double>("demand"+fuel_incommods[region], this,
-                                            assem_size) ;
-      // assume all requests have a preference of 1 
-      port->AddRequest(m, this, commod, 1.0, true);
-      ports.insert(port);
+      Request<Material>* r = port->AddRequest(m, this, commod, pref, true);
+      mreqs.push_back(r);
     }
+
+    std::vector<double>::iterator result;
+    result = std::max_element(fuel_prefs.begin(), fuel_prefs.end());
+    int max_index = std::distance(fuel_prefs.begin(), result);
+
+    cyclus::toolkit::RecordTimeSeries<double>("demand"+fuel_incommods[max_index], this,
+                                          assem_size) ;
+
+    port->AddMutualReqs(mreqs);
+    ports.insert(port);
   }
 
   return ports;
