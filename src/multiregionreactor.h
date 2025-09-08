@@ -344,12 +344,20 @@ class MultiRegionReactor : public cyclus::Facility,
 
   // Resource inventories - these must be defined AFTER/BELOW the member vars
   // referenced (e.g. n_batch_fresh, assem_size, etc.).
+  // ResBufs for region 1
   #pragma cyclus var {"capacity": "n_assem_fresh[0] * assem_size[0]"}
-  cyclus::toolkit::ResBuf<cyclus::Material> fresh;
+  cyclus::toolkit::ResBuf<cyclus::Material> fresh1;
   #pragma cyclus var {"capacity": "n_assem_region[0] * assem_size[0]"}
-  cyclus::toolkit::ResBuf<cyclus::Material> core;
+  cyclus::toolkit::ResBuf<cyclus::Material> core1;
   #pragma cyclus var {"capacity": "n_assem_spent[0] * assem_size[0]"}
-  cyclus::toolkit::ResBuf<cyclus::Material> spent;
+  cyclus::toolkit::ResBuf<cyclus::Material> spent1;
+  // ResBufs for region 2
+  #pragma cyclus var {"capacity": "n_assem_fresh[1] * assem_size[1]"}
+  cyclus::toolkit::ResBuf<cyclus::Material> fresh2;
+  #pragma cyclus var {"capacity": "n_assem_region[1] * assem_size[1]"}
+  cyclus::toolkit::ResBuf<cyclus::Material> core2;
+  #pragma cyclus var {"capacity": "n_assem_spent[1] * assem_size[1]"}
+  cyclus::toolkit::ResBuf<cyclus::Material> spent2;
 
 
   // should be hidden in ui (internal only). True if fuel has already been

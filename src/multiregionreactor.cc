@@ -50,9 +50,9 @@ void MultiRegionReactor::EnterNotify() {
   cyclus::Facility::EnterNotify();
 
   // Set keep packaging parameter in all ResBufs
-  fresh.keep_packaging(keep_packaging);
-  core.keep_packaging(keep_packaging);
-  spent.keep_packaging(keep_packaging);
+  fresh1.keep_packaging(keep_packaging);
+  core1.keep_packaging(keep_packaging);
+  spent1.keep_packaging(keep_packaging);
 
   // Throw error if vectors do not have size n_regions
 
@@ -60,7 +60,7 @@ void MultiRegionReactor::EnterNotify() {
 }
 
 bool MultiRegionReactor::CheckDecommissionCondition() {
-  return core.count() == 0 && spent.count() == 0;
+  return core1.count() == 0 && spent1.count() == 0;
 }
 
 void MultiRegionReactor::Tick() {
@@ -82,7 +82,7 @@ void MultiRegionReactor::Tick() {
         Transmute(ceil(static_cast<double>(n_assem_region[0]) / 2.0));
       }
     }
-    while (core.count() > 0) {
+    while (core1.count() > 0) {
       if (!Discharge()) {
         break;
       }
@@ -90,8 +90,8 @@ void MultiRegionReactor::Tick() {
     // in case a cycle lands exactly on our last time step, we will need to
     // burn a batch from fresh inventory on this time step.  When retired,
     // this batch also needs to be discharged to spent fuel inventory.
-    while (fresh.count() > 0 && spent.space() >= assem_size[0]) {
-      spent.Push(fresh.Pop());
+    while (fresh1.count() > 0 && spent1.space() >= assem_size[0]) {
+      spent1.Push(fresh1.Pop());
     }
     if(CheckDecommissionCondition()) {
       context()->SchedDecom(this);    
@@ -121,7 +121,7 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> MultiRegionReactor::GetMatlReq
 
   // second min expression reduces assembles to amount needed until
   // retirement if it is near.
-  int n_assem_order = n_assem_region[0] - core.count() + n_assem_fresh[0] - fresh.count();
+  int n_assem_order = n_assem_region[0] - core1.count() + n_assem_fresh[0] - fresh1.count();
 
   if (exit_time() != -1) {
     // the +1 accounts for the fact that the reactor is alive and gets to
@@ -131,7 +131,7 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> MultiRegionReactor::GetMatlReq
     double n_cycles_left = static_cast<double>(t_left - t_left_cycle) /
                          static_cast<double>(cycle_time + refuel_time);
     n_cycles_left = ceil(n_cycles_left);
-    int n_need = std::max(0.0, n_cycles_left * n_assem_batch[0] - n_assem_fresh[0] + n_assem_region[0] - core.count());
+    int n_need = std::max(0.0, n_cycles_left * n_assem_batch[0] - n_assem_fresh[0] + n_assem_region[0] - core1.count());
     n_assem_order = std::min(n_assem_order, n_need);
   }
 
@@ -186,7 +186,7 @@ void MultiRegionReactor::AcceptMatlTrades(const std::vector<
                         Material::Ptr> >::const_iterator trade;
 
   std::stringstream ss;
-  int nload = std::min((int)responses.size(), n_assem_region[0] - core.count());
+  int nload = std::min((int)responses.size(), n_assem_region[0] - core1.count());
   if (nload > 0) {
     ss << nload << " assemblies";
     Record("LOAD", ss.str());
@@ -197,10 +197,10 @@ void MultiRegionReactor::AcceptMatlTrades(const std::vector<
     Material::Ptr m = trade->second;
     index_res(m, commod);
 
-    if (core.count() < n_assem_region[0]) {
-      core.Push(m);
+    if (core1.count() < n_assem_region[0]) {
+      core1.Push(m);
     } else {
-      fresh.Push(m);
+      fresh1.Push(m);
     }
   }
 }
@@ -270,17 +270,17 @@ void MultiRegionReactor::Tock() {
   // Check that irradiation and refueling periods are over, that 
   // the core is full and that fuel was successfully discharged in this refueling time.
   // If this is the case, then a new cycle will be initiated.
-  if (cycle_step >= cycle_time + refuel_time && core.count() == n_assem_region[0] && discharged == true) {
+  if (cycle_step >= cycle_time + refuel_time && core1.count() == n_assem_region[0] && discharged == true) {
     discharged = false;
     cycle_step = 0;
   }
 
-  if (cycle_step == 0 && core.count() == n_assem_region[0]) {
+  if (cycle_step == 0 && core1.count() == n_assem_region[0]) {
     Record("CYCLE_START", "");
   }
 
   if (cycle_step >= 0 && cycle_step < cycle_time &&
-      core.count() == n_assem_region[0]) {
+      core1.count() == n_assem_region[0]) {
     cyclus::toolkit::RecordTimeSeries<cyclus::toolkit::POWER>(this, power_cap);
     cyclus::toolkit::RecordTimeSeries<double>("supplyPOWER", this, power_cap);
   } else {
@@ -290,7 +290,7 @@ void MultiRegionReactor::Tock() {
 
   // "if" prevents starting cycle after initial deployment until core is full
   // even though cycle_step is its initial zero.
-  if (cycle_step > 0 || core.count() == n_assem_region[0]) {
+  if (cycle_step > 0 || core1.count() == n_assem_region[0]) {
     cycle_step++;
   }
 }
@@ -298,11 +298,11 @@ void MultiRegionReactor::Tock() {
 void MultiRegionReactor::Transmute() { Transmute(n_assem_batch[0]); }
 
 void MultiRegionReactor::Transmute(int n_assem) {
-  MatVec old = core.PopN(std::min(n_assem, core.count()));
-  core.Push(old);
-  if (core.count() > old.size()) {
+  MatVec old = core1.PopN(std::min(n_assem, core1.count()));
+  core1.Push(old);
+  if (core1.count() > old.size()) {
     // rotate untransmuted mats back to back of buffer
-    core.Push(core.PopN(core.count() - old.size()));
+    core1.Push(core1.PopN(core1.count() - old.size()));
   }
 
   std::stringstream ss;
@@ -316,8 +316,8 @@ void MultiRegionReactor::Transmute(int n_assem) {
 
 std::map<std::string, MatVec> MultiRegionReactor::PeekSpent() {
   std::map<std::string, MatVec> mapped;
-  MatVec mats = spent.PopN(spent.count());
-  spent.Push(mats);
+  MatVec mats = spent1.PopN(spent1.count());
+  spent1.Push(mats);
   for (int i = 0; i < mats.size(); i++) {
     std::string commod = fuel_outcommod(mats[i]);
     mapped[commod].push_back(mats[i]);
@@ -326,8 +326,8 @@ std::map<std::string, MatVec> MultiRegionReactor::PeekSpent() {
 }
 
 bool MultiRegionReactor::Discharge() {
-  int npop = std::min(n_assem_batch[0], core.count());
-  if (n_assem_spent[0] - spent.count() < npop) {
+  int npop = std::min(n_assem_batch[0], core1.count());
+  if (n_assem_spent[0] - spent1.count() < npop) {
     Record("DISCHARGE", "failed");
     return false;  // not enough room in spent buffer
   }
@@ -335,7 +335,7 @@ bool MultiRegionReactor::Discharge() {
   std::stringstream ss;
   ss << npop << " assemblies";
   Record("DISCHARGE", ss.str());
-  spent.Push(core.PopN(npop));
+  spent1.Push(core1.PopN(npop));
 
   std::map<std::string, MatVec> spent_mats;
   for (int i = 0; i < fuel_outcommods.size(); i++) {
@@ -353,7 +353,7 @@ bool MultiRegionReactor::Discharge() {
 }
 
 void MultiRegionReactor::Load() {
-  int n = std::min(n_assem_region[0] - core.count(), fresh.count());
+  int n = std::min(n_assem_region[0] - core1.count(), fresh1.count());
   if (n == 0) {
     return;
   }
@@ -361,7 +361,7 @@ void MultiRegionReactor::Load() {
   std::stringstream ss;
   ss << n << " assemblies";
   Record("LOAD", ss.str());
-  core.Push(fresh.PopN(n));
+  core1.Push(fresh1.PopN(n));
 }
 
 std::string MultiRegionReactor::fuel_incommod(Material::Ptr m) {
@@ -408,7 +408,7 @@ void MultiRegionReactor::index_res(cyclus::Resource::Ptr m, std::string incommod
 }
 
 std::map<std::string, MatVec> MultiRegionReactor::PopSpent() {
-  MatVec mats = spent.PopN(spent.count());
+  MatVec mats = spent1.PopN(spent1.count());
   std::map<std::string, MatVec> mapped;
   for (int i = 0; i < mats.size(); i++) {
     std::string commod = fuel_outcommod(mats[i]);
@@ -429,7 +429,7 @@ void MultiRegionReactor::PushSpent(std::map<std::string, MatVec> leftover) {
   for (it = leftover.begin(); it != leftover.end(); ++it) {
     // undo reverse in PopSpent to make sure oldest assemblies come out first
     std::reverse(it->second.begin(), it->second.end());
-    spent.Push(it->second);
+    spent1.Push(it->second);
   }
 }
 

@@ -108,6 +108,36 @@ TEST(MultiRegionReactorTests, BatchSizes) {
   EXPECT_EQ(7+3*(simdur-1), qr.rows.size());
 }
 
+// tests that the correct number of assemblies are popped from the core each
+// cycle when there are two regions in the core
+TEST(MultiRegionReactorTests, TwoRegionBatchSizes) {
+  std::string config =
+     "  <fuel_inrecipes>  <val>uox</val>  <val>mox</val>    </fuel_inrecipes>  "
+     "  <fuel_outrecipes> <val>spentuox</val> <val>spentmox</val> </fuel_outrecipes>  "
+     "  <fuel_incommods>  <val>uox</val> <val>mox</val>     </fuel_incommods>  "
+     "  <fuel_outcommods> <val>waste</val> <val>mox_waste</val>   </fuel_outcommods>  "
+     ""
+     "  <cycle_time>1</cycle_time>  "
+     "  <refuel_time>0</refuel_time>  "
+     "  <assem_size> <val>1</val> <val>1</val> </assem_size>  "
+     "  <n_assem_region> <val>7</val> <val>7</val> </n_assem_region>  "
+     "  <n_assem_batch> <val>3</val> <val>3</val> </n_assem_batch>  "
+     "  <n_regions>2</n_regions>  ";
+
+  int simdur = 50;
+  cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
+  sim.AddSource("uox").Finalize();
+  sim.AddRecipe("uox", c_uox());
+  sim.AddRecipe("mox", c_mox());
+  sim.AddRecipe("spentuox", c_spentuox());
+  sim.AddRecipe("spentmox", c_spentmox());
+  int id = sim.Run();
+
+  QueryResult qr = sim.db().Query("Transactions", NULL);
+  // 7 for initial core, 3 per time step for each new batch for remainder
+  EXPECT_EQ(7+3*(simdur-1), qr.rows.size());
+}
+
 // tests that the refueling period between cycle end and start of the next
 // cycle is honored.
 TEST(MultiRegionReactorTests, RefuelTimes) {
