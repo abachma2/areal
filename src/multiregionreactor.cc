@@ -83,6 +83,17 @@ void MultiRegionReactor::EnterNotify() {
     throw cyclus::ValueError("areal::MultiRegionReactor n_assem_region "\
                              "does not have n_region number entries");
   }
+
+  // Set the n_assem_fresh and n_assem_spent vectors to have n_regions length.
+  // Assume that n_assem_spent is not initialized by the user and that the 
+  // default value is currently used.  
+  if (n_assem_fresh.size() != n_regions) {
+    n_assem_fresh.resize(n_regions);
+  }
+  if (n_assem_spent.size() != n_regions) {
+    n_assem_spent.resize(n_regions);
+    std::fill_n(n_assem_spent.begin(), n_regions, 1000000000);
+  }
   InitializePosition();
 }
 
