@@ -55,7 +55,34 @@ void MultiRegionReactor::EnterNotify() {
   spent1.keep_packaging(keep_packaging);
 
   // Throw error if vectors do not have size n_regions
-
+  if (fuel_incommods.size() != n_regions) {
+    throw cyclus::ValueError("areal::MultiRegionReactor fuel_incommods "\
+                             "does not have n_region number entries");
+  }
+  if (fuel_outcommods.size() != n_regions) {
+    throw cyclus::ValueError("areal::MultiRegionReactor fuel_outcommods "\
+                             "does not have n_region number entries");
+  }
+  if (fuel_inrecipes.size() != n_regions) {
+    throw cyclus::ValueError("areal::MultiRegionReactor fuel_inrecipes "\
+                             "does not have n_region number entries");
+  }
+  if (fuel_outrecipes.size() != n_regions) {
+    throw cyclus::ValueError("areal::MultiRegionReactor fuel_ourecipes "\
+                             "does not have n_region number entries");
+  }
+  if (assem_size.size() != n_regions) {
+    throw cyclus::ValueError("areal::MultiRegionReactor assem_size "\
+                             "does not have n_region number entries");
+  }
+  if (n_assem_batch.size() != n_regions) {
+    throw cyclus::ValueError("areal::MultiRegionReactor n_assem_batch "\
+                             "does not have n_region number entries");
+  }
+  if (n_assem_region.size() != n_regions) {
+    throw cyclus::ValueError("areal::MultiRegionReactor n_assem_region "\
+                             "does not have n_region number entries");
+  }
   InitializePosition();
 }
 
@@ -68,7 +95,7 @@ void MultiRegionReactor::Tick() {
   // following the cycle_step update - allowing for the all reactor events to
   // occur and be recorded on the "beginning" of a time step.  Another reason
   // they
-  // can't go at the beginnin of the Tock is so that resource exchange has a
+  // can't go at the beginning of the Tock is so that resource exchange has a
   // chance to occur after the discharge on this same time step.
 
   if (retired()) {
