@@ -1,5 +1,5 @@
-#ifndef AREAL_SRC_MULTIREGIONREACTOR_H_
-#define AREAL_SRC_MULTIREGIONREACTOR_H_
+#ifndef AREAL_SRC_TWOREGIONREACTOR_H_
+#define AREAL_SRC_TWOREGIONREACTOR_H_
 
 #include "cyclus.h"
 #include "areal_version.h"
@@ -151,10 +151,10 @@ class TwoRegionReactor : public cyclus::Facility,
 
   /// Discharge a batch from the core if there is room in the spent fuel
   /// inventory.  Returns true if a batch was successfully discharged.
-  bool Discharge();
+  bool Discharge(int region_num);
 
   /// Top up core inventory as much as possible.
-  void Load();
+  void Load(int region_num);
 
   /// Transmute the batch that is about to be discharged from the core to its
   /// fully burnt state as defined by its outrecipe.
@@ -162,22 +162,22 @@ class TwoRegionReactor : public cyclus::Facility,
 
   /// Transmute the specified number of assemblies in the core to their
   /// fully burnt state as defined by their outrecipe.
-  void Transmute(int n_assem);
+  void Transmute(int n_assem, int region_num);
 
   /// Records a reactor event to the output db with the given name and note val.
   void Record(std::string name, std::string val);
 
   /// Complement of PopSpent - must be called with all materials passed that
   /// were not traded away to other agents.
-  void PushSpent(std::map<std::string, cyclus::toolkit::MatVec> leftover);
+  void PushSpent(std::map<std::string, cyclus::toolkit::MatVec> leftover, int region_num);
 
   /// Returns all spent assemblies indexed by outcommod - removing them from
   /// the spent fuel buffer.
-  std::map<std::string, cyclus::toolkit::MatVec> PopSpent();
+  std::map<std::string, cyclus::toolkit::MatVec> PopSpent(int region_num);
 
   /// Returns all spent assemblies indexed by outcommod without removing them
   /// from the spent fuel buffer.
-  std::map<std::string, cyclus::toolkit::MatVec> PeekSpent();
+  std::map<std::string, cyclus::toolkit::MatVec> PeekSpent(int region_num);
 
   /////// fuel specifications /////////
   #pragma cyclus var { \
@@ -219,59 +219,91 @@ class TwoRegionReactor : public cyclus::Facility,
 
  //////////// inventory and core params ////////////
   #pragma cyclus var { \
-    "doc": "Number of regions in core.", \
-    "uilabel": "number of regions.", \
-    "default": 1, \
-  }
-  int n_regions;
-
-  #pragma cyclus var { \
     "doc": "Mass (kg) of a single assembly.", \
     "uilabel": "Assembly Mass", \
     "uitype": "range", \
     "range": [1.0, 1e5], \
     "units": "kg", \
   }
-  double assem_size;
+  std::vector<double> assem_size;
 
   #pragma cyclus var { \
-    "uilabel": "Number of Assemblies per Batch", \
+    "uilabel": "Number of Assemblies per Batch in Region 1", \
     "doc": "Number of assemblies that constitute a single batch.  " \
            "This is the number of assemblies discharged from the core fully " \
            "burned each cycle."           \
            "Batch size is equivalent to ``n_assem_batch / n_assem_core``.", \
   }
-  int n_assem_batch;
+  int n_assem_batch1;
+
+  #pragma cyclus var { \
+    "uilabel": "Number of Assemblies per Batch in Region 2", \
+    "doc": "Number of assemblies that constitute a single batch.  " \
+           "This is the number of assemblies discharged from the core fully " \
+           "burned each cycle."           \
+           "Batch size is equivalent to ``n_assem_batch / n_assem_core``.", \
+  }
+  int n_assem_batch2;
 
   #pragma cyclus var { \
     "default": 3, \
-    "uilabel": "Number of Assemblies in Core", \
+    "uilabel": "Number of Assemblies in Region1", \
     "uitype": "range", \
     "range": [1,3], \
     "doc": "Number of assemblies that constitute a full core.", \
   }
-  int n_assem_core;
+  int n_assem_region1;
+
+  #pragma cyclus var { \
+    "default": 3, \
+    "uilabel": "Number of Assemblies in Region2", \
+    "uitype": "range", \
+    "range": [1,3], \
+    "doc": "Number of assemblies that constitute a full core.", \
+  }
+  int n_assem_region2;
 
   #pragma cyclus var { \
     "default": 0, \
-    "uilabel": "Minimum Fresh Fuel Inventory", \
+    "uilabel": "Minimum Fresh Fuel Inventory for Region 1", \
     "uitype": "range", \
     "range": [0,3], \
     "units": "assemblies", \
     "doc": "Number of fresh fuel assemblies to keep on-hand if possible.", \
   }
-  int n_assem_fresh;
+  int n_assem_fresh1;
+
+  #pragma cyclus var { \
+    "default": 0, \
+    "uilabel": "Minimum Fresh Fuel Inventory for Region 2", \
+    "uitype": "range", \
+    "range": [0,3], \
+    "units": "assemblies", \
+    "doc": "Number of fresh fuel assemblies to keep on-hand if possible.", \
+  }
+  int n_assem_fresh2;
 
   #pragma cyclus var { \
     "default": 1000000000, \
-    "uilabel": "Maximum Spent Fuel Inventory", \
+    "uilabel": "Maximum Spent Fuel Inventory for Region 1", \
     "uitype": "range", \
     "range": [0, 1000000000], \
     "units": "assemblies", \
     "doc": "Number of spent fuel assemblies that can be stored on-site before" \
            " reactor operation stalls.", \
   }
-  int n_assem_spent;
+  int n_assem_spent1;
+
+  #pragma cyclus var { \
+    "default": 1000000000, \
+    "uilabel": "Maximum Spent Fuel Inventory for Region 2", \
+    "uitype": "range", \
+    "range": [0, 1000000000], \
+    "units": "assemblies", \
+    "doc": "Number of spent fuel assemblies that can be stored on-site before" \
+           " reactor operation stalls.", \
+  }
+  int n_assem_spent2;
 
    ///////// cycle params ///////////
   #pragma cyclus var { \
@@ -344,12 +376,18 @@ class TwoRegionReactor : public cyclus::Facility,
 
   // Resource inventories - these must be defined AFTER/BELOW the member vars
   // referenced (e.g. n_batch_fresh, assem_size, etc.).
-  #pragma cyclus var {"capacity": "n_assem_fresh * assem_size"}
-  cyclus::toolkit::ResBuf<cyclus::Material> fresh;
-  #pragma cyclus var {"capacity": "n_assem_core * assem_size"}
-  cyclus::toolkit::ResBuf<cyclus::Material> core;
-  #pragma cyclus var {"capacity": "n_assem_spent * assem_size"}
-  cyclus::toolkit::ResBuf<cyclus::Material> spent;
+  #pragma cyclus var {"capacity": "n_assem_fresh1 * assem_size[0]"}
+  cyclus::toolkit::ResBuf<cyclus::Material> fresh1;
+  #pragma cyclus var {"capacity": "n_assem_region1 * assem_size[0]"}
+  cyclus::toolkit::ResBuf<cyclus::Material> core1;
+  #pragma cyclus var {"capacity": "n_assem_spent1 * assem_size[0]"}
+  cyclus::toolkit::ResBuf<cyclus::Material> spent1;
+  #pragma cyclus var {"capacity": "n_assem_fresh2 * assem_size[1]"}
+  cyclus::toolkit::ResBuf<cyclus::Material> fresh2;
+  #pragma cyclus var {"capacity": "n_assem_region2 * assem_size[1]"}
+  cyclus::toolkit::ResBuf<cyclus::Material> core2;
+  #pragma cyclus var {"capacity": "n_assem_spent2 * assem_size[1]"}
+  cyclus::toolkit::ResBuf<cyclus::Material> spent2;
 
 
   // should be hidden in ui (internal only). True if fuel has already been
@@ -357,7 +395,12 @@ class TwoRegionReactor : public cyclus::Facility,
   #pragma cyclus var {"default": 0, "doc": "This should NEVER be set manually",\
                       "internal": True \
   }
-  bool discharged;
+  bool discharged1;
+
+  #pragma cyclus var {"default": 0, "doc": "This should NEVER be set manually",\
+                      "internal": True \
+  }
+  bool discharged2;
 
   // This variable should be hidden/unavailable in ui.  Maps resource object
   // id's to the index for the incommod through which they were received.
@@ -372,4 +415,4 @@ class TwoRegionReactor : public cyclus::Facility,
 
 } // namespace areal
 
-#endif  // AREAL_SRC_MULTIREGIONREACTOR_H_
+#endif  // AREAL_SRC_TWOREGIONREACTOR_H_

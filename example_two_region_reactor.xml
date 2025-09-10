@@ -59,7 +59,7 @@
         <n_assem_region1>3</n_assem_region1>
         <n_assem_region2>3</n_assem_region2>
         <n_assem_batch1>1</n_assem_batch1>
-        <n_assem_batch2>1<n_assem_batch2>
+        <n_assem_batch2>1</n_assem_batch2>
         <power_cap>100</power_cap>
       </TwoRegionReactor>
     </config>
