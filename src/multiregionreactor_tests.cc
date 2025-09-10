@@ -64,9 +64,9 @@ TEST(MultiRegionReactorTests, JustInTimeOrdering) {
      ""
      "  <cycle_time>1</cycle_time>  "
      "  <refuel_time>0</refuel_time>  "
-     "  <assem_size> <val>300</val> </assem_size>  "
-     "  <n_assem_region> <val>1</val> </n_assem_region>  "
-     "  <n_assem_batch> <val>1</val> </n_assem_batch>  "
+     "  <assem_size>300</assem_size>  "
+     "  <n_assem_core>1</n_assem_core>  "
+     "  <n_assem_batch>1</n_assem_batch>  "
      "  <n_regions>1</n_regions>  ";
 
   int simdur = 50;
@@ -91,9 +91,9 @@ TEST(MultiRegionReactorTests, BatchSizes) {
      ""
      "  <cycle_time>1</cycle_time>  "
      "  <refuel_time>0</refuel_time>  "
-     "  <assem_size> <val>1</val> </assem_size>  "
-     "  <n_assem_region> <val>7</val> </n_assem_region>  "
-     "  <n_assem_batch> <val>3 </val></n_assem_batch>  "
+     "  <assem_size>1</assem_size>  "
+     "  <n_assem_core>7</n_assem_core>  "
+     "  <n_assem_batch>3</n_assem_batch>  "
      "  <n_regions>1</n_regions>  ";
 
   int simdur = 50;
@@ -108,7 +108,6 @@ TEST(MultiRegionReactorTests, BatchSizes) {
   EXPECT_EQ(7+3*(simdur-1), qr.rows.size());
 }
 
-
 // tests that the refueling period between cycle end and start of the next
 // cycle is honored.
 TEST(MultiRegionReactorTests, RefuelTimes) {
@@ -120,9 +119,9 @@ TEST(MultiRegionReactorTests, RefuelTimes) {
      ""
      "  <cycle_time>4</cycle_time>  "
      "  <refuel_time>3</refuel_time>  "
-     "  <assem_size> <val>1</val> </assem_size>  "
-     "  <n_assem_region> <val>1</val> </n_assem_region>  "
-     "  <n_assem_batch> <val>1</val> </n_assem_batch>  "
+     "  <assem_size>1</assem_size>  "
+     "  <n_assem_core>1</n_assem_core>  "
+     "  <n_assem_batch>1</n_assem_batch>  "
      "  <n_regions>1</n_regions>  ";
 
   int simdur = 49;
@@ -151,10 +150,10 @@ TEST(MultiRegionReactorTests, DecomTimes) {
      ""
      "  <cycle_time>2</cycle_time>  "
      "  <refuel_time>2</refuel_time>  "
-     "  <assem_size> <val>1</val> </assem_size>  "
-     "  <n_assem_region> <val>3</val> </n_assem_region>  "
+     "  <assem_size>1</assem_size>  "
+     "  <n_assem_core>3</n_assem_core>  "
      "  <power_cap>1000</power_cap>  "
-     "  <n_assem_batch> <val>1</val> </n_assem_batch>  "
+     "  <n_assem_batch>1</n_assem_batch>  "
      "  <n_regions>1</n_regions>  ";
 
   int simdur = 12;
@@ -191,10 +190,10 @@ TEST(MultiRegionReactorTests, DecomZeroRefuel) {
      ""
      "  <cycle_time>2</cycle_time>  "
      "  <refuel_time>0</refuel_time>  "
-     "  <assem_size> <val>1</val> </assem_size>  "
-     "  <n_assem_region> <val>3</val> </n_assem_region>  "
+     "  <assem_size>1</assem_size>  "
+     "  <n_assem_core>3</n_assem_core>  "
      "  <power_cap>1000</power_cap>  "
-     "  <n_assem_batch> <val>1</val> </n_assem_batch>  "
+     "  <n_assem_batch>1</n_assem_batch>  "
      "  <n_regions>1</n_regions>  ";
 
   int simdur = 8;
@@ -225,9 +224,9 @@ TEST(MultiRegionReactorTests, OrderAtRefuelStart) {
      ""
      "  <cycle_time>4</cycle_time>  "
      "  <refuel_time>3</refuel_time>  "
-     "  <assem_size> <val>1</val> </assem_size>  "
-     "  <n_assem_region> <val>1</val> </n_assem_region>  "
-     "  <n_assem_batch> <val>1</val> </n_assem_batch>  ";
+     "  <assem_size>1</assem_size>  "
+     "  <n_assem_core>1</n_assem_core>  "
+     "  <n_assem_batch>1</n_assem_batch>  ";
 
   int simdur = 7;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
@@ -254,10 +253,10 @@ TEST(MultiRegionReactorTests, MultiFuelMix) {
      ""
      "  <cycle_time>1</cycle_time>  "
      "  <refuel_time>0</refuel_time>  "
-     "  <assem_size> <val>1</val> </assem_size>  "
-     "  <n_assem_fresh> <val>3</val> </n_assem_fresh>  "
-     "  <n_assem_region> <val>3</val></n_assem_region>  "
-     "  <n_assem_batch> <val>3</val> </n_assem_batch>  ";
+     "  <assem_size>1</assem_size>  "
+     "  <n_assem_fresh>3</n_assem_fresh>  "
+     "  <n_assem_core>3</n_assem_core>  "
+     "  <n_assem_batch>3</n_assem_batch>  ";
 
   // it is important that the sources have cumulative capacity greater than
   // the reactor can take on a single time step - to test that inventory
@@ -290,10 +289,10 @@ TEST(MultiRegionReactorTests, FullSpentInventory) {
      ""
      "  <cycle_time>1</cycle_time>  "
      "  <refuel_time>0</refuel_time>  "
-     "  <assem_size> <val>1</val> </assem_size>  "
-     "  <n_assem_region> <val>1</val> </n_assem_region>  "
-     "  <n_assem_batch> <val>1</val> </n_assem_batch>  "
-     "  <n_assem_spent> <val>3</val> </n_assem_spent>  ";
+     "  <assem_size>1</assem_size>  "
+     "  <n_assem_core>1</n_assem_core>  "
+     "  <n_assem_batch>1</n_assem_batch>  "
+     "  <n_assem_spent>3</n_assem_spent>  ";
 
   int simdur = 10;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
@@ -320,10 +319,10 @@ TEST(MultiRegionReactorTests, FullSpentInventoryShutdown) {
     ""
     " <cycle_time>1</cycle_time> "
     " <refuel_time>0</refuel_time> "
-    " <assem_size> <val>1</val> </assem_size> "
-    " <n_assem_region> <val>1</val> </n_assem_region> "
-    " <n_assem_batch> <val>1</val> </n_assem_batch> "
-    " <n_assem_spent> <val>1</val> </n_assem_spent> "
+    " <assem_size>1</assem_size> "
+    " <n_assem_core>1</n_assem_core> "
+    " <n_assem_batch>1</n_assem_batch> "
+    " <n_assem_spent>1</n_assem_spent> "
     " <power_cap>100</power_cap> ";
 
   int simdur = 3;
@@ -352,9 +351,9 @@ TEST(MultiRegionReactorTests, FuelShortage) {
      ""
      "  <cycle_time>7</cycle_time>  "
      "  <refuel_time>0</refuel_time>  "
-     "  <assem_size> <val>1</val> </assem_size>  "
-     "  <n_assem_region> <val>3</val> </n_assem_region>  "
-     "  <n_assem_batch> <val>3</val> </n_assem_batch>  ";
+     "  <assem_size>1</assem_size>  "
+     "  <n_assem_core>3</n_assem_core>  "
+     "  <n_assem_batch>3</n_assem_batch>  ";
 
   int simdur = 50;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
@@ -401,9 +400,9 @@ TEST(MultiRegionReactorTests, DischargedFuelTransmute) {
      ""
      "  <cycle_time>4</cycle_time>  "
      "  <refuel_time>3</refuel_time>  "
-     "  <assem_size> <val>1</val> </assem_size>  "
-     "  <n_assem_region> <val>1</val> </n_assem_region>  "
-     "  <n_assem_batch> <val>1</val> </n_assem_batch>  ";
+     "  <assem_size>1</assem_size>  "
+     "  <n_assem_core>1</n_assem_core>  "
+     "  <n_assem_batch>1</n_assem_batch>  ";
 
   int simdur = 7;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
@@ -435,9 +434,9 @@ TEST(MultiRegionReactorTests, SpentFuelProperCommodTracking) {
      ""
      "  <cycle_time>1</cycle_time>  "
      "  <refuel_time>0</refuel_time>  "
-     "  <assem_size> <val>1</val> </assem_size>  "
-     "  <n_assem_region> <val>3</val> </n_assem_region>  "
-     "  <n_assem_batch> <val>3</val> </n_assem_batch>  ";
+     "  <assem_size>1</assem_size>  "
+     "  <n_assem_core>3</n_assem_core>  "
+     "  <n_assem_batch>3</n_assem_batch>  ";
 
   int simdur = 7;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
@@ -477,10 +476,10 @@ TEST(MultiRegionReactorTests, Retire) {
      ""
      "  <cycle_time>7</cycle_time>  "
      "  <refuel_time>0</refuel_time>  "
-     "  <assem_size> <val>300</val> </assem_size>  "
-     "  <n_assem_fresh> <val>1</val> </n_assem_fresh>  "
-     "  <n_assem_region> <val>3</val> </n_assem_region>  "
-     "  <n_assem_batch> <val>1</val> </n_assem_batch>  "
+     "  <assem_size>300</assem_size>  "
+     "  <n_assem_fresh>1</n_assem_fresh>  "
+     "  <n_assem_core>3</n_assem_core>  "
+     "  <n_assem_batch>1</n_assem_batch>  "
      "  <power_cap>1</power_cap>  "
      "";
 
@@ -535,9 +534,9 @@ TEST(MultiRegionReactorTests, PositionInitialize) {
      ""
      "  <cycle_time>1</cycle_time>  "
      "  <refuel_time>0</refuel_time>  "
-     "  <assem_size> <val>300</val> </assem_size>  "
-     "  <n_assem_region> <val>1</val> </n_assem_region>  "
-     "  <n_assem_batch> <val>1</val> </n_assem_batch>  ";
+     "  <assem_size>300</assem_size>  "
+     "  <n_assem_core>1</n_assem_core>  "
+     "  <n_assem_batch>1</n_assem_batch>  ";
 
   int simdur = 50;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
@@ -560,9 +559,9 @@ TEST(MultiRegionReactorTests, PositionInitialize2) {
      ""
      "  <cycle_time>1</cycle_time>  "
      "  <refuel_time>0</refuel_time>  "
-     "  <assem_size> <val>300</val> </assem_size>  "
-     "  <n_assem_region> <val>1</val> </n_assem_region>  "
-     "  <n_assem_batch> <val>1</val> </n_assem_batch>  "
+     "  <assem_size>300</assem_size>  "
+     "  <n_assem_core>1</n_assem_core>  "
+     "  <n_assem_batch>1</n_assem_batch>  "
      "  <longitude>30.0</longitude>  "
      "  <latitude>30.0</latitude>  ";
 
@@ -576,232 +575,6 @@ TEST(MultiRegionReactorTests, PositionInitialize2) {
   QueryResult qr = sim.db().Query("AgentPosition", NULL);
   EXPECT_EQ(qr.GetVal<double>("Latitude"), 30.0);
   EXPECT_EQ(qr.GetVal<double>("Longitude"), 30.0);
-}
-
-// tests that the correct number of assemblies are popped from the core each
-// cycle when there are two regions in the core
-TEST(MultiRegionReactorTests, TwoRegionBatchSizes) {
-  std::string config =
-     "  <fuel_inrecipes>  <val>uox</val>  <val>mox</val>    </fuel_inrecipes>  "
-     "  <fuel_outrecipes> <val>spentuox</val> <val>spentmox</val> </fuel_outrecipes>  "
-     "  <fuel_incommods>  <val>uox</val> <val>mox</val>     </fuel_incommods>  "
-     "  <fuel_outcommods> <val>waste</val> <val>mox_waste</val>   </fuel_outcommods>  "
-     ""
-     "  <cycle_time>1</cycle_time>  "
-     "  <refuel_time>0</refuel_time>  "
-     "  <assem_size> <val>1</val> <val>1</val> </assem_size>  "
-     "  <n_assem_region> <val>7</val> <val>7</val> </n_assem_region>  "
-     "  <n_assem_batch> <val>3</val> <val>3</val> </n_assem_batch>  "
-     "  <n_regions>2</n_regions>  ";
-
-  int simdur = 50;
-  cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
-  sim.AddSource("uox").Finalize();
-  sim.AddRecipe("uox", c_uox());
-  sim.AddRecipe("mox", c_mox());
-  sim.AddRecipe("spentuox", c_spentuox());
-  sim.AddRecipe("spentmox", c_spentmox());
-  int id = sim.Run();
-
-  QueryResult qr = sim.db().Query("Transactions", NULL);
-  // 7 for initial core, 3 per time step for each new batch for remainder
-  EXPECT_EQ(7+3*(simdur-1), qr.rows.size());
-}
-
-// tests that an error is thrown if fuel_outcommods input does not have the correct number 
-// of entries
-TEST(MultiRegionReactorTests, TwoRegionOutcommodMissing) {
-  std::string config =
-     "  <fuel_inrecipes>  <val>uox</val>  <val>mox</val>    </fuel_inrecipes>  "
-     "  <fuel_outrecipes> <val>spentuox</val> <val>spentmox</val> </fuel_outrecipes>  "
-     "  <fuel_incommods>  <val>uox</val>  <val>mox</val>  </fuel_incommods>  "
-     "  <fuel_outcommods> <val>waste</val>  </fuel_outcommods>  "
-     ""
-     "  <cycle_time>1</cycle_time>  "
-     "  <refuel_time>0</refuel_time>  "
-     "  <assem_size> <val>1</val> <val>1</val> </assem_size>  "
-     "  <n_assem_region> <val>7</val> <val>7</val> </n_assem_region>  "
-     "  <n_assem_batch> <val>3</val> <val>3</val> </n_assem_batch>  "
-     "  <n_regions>2</n_regions>  ";
-
-  int simdur = 50;
-  cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
-  sim.AddSource("uox").Finalize();
-  sim.AddRecipe("uox", c_uox());
-  sim.AddRecipe("mox", c_mox());
-  sim.AddRecipe("spentuox", c_spentuox());
-  sim.AddRecipe("spentmox", c_spentmox());
-  int id;
-  // Testing for an error thrown
-  EXPECT_THROW(id = sim.Run(), cyclus::ValueError);
-}
-
-// tests that an error is thrown if fuel_inrecipes input does not have the correct number 
-// of entries
-TEST(MultiRegionReactorTests, TwoRegionInrecipesMissing) {
-  std::string config =
-     "  <fuel_inrecipes>  <val>uox</val>    </fuel_inrecipes>  "
-     "  <fuel_outrecipes> <val>spentuox</val> <val>spentmox</val> </fuel_outrecipes>  "
-     "  <fuel_incommods>  <val>uox</val>  <val>mox</val>  </fuel_incommods>  "
-     "  <fuel_outcommods> <val>waste</val> <val>mox_waste</val>   </fuel_outcommods>  "
-     ""
-     "  <cycle_time>1</cycle_time>  "
-     "  <refuel_time>0</refuel_time>  "
-     "  <assem_size> <val>1</val> <val>1</val> </assem_size>  "
-     "  <n_assem_region> <val>7</val> <val>7</val> </n_assem_region>  "
-     "  <n_assem_batch> <val>3</val> <val>3</val> </n_assem_batch>  "
-     "  <n_regions>2</n_regions>  ";
-
-  int simdur = 50;
-  cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
-  sim.AddSource("uox").Finalize();
-  sim.AddRecipe("uox", c_uox());
-  sim.AddRecipe("mox", c_mox());
-  sim.AddRecipe("spentuox", c_spentuox());
-  sim.AddRecipe("spentmox", c_spentmox());
-  int id;
-  // Testing for an error thrown
-  EXPECT_THROW(id = sim.Run(), cyclus::ValueError);
-}
-
-// tests that an error is thrown if fuel_outrecipes input does not have the correct number 
-// of entries
-TEST(MultiRegionReactorTests, TwoRegionOutrecipesMissing) {
-  std::string config =
-     "  <fuel_inrecipes>  <val>uox</val>  <val>mox</val>    </fuel_inrecipes>  "
-     "  <fuel_outrecipes> <val>spentuox</val> </fuel_outrecipes>  "
-     "  <fuel_incommods>  <val>uox</val>  <val>mox</val>  </fuel_incommods>  "
-     "  <fuel_outcommods> <val>waste</val> <val>mox_waste</val>   </fuel_outcommods>  "
-     ""
-     "  <cycle_time>1</cycle_time>  "
-     "  <refuel_time>0</refuel_time>  "
-     "  <assem_size> <val>1</val> <val>1</val> </assem_size>  "
-     "  <n_assem_region> <val>7</val> <val>7</val> </n_assem_region>  "
-     "  <n_assem_batch> <val>3</val> <val>3</val> </n_assem_batch>  "
-     "  <n_regions>2</n_regions>  ";
-
-  int simdur = 50;
-  cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
-  sim.AddSource("uox").Finalize();
-  sim.AddRecipe("uox", c_uox());
-  sim.AddRecipe("mox", c_mox());
-  sim.AddRecipe("spentuox", c_spentuox());
-  sim.AddRecipe("spentmox", c_spentmox());
-  int id;
-  // Testing for an error thrown
-  EXPECT_THROW(id = sim.Run(), cyclus::ValueError);
-}
-
-// tests that an error is thrown if assem_size input does not have the correct number 
-// of entries
-TEST(MultiRegionReactorTests, TwoRegionAssemsizeMissing) {
-  std::string config =
-     "  <fuel_inrecipes>  <val>uox</val>  <val>mox</val>    </fuel_inrecipes>  "
-     "  <fuel_outrecipes> <val>spentuox</val> <val>spentmox</val> </fuel_outrecipes>  "
-     "  <fuel_incommods>  <val>uox</val>  <val>mox</val>   </fuel_incommods>  "
-     "  <fuel_outcommods> <val>waste</val> <val>mox_waste</val>   </fuel_outcommods>  "
-     ""
-     "  <cycle_time>1</cycle_time>  "
-     "  <refuel_time>0</refuel_time>  "
-     "  <assem_size> <val>1</val> </assem_size>  "
-     "  <n_assem_region> <val>7</val> <val>7</val> </n_assem_region>  "
-     "  <n_assem_batch> <val>3</val> <val>3</val> </n_assem_batch>  "
-     "  <n_regions>2</n_regions>  ";
-
-  int simdur = 50;
-  cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
-  sim.AddSource("uox").Finalize();
-  sim.AddRecipe("uox", c_uox());
-  sim.AddRecipe("mox", c_mox());
-  sim.AddRecipe("spentuox", c_spentuox());
-  sim.AddRecipe("spentmox", c_spentmox());
-  int id;
-  // Testing for an error thrown
-  EXPECT_THROW(id = sim.Run(), cyclus::ValueError);
-}
-
-// tests that an error is thrown if n_assem_region input does not have the correct number 
-// of entries
-TEST(MultiRegionReactorTests, TwoRegionNassemregionMissing) {
-  std::string config =
-     "  <fuel_inrecipes>  <val>uox</val>  <val>mox</val>    </fuel_inrecipes>  "
-     "  <fuel_outrecipes> <val>spentuox</val> <val>spentmox</val> </fuel_outrecipes>  "
-     "  <fuel_incommods>  <val>uox</val> <val>mox</val>   </fuel_incommods>  "
-     "  <fuel_outcommods> <val>waste</val> <val>mox_waste</val>   </fuel_outcommods>  "
-     ""
-     "  <cycle_time>1</cycle_time>  "
-     "  <refuel_time>0</refuel_time>  "
-     "  <assem_size> <val>1</val> <val>1</val> </assem_size>  "
-     "  <n_assem_region> <val>7</val> </n_assem_region>  "
-     "  <n_assem_batch> <val>3</val> <val>3</val> </n_assem_batch>  "
-     "  <n_regions>2</n_regions>  ";
-
-  int simdur = 50;
-  cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
-  sim.AddSource("uox").Finalize();
-  sim.AddRecipe("uox", c_uox());
-  sim.AddRecipe("mox", c_mox());
-  sim.AddRecipe("spentuox", c_spentuox());
-  sim.AddRecipe("spentmox", c_spentmox());
-  int id;
-  // Testing for an error thrown
-  EXPECT_THROW(id = sim.Run(), cyclus::ValueError);
-}
-
-// tests that an error is thrown if n_assem_batch input does not have the correct number 
-// of entries
-TEST(MultiRegionReactorTests, TwoRegionNassembatchMissing) {
-  std::string config =
-     "  <fuel_inrecipes>  <val>uox</val>  <val>mox</val>    </fuel_inrecipes>  "
-     "  <fuel_outrecipes> <val>spentuox</val> <val>spentmox</val> </fuel_outrecipes>  "
-     "  <fuel_incommods>  <val>uox</val>  <val>mox</val>  </fuel_incommods>  "
-     "  <fuel_outcommods> <val>waste</val> <val>mox_waste</val>   </fuel_outcommods>  "
-     ""
-     "  <cycle_time>1</cycle_time>  "
-     "  <refuel_time>0</refuel_time>  "
-     "  <assem_size> <val>1</val> <val>1</val> </assem_size>  "
-     "  <n_assem_region> <val>7</val> <val>7</val> </n_assem_region>  "
-     "  <n_assem_batch> <val>3</val> </n_assem_batch>  "
-     "  <n_regions>2</n_regions>  ";
-
-  int simdur = 50;
-  cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
-  sim.AddSource("uox").Finalize();
-  sim.AddRecipe("uox", c_uox());
-  sim.AddRecipe("mox", c_mox());
-  sim.AddRecipe("spentuox", c_spentuox());
-  sim.AddRecipe("spentmox", c_spentmox());
-  int id;
-  // Testing for an error thrown
-  EXPECT_THROW(id = sim.Run(), cyclus::ValueError);
-}
-
-// tests that an error is thrown if fuel_incommods input does not have the correct number 
-// of entries
-TEST(MultiRegionReactorTests, TwoRegionIncommodMissing) {
-  std::string config =
-     "  <fuel_inrecipes>  <val>uox</val>  <val>mox</val>    </fuel_inrecipes>  "
-     "  <fuel_outrecipes> <val>spentuox</val> <val>spentmox</val> </fuel_outrecipes>  "
-     "  <fuel_incommods>  <val>uox</val>    </fuel_incommods>  "
-     "  <fuel_outcommods> <val>waste</val> <val>mox_waste</val>   </fuel_outcommods>  "
-     ""
-     "  <cycle_time>1</cycle_time>  "
-     "  <refuel_time>0</refuel_time>  "
-     "  <assem_size> <val>1</val> <val>1</val> </assem_size>  "
-     "  <n_assem_region> <val>7</val> <val>7</val> </n_assem_region>  "
-     "  <n_assem_batch> <val>3</val> <val>3</val> </n_assem_batch>  "
-     "  <n_regions>2</n_regions>  ";
-
-  int simdur = 50;
-  cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
-  sim.AddSource("uox").Finalize();
-  sim.AddRecipe("uox", c_uox());
-  sim.AddRecipe("mox", c_mox());
-  sim.AddRecipe("spentuox", c_spentuox());
-  sim.AddRecipe("spentmox", c_spentmox());
-  int id;
-  // Testing for an error thrown
-  EXPECT_THROW(id = sim.Run(), cyclus::ValueError);
 }
 
 } // namespace MultiRegionReactortests

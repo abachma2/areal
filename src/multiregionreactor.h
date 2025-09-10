@@ -232,7 +232,7 @@ class MultiRegionReactor : public cyclus::Facility,
     "range": [1.0, 1e5], \
     "units": "kg", \
   }
-  std::vector<double> assem_size;
+  double assem_size;
 
   #pragma cyclus var { \
     "uilabel": "Number of Assemblies per Batch", \
@@ -241,29 +241,29 @@ class MultiRegionReactor : public cyclus::Facility,
            "burned each cycle."           \
            "Batch size is equivalent to ``n_assem_batch / n_assem_core``.", \
   }
-  std::vector<int> n_assem_batch;
+  int n_assem_batch;
 
   #pragma cyclus var { \
-    "default": [3], \
+    "default": 3, \
     "uilabel": "Number of Assemblies in Core", \
     "uitype": "range", \
     "range": [1,3], \
     "doc": "Number of assemblies that constitute a full core.", \
   }
-  std::vector<int> n_assem_region;
+  int n_assem_core;
 
   #pragma cyclus var { \
-    "default": [0], \
+    "default": 0, \
     "uilabel": "Minimum Fresh Fuel Inventory", \
     "uitype": "range", \
     "range": [0,3], \
     "units": "assemblies", \
     "doc": "Number of fresh fuel assemblies to keep on-hand if possible.", \
   }
-  std::vector<int> n_assem_fresh;
+  int n_assem_fresh;
 
   #pragma cyclus var { \
-    "default": [1000000000], \
+    "default": 1000000000, \
     "uilabel": "Maximum Spent Fuel Inventory", \
     "uitype": "range", \
     "range": [0, 1000000000], \
@@ -271,7 +271,7 @@ class MultiRegionReactor : public cyclus::Facility,
     "doc": "Number of spent fuel assemblies that can be stored on-site before" \
            " reactor operation stalls.", \
   }
-  std::vector<int> n_assem_spent;
+  int n_assem_spent;
 
    ///////// cycle params ///////////
   #pragma cyclus var { \
@@ -344,20 +344,12 @@ class MultiRegionReactor : public cyclus::Facility,
 
   // Resource inventories - these must be defined AFTER/BELOW the member vars
   // referenced (e.g. n_batch_fresh, assem_size, etc.).
-  // ResBufs for region 1
-  #pragma cyclus var {"capacity": "n_assem_fresh[0] * assem_size[0]"}
-  cyclus::toolkit::ResBuf<cyclus::Material> fresh1;
-  #pragma cyclus var {"capacity": "n_assem_region[0] * assem_size[0]"}
-  cyclus::toolkit::ResBuf<cyclus::Material> core1;
-  #pragma cyclus var {"capacity": "n_assem_spent[0] * assem_size[0]"}
-  cyclus::toolkit::ResBuf<cyclus::Material> spent1;
-  // ResBufs for region 2
-  #pragma cyclus var {"capacity": "n_assem_fresh[1] * assem_size[1]"}
-  cyclus::toolkit::ResBuf<cyclus::Material> fresh2;
-  #pragma cyclus var {"capacity": "n_assem_region[1] * assem_size[1]"}
-  cyclus::toolkit::ResBuf<cyclus::Material> core2;
-  #pragma cyclus var {"capacity": "n_assem_spent[1] * assem_size[1]"}
-  cyclus::toolkit::ResBuf<cyclus::Material> spent2;
+  #pragma cyclus var {"capacity": "n_assem_fresh * assem_size"}
+  cyclus::toolkit::ResBuf<cyclus::Material> fresh;
+  #pragma cyclus var {"capacity": "n_assem_core * assem_size"}
+  cyclus::toolkit::ResBuf<cyclus::Material> core;
+  #pragma cyclus var {"capacity": "n_assem_spent * assem_size"}
+  cyclus::toolkit::ResBuf<cyclus::Material> spent;
 
 
   // should be hidden in ui (internal only). True if fuel has already been
