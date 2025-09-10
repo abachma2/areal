@@ -57,27 +57,44 @@ Composition::Ptr c_water() {
 // delay.
 TEST(TwoRegionReactorTests, JustInTimeOrdering) {
   std::string config =
-     "  <fuel_inrecipes>  <val>lwr_fresh</val>  </fuel_inrecipes>  "
-     "  <fuel_outrecipes> <val>lwr_spent</val>  </fuel_outrecipes>  "
-     "  <fuel_incommods>  <val>enriched_u</val> </fuel_incommods>  "
-     "  <fuel_outcommods> <val>waste</val>      </fuel_outcommods>  "
+     "  <fuel_inrecipes>  <val>lwr_fresh</val> <val>bwr_fresh</val> </fuel_inrecipes>  "
+     "  <fuel_outrecipes> <val>lwr_spent</val> <val>bwr_spent</val> </fuel_outrecipes>  "
+     "  <fuel_incommods>  <val>enriched_u</val> <val>natural_u</val> </fuel_incommods>  "
+     "  <fuel_outcommods> <val>waste</val>   <val>bwr_waste</val>   </fuel_outcommods>  "
      ""
      "  <cycle_time>1</cycle_time>  "
      "  <refuel_time>0</refuel_time>  "
-     "  <assem_size>300</assem_size>  "
-     "  <n_assem_core>1</n_assem_core>  "
-     "  <n_assem_batch>1</n_assem_batch>  "
-     "  <n_regions>1</n_regions>  ";
+     "  <assem_size> <val>300</val> <val>300</val> </assem_size>  "
+     "  <n_assem_region1>1</n_assem_region1>  "
+     "  <n_assem_region2>1</n_assem_region2>"
+     "  <n_assem_batch1>1</n_assem_batch1>  "
+     "  <n_assem_batch2>1</n_assem_batch2>";
 
   int simdur = 50;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
   sim.AddSource("enriched_u").Finalize();
+  sim.AddSource("natural_u").Finalize();
   sim.AddRecipe("lwr_fresh", c_uox());
+  sim.AddRecipe("bwr_fresh", c_mox());
+  sim.AddRecipe("bwr_waste", c_spentmox());
   sim.AddRecipe("lwr_spent", c_spentuox());
   int id = sim.Run();
-
+  
   QueryResult qr = sim.db().Query("Transactions", NULL);
-  EXPECT_EQ(simdur, qr.rows.size()) << "failed to order+run on fresh fuel inside 1 time step";
+  int n_trans = qr.rows.size();
+  EXPECT_EQ(simdur*2, n_trans) << "expected 100 transactions, got " << n_trans;
+  
+  std::vector<cyclus::Cond> cond1;
+  cond1.push_back(cyclus::Cond("Commodity", "==", std::string("enriched_u")));
+  qr = sim.db().Query("Transactions", &cond1);
+  int n_trans1 = qr.rows.size();
+  EXPECT_EQ(simdur, n_trans1) << "expected 50 transactions, got " << n_trans1;
+
+  std::vector<cyclus::Cond> cond2;
+  cond2.push_back(cyclus::Cond("Commodity", "==", std::string("natural_u")));
+  qr = sim.db().Query("Transactions", &cond2);
+  int n_trans2 = qr.rows.size();
+  EXPECT_EQ(simdur, n_trans2) << "expected 50 transactions, got " << n_trans2;
 }
 
 // tests that the correct number of assemblies are popped from the core each
