@@ -4,7 +4,7 @@ CONFIGURE_FILE(areal_version.h.in "${CMAKE_CURRENT_SOURCE_DIR}/areal_version.h" 
 
 SET(CYCLUS_CUSTOM_HEADERS "areal_version.h")
 
-USE_CYCLUS("areal" "multiregionreactor")
+USE_CYCLUS("areal" "tworegionreactor")
 
 
 INSTALL_CYCLUS_MODULE("areal" "" "NONE")

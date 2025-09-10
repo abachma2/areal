@@ -12,7 +12,7 @@ using cyclus::Cond;
 using cyclus::toolkit::MatQuery;
 
 namespace areal {
-namespace multiregionreactortests {
+namespace tworegionreactortests {
 
 Composition::Ptr c_uox() {
   cyclus::CompMap m;
@@ -55,7 +55,7 @@ Composition::Ptr c_water() {
 // Test that with a zero refuel_time and a zero capacity fresh fuel buffer
 // (the default), fuel can be ordered and the cycle started with no time step
 // delay.
-TEST(MultiRegionReactorTests, JustInTimeOrdering) {
+TEST(TwoRegionReactorTests, JustInTimeOrdering) {
   std::string config =
      "  <fuel_inrecipes>  <val>lwr_fresh</val>  </fuel_inrecipes>  "
      "  <fuel_outrecipes> <val>lwr_spent</val>  </fuel_outrecipes>  "
@@ -70,7 +70,7 @@ TEST(MultiRegionReactorTests, JustInTimeOrdering) {
      "  <n_regions>1</n_regions>  ";
 
   int simdur = 50;
-  cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
+  cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
   sim.AddSource("enriched_u").Finalize();
   sim.AddRecipe("lwr_fresh", c_uox());
   sim.AddRecipe("lwr_spent", c_spentuox());
@@ -82,7 +82,7 @@ TEST(MultiRegionReactorTests, JustInTimeOrdering) {
 
 // tests that the correct number of assemblies are popped from the core each
 // cycle.
-TEST(MultiRegionReactorTests, BatchSizes) {
+TEST(TwoRegionReactorTests, BatchSizes) {
   std::string config =
      "  <fuel_inrecipes>  <val>uox</val>      </fuel_inrecipes>  "
      "  <fuel_outrecipes> <val>spentuox</val> </fuel_outrecipes>  "
@@ -97,7 +97,7 @@ TEST(MultiRegionReactorTests, BatchSizes) {
      "  <n_regions>1</n_regions>  ";
 
   int simdur = 50;
-  cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
+  cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
   sim.AddSource("uox").Finalize();
   sim.AddRecipe("uox", c_uox());
   sim.AddRecipe("spentuox", c_spentuox());
@@ -110,7 +110,7 @@ TEST(MultiRegionReactorTests, BatchSizes) {
 
 // tests that the refueling period between cycle end and start of the next
 // cycle is honored.
-TEST(MultiRegionReactorTests, RefuelTimes) {
+TEST(TwoRegionReactorTests, RefuelTimes) {
   std::string config =
      "  <fuel_inrecipes>  <val>uox</val>      </fuel_inrecipes>  "
      "  <fuel_outrecipes> <val>spentuox</val> </fuel_outrecipes>  "
@@ -125,7 +125,7 @@ TEST(MultiRegionReactorTests, RefuelTimes) {
      "  <n_regions>1</n_regions>  ";
 
   int simdur = 49;
-  cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
+  cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
   sim.AddSource("uox").Finalize();
   sim.AddRecipe("uox", c_uox());
   sim.AddRecipe("spentuox", c_spentuox());
@@ -141,7 +141,7 @@ TEST(MultiRegionReactorTests, RefuelTimes) {
 
 // tests that a reactor decommissions on time without producing
 // power at the end of its lifetime.
-TEST(MultiRegionReactorTests, DecomTimes) {
+TEST(TwoRegionReactorTests, DecomTimes) {
   std::string config =
      "  <fuel_inrecipes>  <val>uox</val>      </fuel_inrecipes>  "
      "  <fuel_outrecipes> <val>spentuox</val> </fuel_outrecipes>  "
@@ -158,7 +158,7 @@ TEST(MultiRegionReactorTests, DecomTimes) {
 
   int simdur = 12;
   int lifetime = 7;
-  cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur, lifetime);
+  cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur, lifetime);
   sim.AddSource("uox").Finalize();
   sim.AddRecipe("uox", c_uox());
   sim.AddRecipe("spentuox", c_spentuox());
@@ -181,7 +181,7 @@ TEST(MultiRegionReactorTests, DecomTimes) {
 
 // Tests if a reactor produces power at the time of its decommission
 // given a refuel_time of zero.
-TEST(MultiRegionReactorTests, DecomZeroRefuel) {
+TEST(TwoRegionReactorTests, DecomZeroRefuel) {
   std::string config =
      "  <fuel_inrecipes>  <val>uox</val>      </fuel_inrecipes>  "
      "  <fuel_outrecipes> <val>spentuox</val> </fuel_outrecipes>  "
@@ -198,7 +198,7 @@ TEST(MultiRegionReactorTests, DecomZeroRefuel) {
 
   int simdur = 8;
   int lifetime = 6;
-  cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur, lifetime);
+  cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur, lifetime);
   sim.AddSource("uox").Finalize();
   sim.AddRecipe("uox", c_uox());
   sim.AddRecipe("spentuox", c_spentuox());
@@ -215,7 +215,7 @@ TEST(MultiRegionReactorTests, DecomZeroRefuel) {
 // tests that new fuel is ordered immediately following cycle end - at the
 // start of the refueling period - not before and not after. - thie is subtly
 // different than RefuelTimes test and is not a duplicate of it.
-TEST(MultiRegionReactorTests, OrderAtRefuelStart) {
+TEST(TwoRegionReactorTests, OrderAtRefuelStart) {
   std::string config =
      "  <fuel_inrecipes>  <val>uox</val>      </fuel_inrecipes>  "
      "  <fuel_outrecipes> <val>spentuox</val> </fuel_outrecipes>  "
@@ -229,7 +229,7 @@ TEST(MultiRegionReactorTests, OrderAtRefuelStart) {
      "  <n_assem_batch>1</n_assem_batch>  ";
 
   int simdur = 7;
-  cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
+  cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
   sim.AddSource("uox").Finalize();
   sim.AddRecipe("uox", c_uox());
   sim.AddRecipe("spentuox", c_spentuox());
@@ -244,7 +244,7 @@ TEST(MultiRegionReactorTests, OrderAtRefuelStart) {
 
 // tests that the reactor handles requesting multiple types of fuel correctly
 // - with proper inventory constraint honoring, etc.
-TEST(MultiRegionReactorTests, MultiFuelMix) {
+TEST(TwoRegionReactorTests, MultiFuelMix) {
   std::string config =
      "  <fuel_inrecipes>  <val>uox</val>      <val>mox</val>      </fuel_inrecipes>  "
      "  <fuel_outrecipes> <val>spentuox</val> <val>spentmox</val> </fuel_outrecipes>  "
@@ -264,7 +264,7 @@ TEST(MultiRegionReactorTests, MultiFuelMix) {
   // each source is smaller capacity thatn the reactor orders on each time
   // step to make it easy to compute+check the number of transactions.
   int simdur = 50;
-  cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
+  cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
   sim.AddSource("uox").capacity(2).Finalize();
   sim.AddSource("mox").capacity(2).Finalize();
   sim.AddRecipe("uox", c_uox());
@@ -280,7 +280,7 @@ TEST(MultiRegionReactorTests, MultiFuelMix) {
 
 // tests that the reactor halts operation when it has no more room in its
 // spent fuel inventory buffer.
-TEST(MultiRegionReactorTests, FullSpentInventory) {
+TEST(TwoRegionReactorTests, FullSpentInventory) {
   std::string config =
      "  <fuel_inrecipes>  <val>uox</val>      </fuel_inrecipes>  "
      "  <fuel_outrecipes> <val>spentuox</val> </fuel_outrecipes>  "
@@ -295,7 +295,7 @@ TEST(MultiRegionReactorTests, FullSpentInventory) {
      "  <n_assem_spent>3</n_assem_spent>  ";
 
   int simdur = 10;
-  cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
+  cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
   sim.AddSource("uox").Finalize();
   sim.AddRecipe("uox", c_uox());
   sim.AddRecipe("spentuox", c_spentuox());
@@ -310,7 +310,7 @@ TEST(MultiRegionReactorTests, FullSpentInventory) {
 
 // tests that the reactor shuts down, ie., does not generate power, when the
 // spent fuel inventory is full and the core cannot be unloaded.
-TEST(MultiRegionReactorTests, FullSpentInventoryShutdown) {
+TEST(TwoRegionReactorTests, FullSpentInventoryShutdown) {
   std::string config =
     " <fuel_inrecipes> <val>uox</val> </fuel_inrecipes> "
     " <fuel_outrecipes> <val>spentuox</val> </fuel_outrecipes> "
@@ -326,7 +326,7 @@ TEST(MultiRegionReactorTests, FullSpentInventoryShutdown) {
     " <power_cap>100</power_cap> ";
 
   int simdur = 3;
-  cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
+  cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
   sim.AddSource("uox").Finalize();
   sim.AddRecipe("uox", c_uox());
   sim.AddRecipe("spentuox", c_spentuox());
@@ -342,7 +342,7 @@ TEST(MultiRegionReactorTests, FullSpentInventoryShutdown) {
 // cycle is delayed past an original scheduled start time, as soon as enough fuel is
 // received, a new cycle pattern is established starting from the delayed
 // start time.
-TEST(MultiRegionReactorTests, FuelShortage) {
+TEST(TwoRegionReactorTests, FuelShortage) {
   std::string config =
      "  <fuel_inrecipes>  <val>uox</val>      </fuel_inrecipes>  "
      "  <fuel_outrecipes> <val>spentuox</val> </fuel_outrecipes>  "
@@ -356,7 +356,7 @@ TEST(MultiRegionReactorTests, FuelShortage) {
      "  <n_assem_batch>3</n_assem_batch>  ";
 
   int simdur = 50;
-  cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
+  cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
   sim.AddSource("uox").lifetime(1).Finalize(); // provide initial full batch
   sim.AddSource("uox").start(9).lifetime(1).capacity(2).Finalize(); // provide partial batch post cycle-end
   sim.AddSource("uox").start(15).Finalize(); // provide remainder of batch much later
@@ -391,7 +391,7 @@ TEST(MultiRegionReactorTests, FuelShortage) {
 }
 
 // tests that discharged fuel is transmuted properly immediately at cycle end.
-TEST(MultiRegionReactorTests, DischargedFuelTransmute) {
+TEST(TwoRegionReactorTests, DischargedFuelTransmute) {
   std::string config =
      "  <fuel_inrecipes>  <val>uox</val>      </fuel_inrecipes>  "
      "  <fuel_outrecipes> <val>spentuox</val> </fuel_outrecipes>  "
@@ -405,7 +405,7 @@ TEST(MultiRegionReactorTests, DischargedFuelTransmute) {
      "  <n_assem_batch>1</n_assem_batch>  ";
 
   int simdur = 7;
-  cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
+  cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
   sim.AddSource("uox").Finalize();
   sim.AddSink("waste").Finalize();
   sim.AddRecipe("uox", c_uox());
@@ -425,7 +425,7 @@ TEST(MultiRegionReactorTests, DischargedFuelTransmute) {
 // tests that spent fuel is offerred on correct commods according to the
 // incommod it was received on - esp when dealing with multiple fuel commods
 // simultaneously.
-TEST(MultiRegionReactorTests, SpentFuelProperCommodTracking) {
+TEST(TwoRegionReactorTests, SpentFuelProperCommodTracking) {
   std::string config =
      "  <fuel_inrecipes>  <val>uox</val>      <val>mox</val>      </fuel_inrecipes>  "
      "  <fuel_outrecipes> <val>spentuox</val> <val>spentmox</val> </fuel_outrecipes>  "
@@ -439,7 +439,7 @@ TEST(MultiRegionReactorTests, SpentFuelProperCommodTracking) {
      "  <n_assem_batch>3</n_assem_batch>  ";
 
   int simdur = 7;
-  cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
+  cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
   sim.AddSource("uox").capacity(1).Finalize();
   sim.AddSource("mox").capacity(2).Finalize();
   sim.AddSink("waste1").Finalize();
@@ -467,7 +467,7 @@ TEST(MultiRegionReactorTests, SpentFuelProperCommodTracking) {
 // correctly and the reactor could segfault.  Check that this doesn't happen.
 
 
-TEST(MultiRegionReactorTests, Retire) {
+TEST(TwoRegionReactorTests, Retire) {
   std::string config =
      "  <fuel_inrecipes>  <val>lwr_fresh</val>  </fuel_inrecipes>  "
      "  <fuel_outrecipes> <val>lwr_spent</val>  </fuel_outrecipes>  "
@@ -487,7 +487,7 @@ TEST(MultiRegionReactorTests, Retire) {
   int life = 36;
   int cycle_time = 7;
   int refuel_time = 0;
-  cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, dur, life);
+  cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, dur, life);
   sim.AddSource("enriched_u").Finalize();
   sim.AddSink("waste").Finalize();
   sim.AddRecipe("lwr_fresh", c_uox());
@@ -508,14 +508,14 @@ TEST(MultiRegionReactorTests, Retire) {
   EXPECT_EQ(nassem_recv, qr.rows.size())
       << "failed to stop ordering near retirement";
 
-  // MultiRegionReactor should discharge all fuel before/by retirement
+  // TwoRegionReactor should discharge all fuel before/by retirement
   conds.clear();
   conds.push_back(Cond("SenderId", "==", id));
   qr = sim.db().Query("Transactions", &conds);
   EXPECT_EQ(nassem_recv, qr.rows.size())
       << "failed to discharge all material by retirement time";
 
-  // MultiRegionReactor should record power entry on the time step it retires if operating
+  // TwoRegionReactor should record power entry on the time step it retires if operating
   int time_online = life / (cycle_time + refuel_time) * cycle_time + std::min(life % (cycle_time + refuel_time), cycle_time);
   conds.clear();
   conds.push_back(Cond("AgentId", "==", id));
@@ -525,7 +525,7 @@ TEST(MultiRegionReactorTests, Retire) {
       << "failed to generate power for the correct number of time steps";
 }
 
-TEST(MultiRegionReactorTests, PositionInitialize) {
+TEST(TwoRegionReactorTests, PositionInitialize) {
   std::string config =
      "  <fuel_inrecipes>  <val>lwr_fresh</val>  </fuel_inrecipes>  "
      "  <fuel_outrecipes> <val>lwr_spent</val>  </fuel_outrecipes>  "
@@ -539,7 +539,7 @@ TEST(MultiRegionReactorTests, PositionInitialize) {
      "  <n_assem_batch>1</n_assem_batch>  ";
 
   int simdur = 50;
-  cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
+  cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
   sim.AddSource("enriched_u").Finalize();
   sim.AddRecipe("lwr_fresh", c_uox());
   sim.AddRecipe("lwr_spent", c_spentuox());
@@ -550,7 +550,7 @@ TEST(MultiRegionReactorTests, PositionInitialize) {
   EXPECT_EQ(qr.GetVal<double>("Longitude"), 0.0);
 }
 
-TEST(MultiRegionReactorTests, PositionInitialize2) {
+TEST(TwoRegionReactorTests, PositionInitialize2) {
   std::string config =
      "  <fuel_inrecipes>  <val>lwr_fresh</val>  </fuel_inrecipes>  "
      "  <fuel_outrecipes> <val>lwr_spent</val>  </fuel_outrecipes>  "
@@ -566,7 +566,7 @@ TEST(MultiRegionReactorTests, PositionInitialize2) {
      "  <latitude>30.0</latitude>  ";
 
   int simdur = 50;
-  cyclus::MockSim sim(cyclus::AgentSpec(":areal:MultiRegionReactor"), config, simdur);
+  cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
   sim.AddSource("enriched_u").Finalize();
   sim.AddRecipe("lwr_fresh", c_uox());
   sim.AddRecipe("lwr_spent", c_spentuox());
@@ -577,6 +577,6 @@ TEST(MultiRegionReactorTests, PositionInitialize2) {
   EXPECT_EQ(qr.GetVal<double>("Longitude"), 30.0);
 }
 
-} // namespace MultiRegionReactortests
+} // namespace TwoRegionReactortests
 } // namespace areal
 

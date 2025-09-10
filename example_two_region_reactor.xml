@@ -6,7 +6,7 @@
   </control>
 
   <archetypes>
-    <spec><lib>areal</lib><name>MultiRegionReactor</name></spec>
+    <spec><lib>areal</lib><name>TwoRegionReactor</name></spec>
     <spec><lib>cycamore</lib><name>Source</name></spec>
     <spec><lib>cycamore</lib><name>Sink</name></spec>
     <spec><lib>agents</lib><name>NullInst</name></spec>
@@ -25,7 +25,7 @@
   <facility>
     <name>OneFacility</name>
     <config>
-      <MultiRegionReactor>
+      <TwoRegionReactor>
         <fuel_incommods> 
           <val>fresh_u</val>
         </fuel_incommods>
@@ -44,7 +44,7 @@
         <n_assem_core>3</n_assem_core>
         <n_assem_batch>1</n_assem_batch>
         <power_cap>100</power_cap>
-      </MultiRegionReactor>
+      </TwoRegionReactor>
     </config>
   </facility>
 

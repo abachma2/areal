@@ -52,11 +52,11 @@ namespace areal {
 /// int) of its assemblies are transmuted to their respective burnt
 /// compositions.
 
-class MultiRegionReactor : public cyclus::Facility,
+class TwoRegionReactor : public cyclus::Facility,
   public cyclus::toolkit::CommodityProducer,
   public cyclus::toolkit::Position {
 #pragma cyclus note { \
-"niche": "MultiRegionReactor", \
+"niche": "TwoRegionReactor", \
 "doc": \
   "Reactor is a simple, general reactor based on static compositional" \
   " transformations to model fuel burnup.  The user specifies a set of input" \
@@ -107,8 +107,8 @@ class MultiRegionReactor : public cyclus::Facility,
 }
 
  public:
-  MultiRegionReactor(cyclus::Context* ctx);
-  virtual ~MultiRegionReactor(){};
+  TwoRegionReactor(cyclus::Context* ctx);
+  virtual ~TwoRegionReactor(){};
 
   virtual std::string version() { return AREAL_VERSION; }
 

@@ -1,4 +1,4 @@
-#include "multiregionreactor.h"
+#include "tworegionreactor.h"
 
 using cyclus::Material;
 using cyclus::toolkit::MatVec;
@@ -8,7 +8,7 @@ using cyclus::Request;
 
 namespace areal {
 
-MultiRegionReactor::MultiRegionReactor(cyclus::Context* ctx)
+TwoRegionReactor::TwoRegionReactor(cyclus::Context* ctx)
     : cyclus::Facility(ctx),
       n_assem_batch(0),
       assem_size(0),
@@ -24,34 +24,34 @@ MultiRegionReactor::MultiRegionReactor(cyclus::Context* ctx)
       keep_packaging(true) {}
 
 
-#pragma cyclus def clone areal::MultiRegionReactor
+#pragma cyclus def clone areal::TwoRegionReactor
 
-#pragma cyclus def schema areal::MultiRegionReactor
+#pragma cyclus def schema areal::TwoRegionReactor
 
-#pragma cyclus def annotations areal::MultiRegionReactor
+#pragma cyclus def annotations areal::TwoRegionReactor
 
-#pragma cyclus def infiletodb areal::MultiRegionReactor
+#pragma cyclus def infiletodb areal::TwoRegionReactor
 
-#pragma cyclus def snapshot areal::MultiRegionReactor
+#pragma cyclus def snapshot areal::TwoRegionReactor
 
-#pragma cyclus def snapshotinv areal::MultiRegionReactor
+#pragma cyclus def snapshotinv areal::TwoRegionReactor
 
-#pragma cyclus def initinv areal::MultiRegionReactor
+#pragma cyclus def initinv areal::TwoRegionReactor
 
-void MultiRegionReactor::InitFrom(MultiRegionReactor* m) {
-  #pragma cyclus impl initfromcopy areal::MultiRegionReactor
+void TwoRegionReactor::InitFrom(TwoRegionReactor* m) {
+  #pragma cyclus impl initfromcopy areal::TwoRegionReactor
   cyclus::toolkit::CommodityProducer::Copy(m);
 }
 
-void MultiRegionReactor::InitFrom(cyclus::QueryableBackend* b) {
-  #pragma cyclus impl initfromdb areal::MultiRegionReactor
+void TwoRegionReactor::InitFrom(cyclus::QueryableBackend* b) {
+  #pragma cyclus impl initfromdb areal::TwoRegionReactor
 
   namespace tk = cyclus::toolkit;
   tk::CommodityProducer::Add(tk::Commodity(power_name),
                              tk::CommodInfo(power_cap, power_cap));
 }
 
-void MultiRegionReactor::EnterNotify() {
+void TwoRegionReactor::EnterNotify() {
   cyclus::Facility::EnterNotify();
 
   // Set keep packaging parameter in all ResBufs
@@ -64,11 +64,11 @@ void MultiRegionReactor::EnterNotify() {
   InitializePosition();
 }
 
-bool MultiRegionReactor::CheckDecommissionCondition() {
+bool TwoRegionReactor::CheckDecommissionCondition() {
   return core.count() == 0 && spent.count() == 0;
 }
 
-void MultiRegionReactor::Tick() {
+void TwoRegionReactor::Tick() {
   // The following code must go in the Tick so they fire on the time step
   // following the cycle_step update - allowing for the all reactor events to
   // occur and be recorded on the "beginning" of a time step.  Another reason
@@ -118,7 +118,7 @@ void MultiRegionReactor::Tick() {
 
 }
 
-std::set<cyclus::RequestPortfolio<Material>::Ptr> MultiRegionReactor::GetMatlRequests() {
+std::set<cyclus::RequestPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlRequests() {
   using cyclus::RequestPortfolio;
 
   std::set<RequestPortfolio<Material>::Ptr> ports;
@@ -168,7 +168,7 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> MultiRegionReactor::GetMatlReq
   return ports;
 }
 
-void MultiRegionReactor::GetMatlTrades(
+void TwoRegionReactor::GetMatlTrades(
     const std::vector<cyclus::Trade<Material> >& trades,
     std::vector<std::pair<cyclus::Trade<Material>, Material::Ptr> >&
         responses) {
@@ -185,7 +185,7 @@ void MultiRegionReactor::GetMatlTrades(
   PushSpent(mats);  // return leftovers back to spent buffer
 }
 
-void MultiRegionReactor::AcceptMatlTrades(const std::vector<
+void TwoRegionReactor::AcceptMatlTrades(const std::vector<
     std::pair<cyclus::Trade<Material>, Material::Ptr> >& responses) {
   std::vector<std::pair<cyclus::Trade<Material>,
                         Material::Ptr> >::const_iterator trade;
@@ -210,7 +210,7 @@ void MultiRegionReactor::AcceptMatlTrades(const std::vector<
   }
 }
 
-std::set<cyclus::BidPortfolio<Material>::Ptr> MultiRegionReactor::GetMatlBids(
+std::set<cyclus::BidPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlBids(
     cyclus::CommodMap<Material>::type& commod_requests) {
   using cyclus::BidPortfolio;
   std::set<BidPortfolio<Material>::Ptr> ports;
@@ -267,7 +267,7 @@ std::set<cyclus::BidPortfolio<Material>::Ptr> MultiRegionReactor::GetMatlBids(
   return ports;
 }
 
-void MultiRegionReactor::Tock() {
+void TwoRegionReactor::Tock() {
   if (retired()) {
     return;
   }
@@ -300,9 +300,9 @@ void MultiRegionReactor::Tock() {
   }
 }
 
-void MultiRegionReactor::Transmute() { Transmute(n_assem_batch); }
+void TwoRegionReactor::Transmute() { Transmute(n_assem_batch); }
 
-void MultiRegionReactor::Transmute(int n_assem) {
+void TwoRegionReactor::Transmute(int n_assem) {
   MatVec old = core.PopN(std::min(n_assem, core.count()));
   core.Push(old);
   if (core.count() > old.size()) {
@@ -319,7 +319,7 @@ void MultiRegionReactor::Transmute(int n_assem) {
   }
 }
 
-std::map<std::string, MatVec> MultiRegionReactor::PeekSpent() {
+std::map<std::string, MatVec> TwoRegionReactor::PeekSpent() {
   std::map<std::string, MatVec> mapped;
   MatVec mats = spent.PopN(spent.count());
   spent.Push(mats);
@@ -330,7 +330,7 @@ std::map<std::string, MatVec> MultiRegionReactor::PeekSpent() {
   return mapped;
 }
 
-bool MultiRegionReactor::Discharge() {
+bool TwoRegionReactor::Discharge() {
   int npop = std::min(n_assem_batch, core.count());
   if (n_assem_spent - spent.count() < npop) {
     Record("DISCHARGE", "failed");
@@ -357,7 +357,7 @@ bool MultiRegionReactor::Discharge() {
   return true;
 }
 
-void MultiRegionReactor::Load() {
+void TwoRegionReactor::Load() {
   int n = std::min(n_assem_core - core.count(), fresh.count());
   if (n == 0) {
     return;
@@ -369,39 +369,39 @@ void MultiRegionReactor::Load() {
   core.Push(fresh.PopN(n));
 }
 
-std::string MultiRegionReactor::fuel_incommod(Material::Ptr m) {
+std::string TwoRegionReactor::fuel_incommod(Material::Ptr m) {
   int i = res_indexes[m->obj_id()];
   if (i >= fuel_incommods.size()) {
-    throw KeyError("areal::MultiRegionReactor - no incommod for material object");
+    throw KeyError("areal::TwoRegionReactor - no incommod for material object");
   }
   return fuel_incommods[i];
 }
 
-std::string MultiRegionReactor::fuel_outcommod(Material::Ptr m) {
+std::string TwoRegionReactor::fuel_outcommod(Material::Ptr m) {
   int i = res_indexes[m->obj_id()];
   if (i >= fuel_outcommods.size()) {
-    throw KeyError("areal::MultiRegionReactor - no outcommod for material object");
+    throw KeyError("areal::TwoRegionReactor - no outcommod for material object");
   }
   return fuel_outcommods[i];
 }
 
-std::string MultiRegionReactor::fuel_inrecipe(Material::Ptr m) {
+std::string TwoRegionReactor::fuel_inrecipe(Material::Ptr m) {
   int i = res_indexes[m->obj_id()];
   if (i >= fuel_inrecipes.size()) {
-    throw KeyError("areal::MultiRegionReactor - no inrecipe for material object");
+    throw KeyError("areal::TwoRegionReactor - no inrecipe for material object");
   }
   return fuel_inrecipes[i];
 }
 
-std::string MultiRegionReactor::fuel_outrecipe(Material::Ptr m) {
+std::string TwoRegionReactor::fuel_outrecipe(Material::Ptr m) {
   int i = res_indexes[m->obj_id()];
   if (i >= fuel_outrecipes.size()) {
-    throw KeyError("areal::MultiRegionReactor - no outrecipe for material object");
+    throw KeyError("areal::TwoRegionReactor - no outrecipe for material object");
   }
   return fuel_outrecipes[i];
 }
 
-void MultiRegionReactor::index_res(cyclus::Resource::Ptr m, std::string incommod) {
+void TwoRegionReactor::index_res(cyclus::Resource::Ptr m, std::string incommod) {
   for (int i = 0; i < fuel_incommods.size(); i++) {
     if (fuel_incommods[i] == incommod) {
       res_indexes[m->obj_id()] = i;
@@ -409,10 +409,10 @@ void MultiRegionReactor::index_res(cyclus::Resource::Ptr m, std::string incommod
     }
   }
   throw ValueError(
-      "areal::MultiRegionReactor - received unsupported incommod material");
+      "areal::TwoRegionReactor - received unsupported incommod material");
 }
 
-std::map<std::string, MatVec> MultiRegionReactor::PopSpent() {
+std::map<std::string, MatVec> TwoRegionReactor::PopSpent() {
   MatVec mats = spent.PopN(spent.count());
   std::map<std::string, MatVec> mapped;
   for (int i = 0; i < mats.size(); i++) {
@@ -429,7 +429,7 @@ std::map<std::string, MatVec> MultiRegionReactor::PopSpent() {
   return mapped;
 }
 
-void MultiRegionReactor::PushSpent(std::map<std::string, MatVec> leftover) {
+void TwoRegionReactor::PushSpent(std::map<std::string, MatVec> leftover) {
   std::map<std::string, MatVec>::iterator it;
   for (it = leftover.begin(); it != leftover.end(); ++it) {
     // undo reverse in PopSpent to make sure oldest assemblies come out first
@@ -438,9 +438,9 @@ void MultiRegionReactor::PushSpent(std::map<std::string, MatVec> leftover) {
   }
 }
 
-void MultiRegionReactor::Record(std::string name, std::string val) {
+void TwoRegionReactor::Record(std::string name, std::string val) {
   context()
-      ->NewDatum("MultiRegionReactorEvents")
+      ->NewDatum("TwoRegionReactorEvents")
       ->AddVal("AgentId", id())
       ->AddVal("Time", context()->time())
       ->AddVal("Event", name)
@@ -448,8 +448,8 @@ void MultiRegionReactor::Record(std::string name, std::string val) {
       ->Record();
 }
 
-extern "C" cyclus::Agent* ConstructMultiRegionReactor(cyclus::Context* ctx) {
-  return new MultiRegionReactor(ctx);
+extern "C" cyclus::Agent* ConstructTwoRegionReactor(cyclus::Context* ctx) {
+  return new TwoRegionReactor(ctx);
 }
 
 }  // namespace areal
