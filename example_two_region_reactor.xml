@@ -1,6 +1,6 @@
 <simulation>
   <control>
-    <duration>100</duration>
+    <duration>10</duration>
     <startmonth>1</startmonth>
     <startyear>2000</startyear>
   </control>
@@ -50,8 +50,8 @@
           <val>spent_uranium</val>
           <val>spent_blanket</val>
         </fuel_outrecipes>
-        <cycle_time>10</cycle_time>
-        <refuel_time>1</refuel_time>
+        <cycle_time>1</cycle_time>
+        <refuel_time>0</refuel_time>
         <assem_size> 
           <val>100</val>
           <val>50</val>
@@ -98,11 +98,19 @@
           <number>1</number>
         </entry>
         <entry>
+          <prototype>BlanketSource</prototype>
+          <number>1</number>
+        </entry>
+        <entry>
           <prototype>OneFacility</prototype>
           <number>1</number>
         </entry>
         <entry>
           <prototype>USink</prototype>
+          <number>1</number>
+        </entry>
+        <entry>
+          <prototype>BlanketSink</prototype>
           <number>1</number>
         </entry>
       </initialfacilitylist>
