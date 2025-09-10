@@ -57,7 +57,6 @@ void TwoRegionReactor::InitFrom(cyclus::QueryableBackend* b) {
 
 void TwoRegionReactor::EnterNotify() {
   cyclus::Facility::EnterNotify();
-
   // Set keep packaging parameter in all ResBufs
   fresh1.keep_packaging(keep_packaging);
   core1.keep_packaging(keep_packaging);
@@ -83,10 +82,14 @@ void TwoRegionReactor::Tick() {
   // they
   // can't go at the beginnin of the Tock is so that resource exchange has a
   // chance to occur after the discharge on this same time step.
-
+  LOG(cyclus::LEV_INFO1, "TRR") << "cycle_step: " << cycle_step;
+  LOG(cyclus::LEV_INFO1, "TRR") << "Tick: core1: " << core1.count() << " fresh1: " <<
+  fresh1.count() << " spent1: " << spent1.count();
+  LOG(cyclus::LEV_INFO1, "TRR") << "Tick: core2: " << core2.count() << " fresh2: " <<
+  fresh2.count() << " spent2: " << spent2.count();
   if (retired()) {
     Record("RETIRED", "");
-
+    LOG(cyclus::LEV_INFO1, "TRR") << " TRR is retired ";
     if (context()->time() == exit_time() + 1) { // only need to transmute once
       if (decom_transmute_all == true) {
         Transmute(n_assem_region1, 0);
@@ -124,12 +127,16 @@ void TwoRegionReactor::Tick() {
     Transmute();
     Record("CYCLE_END", "");
   }
-
+  LOG(cyclus::LEV_INFO1, "TRR") << "Checking for discharge conditions: step: " <<
+  cycle_step << " cycle time: " << cycle_time << " discharged1: " << discharged1 <<
+  " discharged2: " << discharged2;
   if (cycle_step >= cycle_time && !discharged1 && !discharged2) {
+    LOG(cyclus::LEV_INFO1, "TRR") << "Discharging fuel";
     discharged1 = Discharge(0);
     discharged2 = Discharge(1);
   }
   if (cycle_step >= cycle_time) {
+    LOG(cyclus::LEV_INFO1, "TRR") << "Loading fuel";
     Load(0);
     Load(1);
   }
@@ -163,6 +170,9 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlReque
     n_assem_order1 = std::min(n_assem_order1, n_need1);
     n_assem_order2 = std::min(n_assem_order2, n_need2); 
   }
+  
+  LOG(cyclus::LEV_INFO1, "TRR") << " requesting " << n_assem_order1 << " assemblies for R1";
+  LOG(cyclus::LEV_INFO1, "TRR") << " requesting " << n_assem_order2 << " assemblies for R2";
 
   if (n_assem_order1 == 0 && n_assem_order2 == 0) {
     return ports;
@@ -211,6 +221,7 @@ void TwoRegionReactor::GetMatlTrades(
 
   for (int i=0; i<2; i++){
     std::map<std::string, MatVec> mats = PopSpent(i);
+    LOG(cyclus::LEV_INFO1, "TRR") << mats.size() << " in spent inventory for R" << i <<" before";
     for (int j = 0; j < trades.size(); j++) {
       std::string commod = trades[j].request->commodity();
       Material::Ptr m = mats[commod].back();
@@ -219,6 +230,7 @@ void TwoRegionReactor::GetMatlTrades(
       res_indexes.erase(m->obj_id());
     }
     PushSpent(mats, i);  // return leftovers back to spent buffer
+    LOG(cyclus::LEV_INFO1, "TRR") << mats.size() << " in spent inventory for R" << i <<" after";
   }
 }
 
@@ -241,6 +253,9 @@ void TwoRegionReactor::AcceptMatlTrades(const std::vector<
   }
   int nload1 = std::min(num_response1, n_assem_region1 - core1.count());
   int nload2 = std::min(num_response2, n_assem_region2 - core2.count());
+
+  LOG(cyclus::LEV_INFO1, "TRR") << " accepting " << nload1 << " assemblies for R1";
+  LOG(cyclus::LEV_INFO1, "TRR") << " accepting " << nload2 << " assemblies for R2";
 
   if (nload1 > 0) {
     ss << nload1 << " assemblies in Region 1";
@@ -290,6 +305,7 @@ std::set<cyclus::BidPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlBids(
     std::string commod = fuel_outcommods[i];
     std::vector<Request<Material>*>& reqs = commod_requests[commod];
     all_mats = PeekSpent(i);
+    LOG(cyclus::LEV_INFO1, "TRR") << " bidding " << reqs.size() << " assemblies from region " << i;
     if (reqs.size() == 0) {
       continue;
     }
@@ -348,6 +364,8 @@ void TwoRegionReactor::Tock() {
 
   if (cycle_step >= 0 && cycle_step < cycle_time &&
       core1.count() == n_assem_region1 && core2.count() == n_assem_region2) {
+        
+    LOG(cyclus::LEV_INFO1, "TRR") << " producing power";
     cyclus::toolkit::RecordTimeSeries<cyclus::toolkit::POWER>(this, power_cap);
     cyclus::toolkit::RecordTimeSeries<double>("supplyPOWER", this, power_cap);
   } else {
@@ -357,10 +375,8 @@ void TwoRegionReactor::Tock() {
 
   // "if" prevents starting cycle after initial deployment until core is full
   // even though cycle_step is its initial zero.
-  if (cycle_step > 0) {
-    if (core1.count() == n_assem_region1 && core2.count() == n_assem_region2) {
+  if ((cycle_step > 0) || (core1.count() == n_assem_region1 && core2.count() == n_assem_region2)){
       cycle_step++;
-    }
   }
 }
 
@@ -371,6 +387,8 @@ void TwoRegionReactor::Transmute() {
 
 void TwoRegionReactor::Transmute(int n_assem, int region_num) {
   MatVec old; 
+  
+  LOG(cyclus::LEV_INFO1, "TRR") << " transmuting " << n_assem << " assemblies in R2";
   if (region_num == 0){
     old = core1.PopN(std::min(n_assem, core1.count()));
     core1.Push(old);
