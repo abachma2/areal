@@ -224,6 +224,9 @@ void TwoRegionReactor::GetMatlTrades(
     LOG(cyclus::LEV_INFO1, "TRR") << mats.size() << " in spent inventory for R" << i <<" before";
     for (int j = 0; j < trades.size(); j++) {
       std::string commod = trades[j].request->commodity();
+      if (commod != fuel_outcommods[i]) {
+        continue;
+      }
       Material::Ptr m = mats[commod].back();
       mats[commod].pop_back();
       responses.push_back(std::make_pair(trades[j], m));
