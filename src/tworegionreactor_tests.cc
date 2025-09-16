@@ -81,20 +81,17 @@ TEST(TwoRegionReactorTests, JustInTimeOrdering) {
   int id = sim.Run();
   
   QueryResult qr = sim.db().Query("Transactions", NULL);
-  int n_trans = qr.rows.size();
-  EXPECT_EQ(simdur*2, n_trans) << "expected 100 transactions, got " << n_trans;
+  EXPECT_EQ(simdur*2, qr.rows.size());
   
-  std::vector<cyclus::Cond> cond1;
-  cond1.push_back(cyclus::Cond("Commodity", "==", std::string("enriched_u")));
-  qr = sim.db().Query("Transactions", &cond1);
-  int n_trans1 = qr.rows.size();
-  EXPECT_EQ(simdur, n_trans1) << "expected 50 transactions, got " << n_trans1;
+  std::vector<cyclus::Cond> conds;
+  conds.push_back(cyclus::Cond("Commodity", "==", std::string("enriched_u")));
+  qr = sim.db().Query("Transactions", &conds);
+  EXPECT_EQ(simdur, qr.rows.size());
 
-  std::vector<cyclus::Cond> cond2;
-  cond2.push_back(cyclus::Cond("Commodity", "==", std::string("natural_u")));
-  qr = sim.db().Query("Transactions", &cond2);
-  int n_trans2 = qr.rows.size();
-  EXPECT_EQ(simdur, n_trans2) << "expected 50 transactions, got " << n_trans2;
+  conds.clear();
+  conds.push_back(cyclus::Cond("Commodity", "==", std::string("natural_u")));
+  qr = sim.db().Query("Transactions", &conds);
+  EXPECT_EQ(simdur, qr.rows.size()) ;
 }
 
 // tests that the correct number of assemblies are popped from the core each
@@ -130,17 +127,15 @@ TEST(TwoRegionReactorTests, BatchSizes) {
   EXPECT_EQ(7+3*(simdur-1)+14+2*(simdur-1), qr.rows.size());
 
   // test each commodity name
-  std::vector<cyclus::Cond> cond1;
-  cond1.push_back(cyclus::Cond("Commodity", "==", std::string("uox")));
-  qr = sim.db().Query("Transactions", &cond1);
-  int n_trans1 = qr.rows.size();
-  EXPECT_EQ(7+3*(simdur-1), n_trans1) << "expected 154 transactions, got " << n_trans1;
+  std::vector<cyclus::Cond> conds;
+  conds.push_back(cyclus::Cond("Commodity", "==", std::string("uox")));
+  qr = sim.db().Query("Transactions", &conds);
+  EXPECT_EQ(7+3*(simdur-1), qr.rows.size());
 
-  std::vector<cyclus::Cond> cond2;
-  cond2.push_back(cyclus::Cond("Commodity", "==", std::string("mox")));
-  qr = sim.db().Query("Transactions", &cond2);
-  int n_trans2 = qr.rows.size();
-  EXPECT_EQ(14+2*(simdur-1), n_trans2) << "expected 112 transactions, got " << n_trans2;
+  conds.clear();
+  conds.push_back(cyclus::Cond("Commodity", "==", std::string("mox")));
+  qr = sim.db().Query("Transactions", &conds);
+  EXPECT_EQ(14+2*(simdur-1), qr.rows.size());
 }
 
 // tests that the refueling period between cycle end and start of the next
@@ -176,17 +171,16 @@ TEST(TwoRegionReactorTests, RefuelTimes) {
   int n_assem_want = simdur/(cyclet+refuelt); // refuels
   EXPECT_EQ(n_assem_want*2+3, qr.rows.size()) << "expected 16 transactions, got " << qr.rows.size();
 
-  std::vector<cyclus::Cond> cond1;
-  cond1.push_back(cyclus::Cond("Commodity", "==", std::string("uox")));
-  qr = sim.db().Query("Transactions", &cond1);
+  std::vector<cyclus::Cond> conds;
+  conds.push_back(cyclus::Cond("Commodity", "==", std::string("uox")));
+  qr = sim.db().Query("Transactions", &conds);
   int n_trans1 = qr.rows.size();
-  EXPECT_EQ(n_assem_want+1, n_trans1) << "expected 8 transactions, got " << n_trans1;
+  EXPECT_EQ(n_assem_want+1, qr.rows.size());
 
-  std::vector<cyclus::Cond> cond2;
-  cond2.push_back(cyclus::Cond("Commodity", "==", std::string("mox")));
-  qr = sim.db().Query("Transactions", &cond2);
-  int n_trans2 = qr.rows.size();
-  EXPECT_EQ(n_assem_want+2, n_trans2) << "expected 8 transactions, got " << n_trans2;
+  conds.clear();
+  conds.push_back(cyclus::Cond("Commodity", "==", std::string("mox")));
+  qr = sim.db().Query("Transactions", &conds);
+  EXPECT_EQ(n_assem_want+2, qr.rows.size());
 }
 
 
@@ -234,20 +228,17 @@ TEST(TwoRegionReactorTests, DecomTimes) {
 
   // make sure transactions are correct
   qr = sim.db().Query("Transactions", NULL);
-  int n_trans = qr.rows.size();
-  EXPECT_EQ(9, n_trans) << "expected 9 transactions, got " << n_trans;
+  EXPECT_EQ(9, qr.rows.size());
   
-  std::vector<cyclus::Cond> cond1;
-  cond1.push_back(cyclus::Cond("Commodity", "==", std::string("uox")));
-  qr = sim.db().Query("Transactions", &cond1);
-  int n_trans1 = qr.rows.size();
-  EXPECT_EQ(5, n_trans1) << "expected 5 transactions, got " << n_trans1;
+  conds.clear();
+  conds.push_back(cyclus::Cond("Commodity", "==", std::string("uox")));
+  qr = sim.db().Query("Transactions", &conds);
+  EXPECT_EQ(5, qr.rows.size());
 
-  std::vector<cyclus::Cond> cond2;
-  cond2.push_back(cyclus::Cond("Commodity", "==", std::string("mox")));
-  qr = sim.db().Query("Transactions", &cond2);
-  int n_trans2 = qr.rows.size();
-  EXPECT_EQ(4, n_trans2) << "expected 4 transactions, got " << n_trans2;
+  conds.clear();
+  conds.push_back(cyclus::Cond("Commodity", "==", std::string("mox")));
+  qr = sim.db().Query("Transactions", &conds);
+  EXPECT_EQ(4, qr.rows.size());
 }
 
 

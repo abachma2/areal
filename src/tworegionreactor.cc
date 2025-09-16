@@ -99,7 +99,7 @@ void TwoRegionReactor::Tick() {
   // following the cycle_step update - allowing for the all reactor events to
   // occur and be recorded on the "beginning" of a time step.  Another reason
   // they
-  // can't go at the beginnin of the Tock is so that resource exchange has a
+  // can't go at the beginning of the Tock is so that resource exchange has a
   // chance to occur after the discharge on this same time step.
   if (retired()) {
     Record("RETIRED", "");
@@ -227,7 +227,7 @@ void TwoRegionReactor::GetMatlTrades(
         responses) {
   using cyclus::Trade;
 
-  for (int i=0; i<2; i++){
+  for (int i = 0; i < 2; i++){
     std::map<std::string, MatVec> mats = PopSpent(i);
     for (int j = 0; j < trades.size(); j++) {
       std::string commod = trades[j].request->commodity();
@@ -267,7 +267,7 @@ void TwoRegionReactor::AcceptMatlTrades(const std::vector<
     ss << nload1 << " assemblies in Region 1";
     Record("LOAD", ss.str());
   }
-  if (nload2 >0 ) {
+  if (nload2 > 0 ) {
     ss << nload2 << "assemblies in Region 2";
     Record("LOAD", ss.str());
   }
@@ -307,7 +307,7 @@ std::set<cyclus::BidPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlBids(
     }
   }
 
-  for (int i =0; i < 2; i++) {
+  for (int i = 0; i < 2; i++) {
     std::string commod = fuel_outcommods[i];
     std::vector<Request<Material>*>& reqs = commod_requests[commod];
     all_mats = PeekSpent(i);
@@ -467,7 +467,7 @@ bool TwoRegionReactor::Discharge(int region_num) {
   spent_mats = PeekSpent(region_num);
   MatVec mats = spent_mats[fuel_outcommods[region_num]];
   double tot_spent = 0;
-  for (int i = 0; i<mats.size(); i++){
+  for (int i = 0; i < mats.size(); i++){
     Material::Ptr m = mats[i];
     tot_spent += m->quantity();
   }
