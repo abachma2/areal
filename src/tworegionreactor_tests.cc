@@ -402,24 +402,29 @@ TEST(TwoRegionReactorTests, FullSpentInventory) {
 // spent fuel inventory is full and the core cannot be unloaded.
 TEST(TwoRegionReactorTests, FullSpentInventoryShutdown) {
   std::string config =
-    " <fuel_inrecipes> <val>uox</val> </fuel_inrecipes> "
-    " <fuel_outrecipes> <val>spentuox</val> </fuel_outrecipes> "
-    " <fuel_incommods> <val>uox</val> </fuel_incommods> "
-    " <fuel_outcommods> <val>waste</val> </fuel_outcommods> "
-    ""
-    " <cycle_time>1</cycle_time> "
-    " <refuel_time>0</refuel_time> "
-    " <assem_size>1</assem_size> "
-    " <n_assem_core>1</n_assem_core> "
-    " <n_assem_batch>1</n_assem_batch> "
-    " <n_assem_spent>1</n_assem_spent> "
-    " <power_cap>100</power_cap> ";
+     "  <fuel_inrecipes>  <val>uox</val>  <val>mox</val>    </fuel_inrecipes>  "
+     "  <fuel_outrecipes> <val>spentuox</val> <val>spentmox</val> </fuel_outrecipes>  "
+     "  <fuel_incommods>  <val>uox</val>   <val>mox</val>   </fuel_incommods>  "
+     "  <fuel_outcommods> <val>spentuox</val> <val>spentmox</val>  </fuel_outcommods>  "
+     ""
+     "  <cycle_time>1</cycle_time> "
+     "  <refuel_time>0</refuel_time> "
+     "  <assem_size> <val>1</val> <val>1</val> </assem_size> "
+     "  <n_assem_region1>1</n_assem_region1> "
+     "  <n_assem_region2>1</n_assem_region2> "
+     "  <n_assem_batch1>1</n_assem_batch1> "
+     "  <n_assem_batch2>1</n_assem_batch2> "
+     " <n_assem_spent1>1</n_assem_spent1> "
+     " <power_cap>100</power_cap> ";
 
   int simdur = 3;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
   sim.AddSource("uox").Finalize();
+  sim.AddSource("mox").Finalize();
   sim.AddRecipe("uox", c_uox());
+  sim.AddRecipe("mox", c_mox());
   sim.AddRecipe("spentuox", c_spentuox());
+  sim.AddRecipe("spentmox", c_spentmox());
   int id = sim.Run();
 
   QueryResult qr = sim.db().Query("TimeSeriesPower", NULL);
@@ -434,82 +439,105 @@ TEST(TwoRegionReactorTests, FullSpentInventoryShutdown) {
 // start time.
 TEST(TwoRegionReactorTests, FuelShortage) {
   std::string config =
-     "  <fuel_inrecipes>  <val>uox</val>      </fuel_inrecipes>  "
-     "  <fuel_outrecipes> <val>spentuox</val> </fuel_outrecipes>  "
-     "  <fuel_incommods>  <val>uox</val>      </fuel_incommods>  "
-     "  <fuel_outcommods> <val>waste</val>    </fuel_outcommods>  "
+     "  <fuel_inrecipes>  <val>uox</val>  <val>mox</val>    </fuel_inrecipes>  "
+     "  <fuel_outrecipes> <val>spentuox</val> <val>spentmox</val> </fuel_outrecipes>  "
+     "  <fuel_incommods>  <val>uox</val>   <val>mox</val>   </fuel_incommods>  "
+     "  <fuel_outcommods> <val>waste</val> <val>spentmox</val>  </fuel_outcommods>  "
      ""
      "  <cycle_time>7</cycle_time>  "
      "  <refuel_time>0</refuel_time>  "
-     "  <assem_size>1</assem_size>  "
-     "  <n_assem_core>3</n_assem_core>  "
-     "  <n_assem_batch>3</n_assem_batch>  ";
+     "  <assem_size> <val>1</val> <val>1</val> </assem_size>  "
+     "  <n_assem_region1>3</n_assem_region1>  "
+     "  <n_assem_region2>2</n_assem_region2>"
+     "  <n_assem_batch1>3</n_assem_batch1>  "
+     "  <n_assem_batch2>2</n_assem_batch2>";
 
   int simdur = 50;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
   sim.AddSource("uox").lifetime(1).Finalize(); // provide initial full batch
+  sim.AddSource("mox").lifetime(1).Finalize();
   sim.AddSource("uox").start(9).lifetime(1).capacity(2).Finalize(); // provide partial batch post cycle-end
+  sim.AddSource("mox").start(9).lifetime(1).capacity(1).Finalize();
   sim.AddSource("uox").start(15).Finalize(); // provide remainder of batch much later
+  sim.AddSource("mox").start(15).Finalize();
   sim.AddRecipe("uox", c_uox());
+  sim.AddRecipe("mox", c_mox());
   sim.AddRecipe("spentuox", c_spentuox());
+  sim.AddRecipe("spentmox", c_spentmox());
   int id = sim.Run();
 
   // check that we never got a full refueled batch during refuel period
   std::vector<Cond> conds;
   conds.push_back(Cond("Time", "<", 15));
   QueryResult qr = sim.db().Query("Transactions", &conds);
-  EXPECT_EQ(5, qr.rows.size());
+  EXPECT_EQ(8, qr.rows.size());
 
   // after being delayed past original scheduled start of new cycle, we got
   // final assembly for core.
   conds.clear();
   conds.push_back(Cond("Time", "==", 15));
   qr = sim.db().Query("Transactions", &conds);
-  EXPECT_EQ(1, qr.rows.size());
+  EXPECT_EQ(2, qr.rows.size());
 
   // all during the next (delayed) cycle we shouldn't be requesting any new fuel
   conds.clear();
   conds.push_back(Cond("Time", "<", 21));
   qr = sim.db().Query("Transactions", &conds);
-  EXPECT_EQ(6, qr.rows.size());
+  EXPECT_EQ(10, qr.rows.size());
 
-  // as soon as this delayed cycle ends, we should be requesting/getting 3 new batches
+  // as soon as this delayed cycle ends, we should be requesting/getting 3 new assemblies 
+  // in region 1 and 2 new assemblies in region 2
   conds.clear();
   conds.push_back(Cond("Time", "==", 22));
   qr = sim.db().Query("Transactions", &conds);
-  EXPECT_EQ(3, qr.rows.size());
+  EXPECT_EQ(5, qr.rows.size());
 }
 
 // tests that discharged fuel is transmuted properly immediately at cycle end.
 TEST(TwoRegionReactorTests, DischargedFuelTransmute) {
   std::string config =
-     "  <fuel_inrecipes>  <val>uox</val>      </fuel_inrecipes>  "
-     "  <fuel_outrecipes> <val>spentuox</val> </fuel_outrecipes>  "
-     "  <fuel_incommods>  <val>uox</val>      </fuel_incommods>  "
-     "  <fuel_outcommods> <val>waste</val>    </fuel_outcommods>  "
+     "  <fuel_inrecipes>  <val>uox</val>  <val>mox</val>    </fuel_inrecipes>  "
+     "  <fuel_outrecipes> <val>spentuox</val> <val>spentmox</val> </fuel_outrecipes>  "
+     "  <fuel_incommods>  <val>uox</val>   <val>mox</val>   </fuel_incommods>  "
+     "  <fuel_outcommods> <val>waste</val> <val>spentmox</val>  </fuel_outcommods>  "
      ""
      "  <cycle_time>4</cycle_time>  "
      "  <refuel_time>3</refuel_time>  "
-     "  <assem_size>1</assem_size>  "
-     "  <n_assem_core>1</n_assem_core>  "
-     "  <n_assem_batch>1</n_assem_batch>  ";
+     "  <assem_size> <val>1</val> <val>1</val> </assem_size>  "
+     "  <n_assem_region1>1</n_assem_region1>  "
+     "  <n_assem_region2>2</n_assem_region2>"
+     "  <n_assem_batch1>1</n_assem_batch1>  "
+     "  <n_assem_batch2>1</n_assem_batch2>  ";
 
   int simdur = 7;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
   sim.AddSource("uox").Finalize();
+  sim.AddSource("mox").Finalize();
   sim.AddSink("waste").Finalize();
+  sim.AddSink("spentmox").Finalize();
   sim.AddRecipe("uox", c_uox());
+  sim.AddRecipe("mox", c_mox());
   Composition::Ptr spentuox = c_spentuox();
   sim.AddRecipe("spentuox", spentuox);
+  Composition::Ptr spentmox = c_spentmox();
+  sim.AddRecipe("spentmox", spentmox);
   int id = sim.Run();
 
   std::vector<Cond> conds;
-  conds.push_back(Cond("SenderId", "==", id));
+  conds.push_back(Cond("Commodity", "==", std::string("waste")));
   int resid = sim.db().Query("Transactions", &conds).GetVal<int>("ResourceId");
   Material::Ptr m = sim.GetMaterial(resid);
-  MatQuery mq(m);
+  MatQuery mq1(m);
   EXPECT_EQ(spentuox->id(), m->comp()->id());
-  EXPECT_TRUE(mq.mass(942390000) > 0) << "transmuted spent fuel doesn't have Pu239";
+  EXPECT_TRUE(mq1.mass(942390000) > 0) << "transmuted spent fuel doesn't have Pu239";
+
+  conds.clear();
+  conds.push_back(Cond("Commodity", "==", std::string("spentmox")));
+  resid = sim.db().Query("Transactions", &conds).GetVal<int>("ResourceId");
+  m = sim.GetMaterial(resid);
+  MatQuery mq2(m);
+  EXPECT_EQ(spentmox->id(), m->comp()->id());
+  EXPECT_TRUE(mq2.mass(942390000) > 0) << "transmuted spent fuel doesn't have Pu239";
 }
 
 // tests that spent fuel is offerred on correct commods according to the
@@ -524,14 +552,16 @@ TEST(TwoRegionReactorTests, SpentFuelProperCommodTracking) {
      ""
      "  <cycle_time>1</cycle_time>  "
      "  <refuel_time>0</refuel_time>  "
-     "  <assem_size>1</assem_size>  "
-     "  <n_assem_core>3</n_assem_core>  "
-     "  <n_assem_batch>3</n_assem_batch>  ";
+     "  <assem_size> <val>1</val> <val>1</val> </assem_size>  "
+     "  <n_assem_region1>3</n_assem_region1>  "
+     "  <n_assem_region2>2</n_assem_region2>"
+     "  <n_assem_batch1>3</n_assem_batch1>  "
+     "  <n_assem_batch2>2</n_assem_batch2>  ";
 
   int simdur = 7;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
-  sim.AddSource("uox").capacity(1).Finalize();
-  sim.AddSource("mox").capacity(2).Finalize();
+  sim.AddSource("uox").Finalize();
+  sim.AddSource("mox").Finalize();
   sim.AddSink("waste1").Finalize();
   sim.AddSink("waste2").Finalize();
   sim.AddRecipe("uox", c_uox());
@@ -544,11 +574,11 @@ TEST(TwoRegionReactorTests, SpentFuelProperCommodTracking) {
   conds.push_back(Cond("SenderId", "==", id));
   conds.push_back(Cond("Commodity", "==", std::string("waste1")));
   QueryResult qr = sim.db().Query("Transactions", &conds);
-  EXPECT_EQ(simdur-1, qr.rows.size());
+  EXPECT_EQ(18, qr.rows.size());
 
   conds[1] = Cond("Commodity", "==", std::string("waste2"));
   qr = sim.db().Query("Transactions", &conds);
-  EXPECT_EQ(2*(simdur-1), qr.rows.size());
+  EXPECT_EQ(12, qr.rows.size());
 }
 
 // The user can optionally omit fuel preferences.  In the case where
@@ -559,17 +589,19 @@ TEST(TwoRegionReactorTests, SpentFuelProperCommodTracking) {
 
 TEST(TwoRegionReactorTests, Retire) {
   std::string config =
-     "  <fuel_inrecipes>  <val>lwr_fresh</val>  </fuel_inrecipes>  "
-     "  <fuel_outrecipes> <val>lwr_spent</val>  </fuel_outrecipes>  "
-     "  <fuel_incommods>  <val>enriched_u</val> </fuel_incommods>  "
-     "  <fuel_outcommods> <val>waste</val>      </fuel_outcommods>  "
+     "  <fuel_inrecipes>  <val>lwr_fresh</val> <val>bwr_fresh</val> </fuel_inrecipes>  "
+     "  <fuel_outrecipes> <val>lwr_spent</val> <val>bwr_spent</val> </fuel_outrecipes>  "
+     "  <fuel_incommods>  <val>enriched_u</val> <val>enriched_pu</val> </fuel_incommods>  "
+     "  <fuel_outcommods> <val>waste</val> <val>spent_pu</val>    </fuel_outcommods>  "
      ""
      "  <cycle_time>7</cycle_time>  "
      "  <refuel_time>0</refuel_time>  "
-     "  <assem_size>300</assem_size>  "
-     "  <n_assem_fresh>1</n_assem_fresh>  "
-     "  <n_assem_core>3</n_assem_core>  "
-     "  <n_assem_batch>1</n_assem_batch>  "
+     "  <assem_size> <val>300</val> <val>150</val> </assem_size>  "
+     "  <n_assem_fresh1>1</n_assem_fresh1>  "
+     "  <n_assem_region1>3</n_assem_region1>  "
+     "  <n_assem_region2>2</n_assem_region2>  "
+     "  <n_assem_batch1>1</n_assem_batch1>  "
+     "  <n_assem_batch2>1</n_assem_batch2>  "
      "  <power_cap>1</power_cap>  "
      "";
 
@@ -579,18 +611,30 @@ TEST(TwoRegionReactorTests, Retire) {
   int refuel_time = 0;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, dur, life);
   sim.AddSource("enriched_u").Finalize();
+  sim.AddSource("enriched_pu").Finalize();
   sim.AddSink("waste").Finalize();
+  sim.AddSink("spent_pu").Finalize();
   sim.AddRecipe("lwr_fresh", c_uox());
+  sim.AddRecipe("bwr_fresh", c_mox());
   sim.AddRecipe("lwr_spent", c_spentuox());
+  sim.AddRecipe("bwr_spent", c_spentmox());
   int id = sim.Run();
 
-  int ncore = 3;
-  int nbatch = 1;
+  int nregion1 = 3;
+  int nregion2 = 2;
+  int nbatch1 = 1;
+  int nbatch2 = 1;
 
   // reactor should stop requesting new fresh fuel as it approaches retirement
   int nassem_recv =
-      static_cast<int>(ceil(static_cast<double>(life) / 7.0)) * nbatch +
-      (ncore - nbatch);
+      static_cast<int>(ceil(static_cast<double>(life) / 7.0)) * (nbatch1 + 
+        nbatch2) + (nregion1 - nbatch1) + (nregion2 - nbatch2);
+  int nassem_recv_r1 =
+      static_cast<int>(ceil(static_cast<double>(life) / 7.0)) * nbatch1 + 
+        (nregion1 - nbatch1);
+  int nassem_recv_r2 =
+      static_cast<int>(ceil(static_cast<double>(life) / 7.0)) * nbatch2 + 
+        (nregion2 - nbatch2);
 
   std::vector<Cond> conds;
   conds.push_back(Cond("ReceiverId", "==", id));
@@ -598,12 +642,36 @@ TEST(TwoRegionReactorTests, Retire) {
   EXPECT_EQ(nassem_recv, qr.rows.size())
       << "failed to stop ordering near retirement";
 
+  conds.clear();
+  conds.push_back(Cond("Commodity", "==", std::string("enriched_u")));
+  qr = sim.db().Query("Transactions", &conds);
+  EXPECT_EQ(nassem_recv_r1, qr.rows.size())
+      << "failed to stop ordering region 1 near retirement";
+
+  conds.clear();
+  conds.push_back(Cond("Commodity", "==", std::string("enriched_pu")));
+  qr = sim.db().Query("Transactions", &conds);
+  EXPECT_EQ(nassem_recv_r2, qr.rows.size())
+      << "failed to stop ordering region 2 near retirement";
+
   // TwoRegionReactor should discharge all fuel before/by retirement
   conds.clear();
   conds.push_back(Cond("SenderId", "==", id));
   qr = sim.db().Query("Transactions", &conds);
   EXPECT_EQ(nassem_recv, qr.rows.size())
       << "failed to discharge all material by retirement time";
+
+  conds.clear();
+  conds.push_back(Cond("Commodity", "==", std::string("waste")));
+  qr = sim.db().Query("Transactions", &conds);
+  EXPECT_EQ(nassem_recv_r1, qr.rows.size())
+      << "failed to discharge R1 material by retirement time";
+
+  conds.clear();
+  conds.push_back(Cond("Commodity", "==", std::string("spent_pu")));
+  qr = sim.db().Query("Transactions", &conds);
+  EXPECT_EQ(nassem_recv_r2, qr.rows.size())
+      << "failed to discharge R2 material by retirement time";
 
   // TwoRegionReactor should record power entry on the time step it retires if operating
   int time_online = life / (cycle_time + refuel_time) * cycle_time + std::min(life % (cycle_time + refuel_time), cycle_time);
@@ -617,22 +685,27 @@ TEST(TwoRegionReactorTests, Retire) {
 
 TEST(TwoRegionReactorTests, PositionInitialize) {
   std::string config =
-     "  <fuel_inrecipes>  <val>lwr_fresh</val>  </fuel_inrecipes>  "
-     "  <fuel_outrecipes> <val>lwr_spent</val>  </fuel_outrecipes>  "
-     "  <fuel_incommods>  <val>enriched_u</val> </fuel_incommods>  "
-     "  <fuel_outcommods> <val>waste</val>      </fuel_outcommods>  "
+     "  <fuel_inrecipes>  <val>lwr_fresh</val> <val>bwr_fresh</val> </fuel_inrecipes>  "
+     "  <fuel_outrecipes> <val>lwr_spent</val> <val>bwr_spent</val> </fuel_outrecipes>  "
+     "  <fuel_incommods>  <val>enriched_u</val> <val>enriched_pu</val> </fuel_incommods>  "
+     "  <fuel_outcommods> <val>waste</val> <val>waste2</val>    </fuel_outcommods>  "
      ""
      "  <cycle_time>1</cycle_time>  "
      "  <refuel_time>0</refuel_time>  "
-     "  <assem_size>300</assem_size>  "
-     "  <n_assem_core>1</n_assem_core>  "
-     "  <n_assem_batch>1</n_assem_batch>  ";
+     "  <assem_size> <val>300</val> <val>150</val> </assem_size>  "
+     "  <n_assem_region1>1</n_assem_region1>  "
+     "  <n_assem_region2>2</n_assem_region2>  "
+     "  <n_assem_batch1>1</n_assem_batch1>  "
+     "  <n_assem_batch2>1</n_assem_batch2>  ";
 
   int simdur = 50;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
   sim.AddSource("enriched_u").Finalize();
+  sim.AddSource("enriched_pu").Finalize();
   sim.AddRecipe("lwr_fresh", c_uox());
+  sim.AddRecipe("bwr_fresh", c_mox());
   sim.AddRecipe("lwr_spent", c_spentuox());
+  sim.AddRecipe("bwr_spent", c_spentmox());
   int id = sim.Run();
 
   QueryResult qr = sim.db().Query("AgentPosition", NULL);
@@ -642,24 +715,29 @@ TEST(TwoRegionReactorTests, PositionInitialize) {
 
 TEST(TwoRegionReactorTests, PositionInitialize2) {
   std::string config =
-     "  <fuel_inrecipes>  <val>lwr_fresh</val>  </fuel_inrecipes>  "
-     "  <fuel_outrecipes> <val>lwr_spent</val>  </fuel_outrecipes>  "
-     "  <fuel_incommods>  <val>enriched_u</val> </fuel_incommods>  "
-     "  <fuel_outcommods> <val>waste</val>      </fuel_outcommods>  "
+     "  <fuel_inrecipes>  <val>lwr_fresh</val> <val>bwr_fresh</val> </fuel_inrecipes>  "
+     "  <fuel_outrecipes> <val>lwr_spent</val> <val>bwr_spent</val> </fuel_outrecipes>  "
+     "  <fuel_incommods>  <val>enriched_u</val> <val>enriched_pu</val> </fuel_incommods>  "
+     "  <fuel_outcommods> <val>waste</val> <val>waste2</val>    </fuel_outcommods>  "
      ""
      "  <cycle_time>1</cycle_time>  "
      "  <refuel_time>0</refuel_time>  "
-     "  <assem_size>300</assem_size>  "
-     "  <n_assem_core>1</n_assem_core>  "
-     "  <n_assem_batch>1</n_assem_batch>  "
+     "  <assem_size> <val>300</val> <val>150</val> </assem_size>  "
+     "  <n_assem_region1>1</n_assem_region1>  "
+     "  <n_assem_region2>2</n_assem_region2>  "
+     "  <n_assem_batch1>1</n_assem_batch1>  "
+     "  <n_assem_batch2>1</n_assem_batch2>  "
      "  <longitude>30.0</longitude>  "
      "  <latitude>30.0</latitude>  ";
 
   int simdur = 50;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
   sim.AddSource("enriched_u").Finalize();
+  sim.AddSource("enriched_pu").Finalize();
   sim.AddRecipe("lwr_fresh", c_uox());
+  sim.AddRecipe("bwr_fresh", c_mox());
   sim.AddRecipe("lwr_spent", c_spentuox());
+  sim.AddRecipe("bwr_spent", c_spentmox());
   int id = sim.Run();
 
   QueryResult qr = sim.db().Query("AgentPosition", NULL);
