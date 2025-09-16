@@ -745,6 +745,151 @@ TEST(TwoRegionReactorTests, PositionInitialize2) {
   EXPECT_EQ(qr.GetVal<double>("Longitude"), 30.0);
 }
 
+// tests that an error is thrown if fuel_outcommods input does not have the correct number 
+// of entries
+TEST(TwoRegionReactorTests, TwoRegionOutcommodMissing) {
+  std::string config =
+     "  <fuel_inrecipes>  <val>uox</val>  <val>mox</val>    </fuel_inrecipes>  "
+     "  <fuel_outrecipes> <val>spentuox</val> <val>spentmox</val> </fuel_outrecipes>  "
+     "  <fuel_incommods>  <val>uox</val>  <val>mox</val>  </fuel_incommods>  "
+     "  <fuel_outcommods> <val>waste</val>  </fuel_outcommods>  "
+     ""
+     "  <cycle_time>1</cycle_time>  "
+     "  <refuel_time>0</refuel_time>  "
+     "  <assem_size> <val>1</val> <val>1</val> </assem_size>  "
+     "  <n_assem_region1>7</n_assem_region1>  "
+     "  <n_assem_region2>7</n_assem_region2>"
+     "  <n_assem_batch1>3</n_assem_batch1>  "
+     "  <n_assem_batch2>3</n_assem_batch2>";
+
+  int simdur = 50;
+  cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
+  sim.AddSource("uox").Finalize();
+  sim.AddRecipe("uox", c_uox());
+  sim.AddRecipe("mox", c_mox());
+  sim.AddRecipe("spentuox", c_spentuox());
+  sim.AddRecipe("spentmox", c_spentmox());
+  int id;
+  // Testing for an error thrown
+  EXPECT_THROW(id = sim.Run(), cyclus::ValueError);
+}
+
+// tests that an error is thrown if fuel_inrecipes input does not have the correct number 
+// of entries
+TEST(TwoRegionReactorTests, InrecipesMissing) {
+  std::string config =
+     "  <fuel_inrecipes>  <val>uox</val>    </fuel_inrecipes>  "
+     "  <fuel_outrecipes> <val>spentuox</val> <val>spentmox</val> </fuel_outrecipes>  "
+     "  <fuel_incommods>  <val>uox</val>  <val>mox</val>  </fuel_incommods>  "
+     "  <fuel_outcommods> <val>waste</val> <val>mox_waste</val>   </fuel_outcommods>  "
+     ""
+     "  <cycle_time>1</cycle_time>  "
+     "  <refuel_time>0</refuel_time>  "
+     "  <assem_size> <val>1</val> <val>1</val> </assem_size>  "
+     "  <n_assem_region1>7</n_assem_region1>  "
+     "  <n_assem_region2>7</n_assem_region2>"
+     "  <n_assem_batch1>3</n_assem_batch1>  "
+     "  <n_assem_batch2>3</n_assem_batch2>";
+
+  int simdur = 50;
+  cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
+  sim.AddSource("uox").Finalize();
+  sim.AddRecipe("uox", c_uox());
+  sim.AddRecipe("mox", c_mox());
+  sim.AddRecipe("spentuox", c_spentuox());
+  sim.AddRecipe("spentmox", c_spentmox());
+  int id;
+  // Testing for an error thrown
+  EXPECT_THROW(id = sim.Run(), cyclus::ValueError);
+}
+
+// tests that an error is thrown if fuel_outrecipes input does not have the correct number 
+// of entries
+TEST(TwoRegionReactorTests, OutrecipesMissing) {
+  std::string config =
+     "  <fuel_inrecipes>  <val>uox</val>  <val>mox</val>    </fuel_inrecipes>  "
+     "  <fuel_outrecipes> <val>spentuox</val> </fuel_outrecipes>  "
+     "  <fuel_incommods>  <val>uox</val>  <val>mox</val>  </fuel_incommods>  "
+     "  <fuel_outcommods> <val>waste</val> <val>mox_waste</val>   </fuel_outcommods>  "
+     ""
+     "  <cycle_time>1</cycle_time>  "
+     "  <refuel_time>0</refuel_time>  "
+     "  <assem_size> <val>1</val> <val>1</val> </assem_size>  "
+     "  <n_assem_region1>7</n_assem_region1>  "
+     "  <n_assem_region2>7</n_assem_region2>"
+     "  <n_assem_batch1>3</n_assem_batch1>  "
+     "  <n_assem_batch2>3</n_assem_batch2>";
+
+  int simdur = 50;
+  cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
+  sim.AddSource("uox").Finalize();
+  sim.AddRecipe("uox", c_uox());
+  sim.AddRecipe("mox", c_mox());
+  sim.AddRecipe("spentuox", c_spentuox());
+  sim.AddRecipe("spentmox", c_spentmox());
+  int id;
+  // Testing for an error thrown
+  EXPECT_THROW(id = sim.Run(), cyclus::ValueError);
+}
+
+// tests that an error is thrown if assem_size input does not have the correct number 
+// of entries
+TEST(TwoRegionReactorTests, AssemsizeMissing) {
+  std::string config =
+     "  <fuel_inrecipes>  <val>uox</val>  <val>mox</val>    </fuel_inrecipes>  "
+     "  <fuel_outrecipes> <val>spentuox</val> <val>spentmox</val> </fuel_outrecipes>  "
+     "  <fuel_incommods>  <val>uox</val>  <val>mox</val>   </fuel_incommods>  "
+     "  <fuel_outcommods> <val>waste</val> <val>mox_waste</val>   </fuel_outcommods>  "
+     ""
+    "  <cycle_time>1</cycle_time>  "
+     "  <refuel_time>0</refuel_time>  "
+     "  <assem_size> <val>1</val> </assem_size>  "
+     "  <n_assem_region1>7</n_assem_region1>  "
+     "  <n_assem_region2>7</n_assem_region2>"
+     "  <n_assem_batch1>3</n_assem_batch1>  "
+     "  <n_assem_batch2>3</n_assem_batch2>";
+
+  int simdur = 50;
+  cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
+  sim.AddSource("uox").Finalize();
+  sim.AddRecipe("uox", c_uox());
+  sim.AddRecipe("mox", c_mox());
+  sim.AddRecipe("spentuox", c_spentuox());
+  sim.AddRecipe("spentmox", c_spentmox());
+  int id;
+  // Testing for an error thrown
+  EXPECT_THROW(id = sim.Run(), cyclus::ValueError);
+}
+
+// tests that an error is thrown if fuel_incommods input does not have the correct number 
+// of entries
+TEST(TwoRegionReactorTests, IncommodMissing) {
+  std::string config =
+     "  <fuel_inrecipes>  <val>uox</val>  <val>mox</val>    </fuel_inrecipes>  "
+     "  <fuel_outrecipes> <val>spentuox</val> <val>spentmox</val> </fuel_outrecipes>  "
+     "  <fuel_incommods>  <val>uox</val>    </fuel_incommods>  "
+     "  <fuel_outcommods> <val>waste</val> <val>mox_waste</val>   </fuel_outcommods>  "
+     ""
+     "  <cycle_time>1</cycle_time>  "
+     "  <refuel_time>0</refuel_time>  "
+     "  <assem_size> <val>1</val> <val>1</val> </assem_size>  "
+     "  <n_assem_region1>7</n_assem_region1>  "
+     "  <n_assem_region2>7</n_assem_region2>"
+     "  <n_assem_batch1>3</n_assem_batch1>  "
+     "  <n_assem_batch2>3</n_assem_batch2>";
+
+  int simdur = 50;
+  cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
+  sim.AddSource("uox").Finalize();
+  sim.AddRecipe("uox", c_uox());
+  sim.AddRecipe("mox", c_mox());
+  sim.AddRecipe("spentuox", c_spentuox());
+  sim.AddRecipe("spentmox", c_spentmox());
+  int id;
+  // Testing for an error thrown
+  EXPECT_THROW(id = sim.Run(), cyclus::ValueError);
+}
+
 } // namespace TwoRegionReactortests
 } // namespace areal
 

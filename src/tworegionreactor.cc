@@ -65,8 +65,27 @@ void TwoRegionReactor::EnterNotify() {
   core2.keep_packaging(keep_packaging);
   spent2.keep_packaging(keep_packaging);
 
-  // Throw error if vectors do not have size n_regions
-
+  // Throw error if vectors do not have size 2
+  if (fuel_incommods.size() != 2) {
+    throw cyclus::ValueError("areal::TwoRegionReactor fuel_incommods "\
+                             "does not have 2 entries");
+  }
+  if (fuel_outcommods.size() != 2) {
+    throw cyclus::ValueError("areal::TwoRegionReactor fuel_outcommods "\
+                             "does not have 2 entries");
+  }
+  if (fuel_inrecipes.size() != 2) {
+    throw cyclus::ValueError("areal::TwoRegionReactor fuel_inrecipes "\
+                             "does not have 2 entries");
+  }
+  if (fuel_outrecipes.size() != 2) {
+    throw cyclus::ValueError("areal::TwoRegionReactor fuel_outrecipes "\
+                             "does not have 2 entries");
+  }
+  if (assem_size.size() != 2) {
+    throw cyclus::ValueError("areal::TwoRegionReactor assem_size "\
+                             "does not have 2 entries");
+  }
   InitializePosition();
 }
 
