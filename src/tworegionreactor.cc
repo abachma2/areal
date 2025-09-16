@@ -72,7 +72,7 @@ void TwoRegionReactor::EnterNotify() {
 
 bool TwoRegionReactor::CheckDecommissionCondition() {
   return core1.count() == 0 && spent1.count() == 0 &&
-  core2.count() && spent2.count();
+  core2.count() == 0 && spent2.count() == 0;
 }
 
 void TwoRegionReactor::Tick() {
@@ -97,14 +97,19 @@ void TwoRegionReactor::Tick() {
       }
       else {
         Transmute(ceil(static_cast<double>(n_assem_region1) / 2.0), 0);
-        Transmute(ceil(static_cast<double>(n_assem_region1) / 2.0), 1);
+        Transmute(ceil(static_cast<double>(n_assem_region2) / 2.0), 1);
       }
     }
-    while (core1.count() > 0 && core2.count() > 0) {
+    LOG(cyclus::LEV_INFO1, "TRR") << core1.count() << ", " << core2.count();
+    while (core1.count() > 0){
       if (!Discharge(0)) {
+        LOG(cyclus::LEV_INFO1, "TRR") << " discharging in R1 for tick";
         break;
       }
+    }
+    while (core2.count() > 0){
       if (!Discharge(1)) {
+        LOG(cyclus::LEV_INFO1, "TRR") << " discharging in R2 for tick";
         break;
       }
     }
@@ -221,7 +226,7 @@ void TwoRegionReactor::GetMatlTrades(
 
   for (int i=0; i<2; i++){
     std::map<std::string, MatVec> mats = PopSpent(i);
-    LOG(cyclus::LEV_INFO1, "TRR") << mats.size() << " in spent inventory for R" << i <<" before";
+    LOG(cyclus::LEV_INFO1, "TRR") << mats.size() << " in spent inventory for R" << i;
     for (int j = 0; j < trades.size(); j++) {
       std::string commod = trades[j].request->commodity();
       if (commod != fuel_outcommods[i]) {
@@ -233,7 +238,6 @@ void TwoRegionReactor::GetMatlTrades(
       res_indexes.erase(m->obj_id());
     }
     PushSpent(mats, i);  // return leftovers back to spent buffer
-    LOG(cyclus::LEV_INFO1, "TRR") << mats.size() << " in spent inventory for R" << i <<" after";
   }
 }
 
@@ -347,7 +351,10 @@ std::set<cyclus::BidPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlBids(
 }
 
 void TwoRegionReactor::Tock() {
+  LOG(cyclus::LEV_INFO1, "TRR") << " Tocking";
+  LOG(cyclus::LEV_INFO1, "TRR") << " R1 core: " << core1.count() << " R2 core: " << core2.count();
   if (retired()) {
+    LOG(cyclus::LEV_INFO1, "TRR") << " retired in tock"; 
     return;
   }
   
@@ -356,6 +363,7 @@ void TwoRegionReactor::Tock() {
   // If this is the case, then a new cycle will be initiated.
   if (cycle_step >= cycle_time + refuel_time && core1.count() == n_assem_region1 && 
       core2.count() == n_assem_region2 && discharged1 == true && discharged2 == true) {
+        LOG(cyclus::LEV_INFO1, "TRR") << " resetting cycle markers";
     discharged1 = false;
     discharged2 = false; 
     cycle_step = 0;
@@ -391,7 +399,7 @@ void TwoRegionReactor::Transmute() {
 void TwoRegionReactor::Transmute(int n_assem, int region_num) {
   MatVec old; 
   
-  LOG(cyclus::LEV_INFO1, "TRR") << " transmuting " << n_assem << " assemblies in R2";
+  LOG(cyclus::LEV_INFO1, "TRR") << " transmuting " << n_assem << " assemblies in R1";
   if (region_num == 0){
     old = core1.PopN(std::min(n_assem, core1.count()));
     core1.Push(old);
@@ -438,8 +446,10 @@ std::map<std::string, MatVec> TwoRegionReactor::PeekSpent(int region_num) {
 }
 
 bool TwoRegionReactor::Discharge(int region_num) {
+  LOG(cyclus::LEV_INFO1, "TRR") << " discharging in Region " << region_num;
   if (region_num == 0){
     int npop = std::min(n_assem_batch1, core1.count());
+    LOG(cyclus::LEV_INFO1, "TRR") << " npop: " << npop;
     if (n_assem_spent1 - spent1.count() < npop) {
       Record("DISCHARGE", "failed");
       return false;  // not enough room in spent buffer
@@ -453,6 +463,7 @@ bool TwoRegionReactor::Discharge(int region_num) {
 
   if (region_num == 1){
     int npop = std::min(n_assem_batch2, core2.count());
+    LOG(cyclus::LEV_INFO1, "TRR") << " npop: " <<  npop; 
     if (n_assem_spent2 - spent2.count() < npop) {
       Record("DISCHARGE", "failed");
       return false;  // not enough room in spent buffer
