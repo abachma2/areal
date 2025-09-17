@@ -956,8 +956,8 @@ TEST(TwoRegionReactorTests, Retire) {
       << "failed to generate power for the correct number of time steps";
 }
 
-// test the decom transmute all set to true
-TEST(TwoRegionReactorTests, DecomTransmusteAll) {
+// test the decom transmute all set to true (first test) and false (second test)
+TEST(TwoRegionReactorTests, DecomTransmusteAll1) {
   std::string config =
      "  <fuel_inrecipes>  <val>lwr_fresh</val> <val>bwr_fresh</val> </fuel_inrecipes>  "
      "  <fuel_outrecipes> <val>lwr_spent</val> <val>bwr_spent</val> </fuel_outrecipes>  "
@@ -967,7 +967,6 @@ TEST(TwoRegionReactorTests, DecomTransmusteAll) {
      "  <cycle_time>7</cycle_time>  "
      "  <refuel_time>0</refuel_time>  "
      "  <assem_size> <val>300</val> <val>150</val> </assem_size>  "
-     "  <n_assem_fresh1>1</n_assem_fresh1>  "
      "  <n_assem_region1>3</n_assem_region1>  "
      "  <n_assem_region2>2</n_assem_region2>  "
      "  <n_assem_batch1>1</n_assem_batch1>  "
@@ -987,25 +986,81 @@ TEST(TwoRegionReactorTests, DecomTransmusteAll) {
   sim.AddSink("spent_pu").Finalize();
   sim.AddRecipe("lwr_fresh", c_uox());
   sim.AddRecipe("bwr_fresh", c_mox());
- Composition::Ptr spentuox = c_spentuox();
+  Composition::Ptr spentuox = c_spentuox();
   sim.AddRecipe("lwr_spent", spentuox);
   Composition::Ptr spentmox = c_spentmox();
   sim.AddRecipe("bwr_spent", spentmox);
   int id = sim.Run();
 
-  std::vector<Cond> cond_trans;
-  cond_trans.push_back(Cond("Commodity", "==", std::string("waste")));
+  
   std::vector<Cond> cond_recipe;
   cond_recipe.push_back(Cond("Recipe", "==", std::string("lwr_spent")));
-  int resid = sim.db().Query("Transactions", &cond_trans).GetVal<int>("ResourceId");
   int qualid = sim.db().Query("Recipes", &cond_recipe).GetVal<int>("QualId");
   std::vector<Cond> cond_resources;
-  cond_resources.push_back(Cond("ResourceId", "==", resid));
   cond_resources.push_back(Cond("QualId", "==", qualid));
   QueryResult qr = sim.db().Query("Resources", &cond_resources);
   EXPECT_EQ(8, qr.rows.size());
 
+  cond_recipe.clear();
+  cond_resources.clear();
+  cond_recipe.push_back(Cond("Recipe", "==", std::string("bwr_spent")));
+  qualid = sim.db().Query("Recipes", &cond_recipe).GetVal<int>("QualId");
+  cond_resources.push_back(Cond("QualId", "==", qualid));
+  qr = sim.db().Query("Resources", &cond_resources);
+  EXPECT_EQ(7, qr.rows.size());
+}
 
+TEST(TwoRegionReactorTests, DecomTransmusteAll2) {
+  std::string config =
+     "  <fuel_inrecipes>  <val>lwr_fresh</val> <val>bwr_fresh</val> </fuel_inrecipes>  "
+     "  <fuel_outrecipes> <val>lwr_spent</val> <val>bwr_spent</val> </fuel_outrecipes>  "
+     "  <fuel_incommods>  <val>enriched_u</val> <val>enriched_pu</val> </fuel_incommods>  "
+     "  <fuel_outcommods> <val>waste</val> <val>spent_pu</val>    </fuel_outcommods>  "
+     ""
+     "  <cycle_time>7</cycle_time>  "
+     "  <refuel_time>0</refuel_time>  "
+     "  <assem_size> <val>300</val> <val>150</val> </assem_size>  "
+     "  <n_assem_region1>3</n_assem_region1>  "
+     "  <n_assem_region2>2</n_assem_region2>  "
+     "  <n_assem_batch1>1</n_assem_batch1>  "
+     "  <n_assem_batch2>1</n_assem_batch2>  "
+     "  <power_cap>1</power_cap>  "
+     "  <decom_transmute_all>0</decom_transmute_all>"
+     "";
+
+  int dur = 50;
+  int life = 36;
+  int cycle_time = 7;
+  int refuel_time = 0;
+  cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, dur, life);
+  sim.AddSource("enriched_u").Finalize();
+  sim.AddSource("enriched_pu").Finalize();
+  sim.AddSink("waste").Finalize();
+  sim.AddSink("spent_pu").Finalize();
+  sim.AddRecipe("lwr_fresh", c_uox());
+  sim.AddRecipe("bwr_fresh", c_mox());
+  Composition::Ptr spentuox = c_spentuox();
+  sim.AddRecipe("lwr_spent", spentuox);
+  Composition::Ptr spentmox = c_spentmox();
+  sim.AddRecipe("bwr_spent", spentmox);
+  int id = sim.Run();
+
+  
+  std::vector<Cond> cond_recipe;
+  cond_recipe.push_back(Cond("Recipe", "==", std::string("lwr_spent")));
+  int qualid = sim.db().Query("Recipes", &cond_recipe).GetVal<int>("QualId");
+  std::vector<Cond> cond_resources;
+  cond_resources.push_back(Cond("QualId", "==", qualid));
+  QueryResult qr = sim.db().Query("Resources", &cond_resources);
+  EXPECT_EQ(7, qr.rows.size());
+
+  cond_recipe.clear();
+  cond_resources.clear();
+  cond_recipe.push_back(Cond("Recipe", "==", std::string("bwr_spent")));
+  qualid = sim.db().Query("Recipes", &cond_recipe).GetVal<int>("QualId");
+  cond_resources.push_back(Cond("QualId", "==", qualid));
+  qr = sim.db().Query("Resources", &cond_resources);
+  EXPECT_EQ(6, qr.rows.size());
 }
 
 TEST(TwoRegionReactorTests, PositionInitialize) {
