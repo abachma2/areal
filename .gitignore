@@ -1,2 +1,2 @@
 build/*
-tests/__pychache__/*
+__pycache__/*
