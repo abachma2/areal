@@ -113,6 +113,10 @@ void TwoRegionReactor::Tick() {
         Transmute(ceil(static_cast<double>(n_assem_region2) / 2.0), 1);
       }
     }
+    // discharging fuel from each core region. This needs to be in 
+    // separate loops because if the regions have different numbers of 
+    // assemblies then it might break before both regions are fully 
+    // discharged. 
     while (core1.count() > 0){
       if (!Discharge(0)) {
         break;
@@ -155,6 +159,7 @@ void TwoRegionReactor::Tick() {
 }
 
 std::set<cyclus::RequestPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlRequests() {
+  // DRE phase 1 -- placing requests
   using cyclus::RequestPortfolio;
 
   std::set<RequestPortfolio<Material>::Ptr> ports;
@@ -189,6 +194,7 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlReque
   }
   
   if (n_assem_order1 > 0){
+    // building request portfolio for region 1 and recording demand
     for (int i = 0; i < n_assem_order1; i++) {
       RequestPortfolio<Material>::Ptr port(new RequestPortfolio<Material>());
       std::string commod = fuel_incommods[0];
@@ -204,6 +210,7 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlReque
   }
 
   if (n_assem_order2 > 0){
+    // building request portfolio for region 2 and recording demand
     for (int i = 0; i < n_assem_order2; i++) {
       RequestPortfolio<Material>::Ptr port(new RequestPortfolio<Material>());
       std::string commod = fuel_incommods[1];
@@ -222,6 +229,7 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlReque
 }
 
 void TwoRegionReactor::GetMatlTrades(
+  // DRE phase 5.1 -- getting materials to trade away
     const std::vector<cyclus::Trade<Material> >& trades,
     std::vector<std::pair<cyclus::Trade<Material>, Material::Ptr> >&
         responses) {
@@ -245,6 +253,7 @@ void TwoRegionReactor::GetMatlTrades(
 
 void TwoRegionReactor::AcceptMatlTrades(const std::vector<
     std::pair<cyclus::Trade<Material>, Material::Ptr> >& responses) {
+  // DRE phase 5.2 -- getting materials from other facilities
   std::vector<std::pair<cyclus::Trade<Material>,
                         Material::Ptr> >::const_iterator trade;
 
@@ -295,6 +304,7 @@ void TwoRegionReactor::AcceptMatlTrades(const std::vector<
 
 std::set<cyclus::BidPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlBids(
     cyclus::CommodMap<Material>::type& commod_requests) {
+  // DRE phase 2 -- getting bids that might fulfil other facility requests
   using cyclus::BidPortfolio;
   std::set<BidPortfolio<Material>::Ptr> ports;
 
@@ -367,6 +377,7 @@ void TwoRegionReactor::Tock() {
     Record("CYCLE_START", "");
   }
 
+  // record power generation if we're in the middle of a cycle. 
   if (cycle_step >= 0 && cycle_step < cycle_time &&
       core1.count() == n_assem_region1 && core2.count() == n_assem_region2) {
     cyclus::toolkit::RecordTimeSeries<cyclus::toolkit::POWER>(this, power_cap);
@@ -418,6 +429,7 @@ void TwoRegionReactor::Transmute(int n_assem, int region_num) {
 }
 
 std::map<std::string, MatVec> TwoRegionReactor::PeekSpent(int region_num) {
+  // looking at the number and commodity name of the materials in each region
   std::map<std::string, MatVec> mapped;
   MatVec mats; 
   if (region_num == 0){
@@ -502,6 +514,7 @@ void TwoRegionReactor::Load(int region_num) {
 }
 
 std::string TwoRegionReactor::fuel_incommod(Material::Ptr m) {
+  // get the input commodity name for a material
   int i = res_indexes[m->obj_id()];
   if (i >= fuel_incommods.size()) {
     throw KeyError("areal::TwoRegionReactor - no incommod for material object");
@@ -510,6 +523,7 @@ std::string TwoRegionReactor::fuel_incommod(Material::Ptr m) {
 }
 
 std::string TwoRegionReactor::fuel_outcommod(Material::Ptr m) {
+  // get the output commodity name for a material
   int i = res_indexes[m->obj_id()];
   if (i >= fuel_outcommods.size()) {
     throw KeyError("areal::TwoRegionReactor - no outcommod for material object");
@@ -518,6 +532,7 @@ std::string TwoRegionReactor::fuel_outcommod(Material::Ptr m) {
 }
 
 std::string TwoRegionReactor::fuel_inrecipe(Material::Ptr m) {
+  // get the input recipe name for a material
   int i = res_indexes[m->obj_id()];
   if (i >= fuel_inrecipes.size()) {
     throw KeyError("areal::TwoRegionReactor - no inrecipe for material object");
@@ -526,6 +541,7 @@ std::string TwoRegionReactor::fuel_inrecipe(Material::Ptr m) {
 }
 
 std::string TwoRegionReactor::fuel_outrecipe(Material::Ptr m) {
+  // get the output recipe name for a material
   int i = res_indexes[m->obj_id()];
   if (i >= fuel_outrecipes.size()) {
     throw KeyError("areal::TwoRegionReactor - no outrecipe for material object");
@@ -534,6 +550,8 @@ std::string TwoRegionReactor::fuel_outrecipe(Material::Ptr m) {
 }
 
 void TwoRegionReactor::index_res(cyclus::Resource::Ptr m, std::string incommod) {
+  // get the index number of the fuel_incommods input that corresponds 
+  // to a material
   for (int i = 0; i < fuel_incommods.size(); i++) {
     if (fuel_incommods[i] == incommod) {
       res_indexes[m->obj_id()] = i;
