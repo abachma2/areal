@@ -6,43 +6,44 @@
 
 namespace areal {
 
-/// Reactor is a simple, general reactor based on static compositional
-/// transformations to model fuel burnup.  The user specifies a set of input
-/// fuels and corresponding burnt compositions that fuel is transformed to when
-/// it is discharged from the core.  No incremental transmutation takes place.
-/// Rather, at the end of an operational cycle, the batch being discharged from
-/// the core is instantaneously transmuted from its original fresh fuel
-/// composition into its spent fuel form.
+/// TwoRegionReactor is a general reactor archetype to handle material 
+/// movement and depletion for two regions of a core. The depletion is 
+/// based on static compositional transformations to model fuel burnup. 
 ///
-/// Each fuel is identified by a specific input commodity and has an associated
-/// input recipe (nuclide composition), output recipe, output commidity, and
-/// preference.  The preference identifies which input fuels are preferred when
-/// requesting.  Changes in these preferences can be specified as a function of
-/// time using the pref_change variables.  Changes in the input-output recipe
-/// compositions can also be specified as a function of time using the
-/// recipe_change variables.
+/// The user must specify an input fuel commodity name, input fuel recipe,
+/// output fuel commodity, output fuel recipe, assembly mass size (in kg), 
+/// number of assemblies total, and number of assemblies per batch for 
+/// each of the two regions in the reactor. The fuel_incommods, 
+/// fuel_inrecipes, fuel_outcommods, fuel_outrecipe inputs, and assem_size,
+/// are vectors that must have a length of 2. The first item in these vectors 
+/// corresponds to region 1, which also has input variables n_assem_region1 
+/// and n_assem_batch1. The second item in the vectors corresponds to 
+/// region 2, which also has input variables n_assem_region2 and n_assem_batch2. 
 ///
 /// The reactor treats fuel as individual assemblies that are never split,
 /// combined or otherwise treated in any non-discrete way.  Fuel is requested
 /// in full-or-nothing assembly sized quanta.  If real-world assembly modeling
-/// is unnecessary, parameters can be adjusted (e.g. n_assem_core, assem_size,
-/// n_assem_batch).  At the end of every cycle, a full batch is discharged from
-/// the core consisting of n_assem_batch assemblies of assem_size kg. The
+/// is unnecessary, parameters can be adjusted (e.g. n_assem_region#, assem_size,
+/// n_assem_batch#).  At the end of every cycle, a full batch is discharged from
+/// each region, consisting of the n_assem_batch# and assem_size input that 
+/// corresponds to that region. The
 /// reactor also has a specifiable refueling time period following the end of
 /// each cycle at the end of which it will resume operation on the next cycle
-/// *if* it has enough fuel for a full core; otherwise it waits until it has
-/// enough fresh fuel assemblies.
+/// *if* it has enough fuel to fill both regions; otherwise it waits until it has
+/// enough fresh fuel assemblies. the refueling time is the same for both regions.
 ///
 /// In addition to its core, the reactor has an on-hand fresh fuel inventory
-/// and a spent fuel inventory whose capacities are specified by n_assem_fresh
-/// and n_assem_spent respectively.  Each time step the reactor will attempt to
+/// and a spent fuel inventory for each region, whose capacities are specified 
+/// by n_assem_fresh1 and n_assem_fresh2 for the fresh fuel
+/// and n_assem_spent1 and n_assem_spent2 for the spent fuel.  
+/// Each time step the reactor will attempt to
 /// acquire enough fresh fuel to fill its fresh fuel inventory (and its core if
 /// the core isn't currently full).  If the fresh fuel inventory has zero
 /// capacity, fuel will be ordered just-in-time after the end of each
-/// operational cycle before the next begins.  If the spent fuel inventory
-/// becomes full, the reactor will halt operation at the end of the next cycle
-/// until there is more room.  Each time step, the reactor will try to trade
-/// away as much of its spent fuel inventory as possible.
+/// operational cycle before the next begins.  If the spent fuel inventory for 
+/// either region becomes full, the reactor will halt operation at the end of 
+/// the next cycle until there is more room.  Each time step, the reactor will 
+/// try to trade away as much of its spent fuel inventory as possible.
 ///
 /// When the reactor reaches the end of its lifetime, it will discharge all
 /// material from its core and trade away all its spent fuel as quickly as
