@@ -105,12 +105,12 @@ void TwoRegionReactor::Tick() {
     Record("RETIRED", "");
     if (context()->time() == exit_time() + 1) { // only need to transmute once
       if (decom_transmute_all == true) {
-        Transmute(n_assem_region1, 0);
-        Transmute(n_assem_region2, 1);
+        Transmute(n_assem_region1, region1_ID);
+        Transmute(n_assem_region2, region2_ID);
       }
       else {
-        Transmute(ceil(static_cast<double>(n_assem_region1) / 2.0), 0);
-        Transmute(ceil(static_cast<double>(n_assem_region2) / 2.0), 1);
+        Transmute(ceil(static_cast<double>(n_assem_region1) / 2.0), region1_ID);
+        Transmute(ceil(static_cast<double>(n_assem_region2) / 2.0), region2_ID);
       }
     }
     // discharging fuel from each core region. This needs to be in 
@@ -388,14 +388,14 @@ void TwoRegionReactor::Tock() {
 
   // "if" prevents starting cycle after initial deployment until core is full
   // even though cycle_step is its initial zero.
-  if ((cycle_step > 0) || (FullRegion(region1_ID) && FullREgion(region2_ID))){
+  if ((cycle_step > 0) || (FullRegion(region1_ID) && FullRegion(region2_ID))){
       cycle_step++;
   }
 }
 
 void TwoRegionReactor::Transmute() { 
-  Transmute(n_assem_batch1, 0); 
-  Transmute(n_assem_batch2, 1);
+  Transmute(n_assem_batch1, region1_ID); 
+  Transmute(n_assem_batch2, region2_ID);
 }
 
 void TwoRegionReactor::Transmute(int n_assem, int region_num) {
