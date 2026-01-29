@@ -142,6 +142,12 @@ class TwoRegionReactor : public cyclus::Facility,
   std::string fuel_inrecipe(cyclus::Material::Ptr m);
   std::string fuel_outrecipe(cyclus::Material::Ptr m);
 
+  // vector index for each region. Want to variables 
+  // to prevent confusing with the 0-indexing for 
+  // the vectors
+  int region1_ID = 0;
+  int region2_ID = 1;
+
   bool retired() {
     return exit_time() != -1 && context()->time() > exit_time();
   }

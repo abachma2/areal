@@ -118,12 +118,12 @@ void TwoRegionReactor::Tick() {
     // assemblies then it might break before both regions are fully 
     // discharged. 
     while (core1.count() > 0){
-      if (!Discharge(0)) {
+      if (!Discharge(region1_ID)) {
         break;
       }
     }
     while (core2.count() > 0){
-      if (!Discharge(1)) {
+      if (!Discharge(region2_ID)) {
         break;
       }
     }
@@ -148,12 +148,12 @@ void TwoRegionReactor::Tick() {
   }
 
   if (cycle_step >= cycle_time && !discharged1 && !discharged2) {
-    discharged1 = Discharge(0);
-    discharged2 = Discharge(1);
+    discharged1 = Discharge(region1_ID);
+    discharged2 = Discharge(region2_ID);
   }
   if (cycle_step >= cycle_time) {
-    Load(0);
-    Load(1);
+    Load(region1_ID);
+    Load(region2_ID);
   }
 
 }
