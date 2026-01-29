@@ -10,10 +10,6 @@ namespace areal {
 
 TwoRegionReactor::TwoRegionReactor(cyclus::Context* ctx)
     : cyclus::Facility(ctx),
-      n_assem_spent1(0),
-      n_assem_spent2(0),
-      n_assem_fresh1(0),
-      n_assem_fresh2(0),
       cycle_time(0),
       refuel_time(0),
       cycle_step(0),
@@ -88,6 +84,14 @@ void TwoRegionReactor::EnterNotify() {
   }
   if (n_assem_region.size() != 2) {
     throw cyclus::ValueError("areal::TwoRegionReactor n_assem_region "\
+                             "does not have 2 entries");
+  }
+  if (n_assem_fresh.size() != 2) {
+    throw cyclus::ValueError("areal::TwoRegionReactor n_assem_fresh "\
+                             "does not have 2 entries");
+  }
+  if (n_assem_spent.size() != 2) {
+    throw cyclus::ValueError("areal::TwoRegionReactor n_assem_spent "\
                              "does not have 2 entries");
   }
   InitializePosition();
@@ -175,8 +179,8 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlReque
 
   // second min expression reduces assembles to amount needed until
   // retirement if it is near.
-  int n_assem_order1 = n_assem_region[region1_ID] - core1.count() + n_assem_fresh1 - fresh1.count();
-  int n_assem_order2 = n_assem_region[region2_ID] - core2.count() + n_assem_fresh2 - fresh2.count(); 
+  int n_assem_order1 = n_assem_region[region1_ID] - core1.count() + n_assem_fresh[region1_ID] - fresh1.count();
+  int n_assem_order2 = n_assem_region[region2_ID] - core2.count() + n_assem_fresh[region2_ID] - fresh2.count(); 
 
   if (exit_time() != -1) {
     // the +1 accounts for the fact that the reactor is alive and gets to
@@ -187,9 +191,9 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlReque
                          static_cast<double>(cycle_time + refuel_time);
     n_cycles_left = ceil(n_cycles_left);
 
-    int n_need1 = std::max(0.0, n_cycles_left * n_assem_batch[region1_ID] - n_assem_fresh1 + n_assem_region[region1_ID] - core1.count());
+    int n_need1 = std::max(0.0, n_cycles_left * n_assem_batch[region1_ID] - n_assem_fresh[region1_ID] + n_assem_region[region1_ID] - core1.count());
 
-    int n_need2 = std::max(0.0, n_cycles_left * n_assem_batch[region2_ID] - n_assem_fresh2 + n_assem_region[region2_ID] - core2.count());
+    int n_need2 = std::max(0.0, n_cycles_left * n_assem_batch[region2_ID] - n_assem_fresh[region2_ID] + n_assem_region[region2_ID] - core2.count());
 
     n_assem_order1 = std::min(n_assem_order1, n_need1);
     n_assem_order2 = std::min(n_assem_order2, n_need2); 
@@ -460,7 +464,7 @@ std::map<std::string, MatVec> TwoRegionReactor::PeekSpent(int region_num) {
 bool TwoRegionReactor::Discharge(int region_num) {
   if (region_num == 0){
     int npop = std::min(n_assem_batch[region1_ID], core1.count());
-    if (n_assem_spent1 - spent1.count() < npop) {
+    if (n_assem_spent[region1_ID] - spent1.count() < npop) {
       Record("DISCHARGE", "failed");
       return false;  // not enough room in spent buffer
     }
@@ -473,7 +477,7 @@ bool TwoRegionReactor::Discharge(int region_num) {
 
   if (region_num == 1){
     int npop = std::min(n_assem_batch[region2_ID], core2.count());
-    if (n_assem_spent2 - spent2.count() < npop) {
+    if (n_assem_spent[region2_ID] - spent2.count() < npop) {
       Record("DISCHARGE", "failed");
       return false;  // not enough room in spent buffer
     }
