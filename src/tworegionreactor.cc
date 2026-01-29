@@ -10,8 +10,6 @@ namespace areal {
 
 TwoRegionReactor::TwoRegionReactor(cyclus::Context* ctx)
     : cyclus::Facility(ctx),
-      n_assem_region1(0),
-      n_assem_region2(0),
       n_assem_spent1(0),
       n_assem_spent2(0),
       n_assem_fresh1(0),
@@ -88,6 +86,10 @@ void TwoRegionReactor::EnterNotify() {
     throw cyclus::ValueError("areal::TwoRegionReactor n_assem_batch "\
                              "does not have 2 entries");
   }
+  if (n_assem_region.size() != 2) {
+    throw cyclus::ValueError("areal::TwoRegionReactor n_assem_region "\
+                             "does not have 2 entries");
+  }
   InitializePosition();
 }
 
@@ -101,18 +103,22 @@ void TwoRegionReactor::Tick() {
   // following the cycle_step update - allowing for the all reactor events to
   // occur and be recorded on the "beginning" of a time step.  Another reason
   // they
-  // can't go at the beginning of the Tock is so that resource exchange has a
+  // can't go at the beginning of the Tock is so that resource exchange has 
   // chance to occur after the discharge on this same time step.
   if (retired()) {
     Record("RETIRED", "");
     if (context()->time() == exit_time() + 1) { // only need to transmute once
       if (decom_transmute_all == true) {
-        Transmute(n_assem_region1, region1_ID);
-        Transmute(n_assem_region2, region2_ID);
+        /// transmute all the fuel in each region
+        for (int i=0; i<2; i++){
+          Transmute(n_assem_region[i], i);
+        }
       }
       else {
-        Transmute(ceil(static_cast<double>(n_assem_region1) / 2.0), region1_ID);
-        Transmute(ceil(static_cast<double>(n_assem_region2) / 2.0), region2_ID);
+        /// transmute half the fuel in each region
+        for (int i=0; i<2; i++){
+          Transmute(ceil(static_cast<double>(n_assem_region[i]) / 2.0), i);
+        }
       }
     }
     // discharging fuel from each core region. This needs to be in 
@@ -169,8 +175,8 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlReque
 
   // second min expression reduces assembles to amount needed until
   // retirement if it is near.
-  int n_assem_order1 = n_assem_region1 - core1.count() + n_assem_fresh1 - fresh1.count();
-  int n_assem_order2 = n_assem_region2 - core2.count() + n_assem_fresh2 - fresh2.count(); 
+  int n_assem_order1 = n_assem_region[region1_ID] - core1.count() + n_assem_fresh1 - fresh1.count();
+  int n_assem_order2 = n_assem_region[region2_ID] - core2.count() + n_assem_fresh2 - fresh2.count(); 
 
   if (exit_time() != -1) {
     // the +1 accounts for the fact that the reactor is alive and gets to
@@ -181,9 +187,9 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlReque
                          static_cast<double>(cycle_time + refuel_time);
     n_cycles_left = ceil(n_cycles_left);
 
-    int n_need1 = std::max(0.0, n_cycles_left * n_assem_batch[region1_ID] - n_assem_fresh1 + n_assem_region1 - core1.count());
+    int n_need1 = std::max(0.0, n_cycles_left * n_assem_batch[region1_ID] - n_assem_fresh1 + n_assem_region[region1_ID] - core1.count());
 
-    int n_need2 = std::max(0.0, n_cycles_left * n_assem_batch[region2_ID] - n_assem_fresh2 + n_assem_region2 - core2.count());
+    int n_need2 = std::max(0.0, n_cycles_left * n_assem_batch[region2_ID] - n_assem_fresh2 + n_assem_region[region2_ID] - core2.count());
 
     n_assem_order1 = std::min(n_assem_order1, n_need1);
     n_assem_order2 = std::min(n_assem_order2, n_need2); 
@@ -271,8 +277,8 @@ void TwoRegionReactor::AcceptMatlTrades(const std::vector<
       ++num_response2;
     }
   }
-  int nload1 = std::min(num_response1, n_assem_region1 - core1.count());
-  int nload2 = std::min(num_response2, n_assem_region2 - core2.count());
+  int nload1 = std::min(num_response1, n_assem_region[region1_ID] - core1.count());
+  int nload2 = std::min(num_response2, n_assem_region[region2_ID] - core2.count());
 
   if (nload1 > 0) {
     ss << nload1 << " assemblies in Region 1";
@@ -288,14 +294,14 @@ void TwoRegionReactor::AcceptMatlTrades(const std::vector<
     Material::Ptr m = trade->second;
     index_res(m, commod);
     if (commod == fuel_incommods[0]){
-      if (core1.count() < n_assem_region1) {
+      if (core1.count() < n_assem_region[region1_ID]) {
         core1.Push(m);
       } else {
         fresh1.Push(m);
       }
     }
     if (commod == fuel_incommods[1]){
-      if (core2.count() < n_assem_region2) {
+      if (core2.count() < n_assem_region[region2_ID]) {
         core2.Push(m);
       } else {
         fresh2.Push(m);
@@ -493,7 +499,7 @@ bool TwoRegionReactor::Discharge(int region_num) {
 
 void TwoRegionReactor::Load(int region_num) {
   if (region_num == 0){
-    int n = std::min(n_assem_region1 - core1.count(), fresh1.count());
+    int n = std::min(n_assem_region[region1_ID] - core1.count(), fresh1.count());
     if (n == 0) {
       return;
     }
@@ -504,7 +510,7 @@ void TwoRegionReactor::Load(int region_num) {
     core1.Push(fresh1.PopN(n));
   }
   if (region_num == 1){
-    int n = std::min(n_assem_region2 - core2.count(), fresh2.count());
+    int n = std::min(n_assem_region[region2_ID] - core2.count(), fresh2.count());
     if (n == 0) {
       return;
     }
@@ -608,10 +614,10 @@ bool TwoRegionReactor::ReadyToRefuel() {
 
 bool TwoRegionReactor::FullRegion(int region_num) {
   if (region_num == 0){
-    return core1.count() == n_assem_region1;
+    return core1.count() == n_assem_region[region1_ID];
   }
   if (region_num == 1){
-    return core2.count() == n_assem_region2;
+    return core2.count() == n_assem_region[region2_ID];
   }
 }
 

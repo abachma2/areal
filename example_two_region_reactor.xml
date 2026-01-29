@@ -56,8 +56,10 @@
           <val>100</val>
           <val>50</val>
         </assem_size>
-        <n_assem_region1>3</n_assem_region1>
-        <n_assem_region2>3</n_assem_region2>
+        <n_assem_region>
+          <val>3</val>
+          <val>3</val>
+        </n_assem_region>
         <n_assem_batch>
           <val>1</val>
           <val>1</val>

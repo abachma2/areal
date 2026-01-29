@@ -250,22 +250,10 @@ class TwoRegionReactor : public cyclus::Facility,
   std::vector<int> n_assem_batch;
 
   #pragma cyclus var { \
-    "default": 3, \
-    "uilabel": "Number of Assemblies in Region1", \
-    "uitype": "range", \
-    "range": [1,3], \
+    "uilabel": "Number of Assemblies in each region", \
     "doc": "Number of assemblies that constitute a full core.", \
   }
-  int n_assem_region1;
-
-  #pragma cyclus var { \
-    "default": 3, \
-    "uilabel": "Number of Assemblies in Region2", \
-    "uitype": "range", \
-    "range": [1,3], \
-    "doc": "Number of assemblies that constitute a full core.", \
-  }
-  int n_assem_region2;
+  std::vector<int> n_assem_region;
 
   #pragma cyclus var { \
     "default": 0, \
@@ -382,13 +370,13 @@ class TwoRegionReactor : public cyclus::Facility,
   // referenced (e.g. n_batch_fresh, assem_size, etc.).
   #pragma cyclus var {"capacity": "n_assem_fresh1 * assem_size[0]"}
   cyclus::toolkit::ResBuf<cyclus::Material> fresh1;
-  #pragma cyclus var {"capacity": "n_assem_region1 * assem_size[0]"}
+  #pragma cyclus var {"capacity": "n_assem_region[0] * assem_size[0]"}
   cyclus::toolkit::ResBuf<cyclus::Material> core1;
   #pragma cyclus var {"capacity": "n_assem_spent1 * assem_size[0]"}
   cyclus::toolkit::ResBuf<cyclus::Material> spent1;
   #pragma cyclus var {"capacity": "n_assem_fresh2 * assem_size[1]"}
   cyclus::toolkit::ResBuf<cyclus::Material> fresh2;
-  #pragma cyclus var {"capacity": "n_assem_region2 * assem_size[1]"}
+  #pragma cyclus var {"capacity": "n_assem_region[1] * assem_size[1]"}
   cyclus::toolkit::ResBuf<cyclus::Material> core2;
   #pragma cyclus var {"capacity": "n_assem_spent2 * assem_size[1]"}
   cyclus::toolkit::ResBuf<cyclus::Material> spent2;
