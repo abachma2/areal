@@ -241,8 +241,9 @@ class TwoRegionReactor : public cyclus::Facility,
   std::vector<double> assem_size;
 
   #pragma cyclus var { \
-    "uilabel": "Number of Assemblies per Batch in Region 1", \
-    "doc": "Number of assemblies that constitute a single batch.  " \
+    "uilabel": "Number of Assemblies per Batch in each region", \
+    "doc": "Number of assemblies that constitute a single batch in each region.  " \
+           "The first entry is for region 1, the second is for region 2. " \
            "This is the number of assemblies discharged from the core fully " \
            "burned each cycle."           \
            "Batch size is equivalent to ``n_assem_batch / n_assem_core``.", \
@@ -251,24 +252,29 @@ class TwoRegionReactor : public cyclus::Facility,
 
   #pragma cyclus var { \
     "uilabel": "Number of Assemblies in each region", \
-    "doc": "Number of assemblies that constitute a full core.", \
+    "doc": "Number of assemblies that constitute a full region. "\
+           "The first entry is for region 1 and he second is for region 2.", \
   }
   std::vector<int> n_assem_region;
 
   #pragma cyclus var { \
     "default": [0,0], \
-    "uilabel": "Minimum Fresh Fuel Inventory for Region 1",\
+    "uilabel": "Minimum Fresh Fuel Inventory for each region",\
     "units": "assemblies", \
-    "doc": "Number of fresh fuel assemblies to keep on-hand if possible.", \
+    "doc": "Number of fresh fuel assemblies to keep on-hand if possible. "
+           "The first entry is for region 1 and he second is for region 2. "
+           "The default values are 0 for each region.", \
   }
   std::vector<int> n_assem_fresh;
 
   #pragma cyclus var { \
     "default": [1000000000, 1000000000], \
-    "uilabel": "Maximum Spent Fuel Inventory for Region 1",\
+    "uilabel": "Maximum Spent Fuel Inventory for each region",\
     "units": "assemblies", \
     "doc": "Number of spent fuel assemblies that can be stored on-site before" \
-           " reactor operation stalls.", \
+           " reactor operation stalls. " \
+           "The first entry is for region 1 and he second is for region 2. "\
+           "The default value for both regions is 1000000000.", \
   }
   std::vector<int> n_assem_spent;
 
