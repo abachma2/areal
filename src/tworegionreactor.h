@@ -247,16 +247,7 @@ class TwoRegionReactor : public cyclus::Facility,
            "burned each cycle."           \
            "Batch size is equivalent to ``n_assem_batch / n_assem_core``.", \
   }
-  int n_assem_batch1;
-
-  #pragma cyclus var { \
-    "uilabel": "Number of Assemblies per Batch in Region 2", \
-    "doc": "Number of assemblies that constitute a single batch.  " \
-           "This is the number of assemblies discharged from the core fully " \
-           "burned each cycle."           \
-           "Batch size is equivalent to ``n_assem_batch / n_assem_core``.", \
-  }
-  int n_assem_batch2;
+  std::vector<int> n_assem_batch;
 
   #pragma cyclus var { \
     "default": 3, \

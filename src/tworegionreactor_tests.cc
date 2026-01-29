@@ -67,8 +67,7 @@ TEST(TwoRegionReactorTests, JustInTimeOrdering) {
      "  <assem_size> <val>300</val> <val>300</val> </assem_size>  "
      "  <n_assem_region1>1</n_assem_region1>  "
      "  <n_assem_region2>1</n_assem_region2>"
-     "  <n_assem_batch1>1</n_assem_batch1>  "
-     "  <n_assem_batch2>1</n_assem_batch2>";
+     "  <n_assem_batch> <val>1</val> <val>1</val> </n_assem_batch>  ";
 
   int simdur = 50;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
@@ -113,8 +112,7 @@ TEST(TwoRegionReactorTests, BatchSizes) {
      "  <assem_size> <val>1</val> <val>2</val> </assem_size>  "
      "  <n_assem_region1>7</n_assem_region1>  "
      "  <n_assem_region2>14</n_assem_region2>"
-     "  <n_assem_batch1>3</n_assem_batch1>  "
-     "  <n_assem_batch2>2</n_assem_batch2>  ";
+     "  <n_assem_batch> <val>3</val> <val>2</val> </n_assem_batch>  ";
 
   int simdur = 50;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
@@ -157,8 +155,7 @@ TEST(TwoRegionReactorTests, RefuelTimes) {
      "  <assem_size> <val>1</val> <val>2</val> </assem_size>  "
      "  <n_assem_region1>1</n_assem_region1>  "
      "  <n_assem_region2>2</n_assem_region2>"
-     "  <n_assem_batch1>1</n_assem_batch1>  "
-     "  <n_assem_batch2>1</n_assem_batch2>  ";
+     "  <n_assem_batch>v<val>1</val> <val>1</val> </n_assem_batch>  ";
 
   int simdur = 49;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
@@ -204,8 +201,7 @@ TEST(TwoRegionReactorTests, DecomTimes) {
      "  <n_assem_region1>3</n_assem_region1>  "
      "  <n_assem_region2>2</n_assem_region2>"
      "  <power_cap>1000</power_cap>  "
-     "  <n_assem_batch1>1</n_assem_batch1>  "
-     "  <n_assem_batch2>1</n_assem_batch2>  ";
+     "  <n_assem_batch> <val>1</val> <val>1</val> </n_assem_batch>  ";
 
   int simdur = 12;
   int lifetime = 7;
@@ -261,8 +257,7 @@ TEST(TwoRegionReactorTests, DecomZeroRefuel) {
      "  <assem_size> <val>1</val> <val>2</val> </assem_size>  "
      "  <n_assem_region1>3</n_assem_region1>  "
      "  <n_assem_region2>2</n_assem_region2>"
-     "  <n_assem_batch1>1</n_assem_batch1>  "
-     "  <n_assem_batch2>1</n_assem_batch2>  "
+     "  <n_assem_batch> <val>1</val> <val>1</val></n_assem_batch>  "
      "  <power_cap>1000</power_cap>";
 
   int simdur = 8;
@@ -299,8 +294,7 @@ TEST(TwoRegionReactorTests, OrderAtRefuelStart) {
      "  <assem_size> <val>1</val> <val>1</val> </assem_size>  "
      "  <n_assem_region1>1</n_assem_region1>  "
      "  <n_assem_region2>1</n_assem_region2>"
-     "  <n_assem_batch1>1</n_assem_batch1>  "
-     "  <n_assem_batch2>1</n_assem_batch2>";
+     "  <n_assem_batch> <val>1</val> <val>1</val> </n_assem_batch>  ";
 
   int simdur = 7;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
@@ -334,8 +328,7 @@ TEST(TwoRegionReactorTests, MultiFuelMix) {
      "  <n_assem_fresh1>3</n_assem_fresh1>  "
      "  <n_assem_region1>3</n_assem_region1>  "
      "  <n_assem_region2>3</n_assem_region2>"
-     "  <n_assem_batch1>3</n_assem_batch1>  "
-     "  <n_assem_batch2>3</n_assem_batch2>";
+     "  <n_assem_batch> <val>3</val> <val>3</val> </n_assem_batch>  ";
 
   // it is important that the sources have cumulative capacity greater than
   // the reactor can take on a single time step - to test that inventory
@@ -372,8 +365,7 @@ TEST(TwoRegionReactorTests, FullSpentInventory1) {
      "  <assem_size> <val>1</val> <val>1</val> </assem_size>  "
      "  <n_assem_region1>1</n_assem_region1>  "
      "  <n_assem_region2>1</n_assem_region2>"
-     "  <n_assem_batch1>1</n_assem_batch1>  "
-     "  <n_assem_batch2>1</n_assem_batch2>"
+     "  <n_assem_batch> <val>1</val> <val>1</val> </n_assem_batch>  "
      "  <n_assem_spent1>3</n_assem_spent1>  ";
 
   int simdur = 10;
@@ -416,8 +408,7 @@ TEST(TwoRegionReactorTests, FullSpentInventory2) {
      "  <assem_size> <val>1</val> <val>1</val> </assem_size>  "
      "  <n_assem_region1>1</n_assem_region1>  "
      "  <n_assem_region2>1</n_assem_region2>"
-     "  <n_assem_batch1>1</n_assem_batch1>  "
-     "  <n_assem_batch2>1</n_assem_batch2>"
+     "  <n_assem_batch> <val>1</val> <val>1</val> </n_assem_batch>  "
      "  <n_assem_spent2>3</n_assem_spent2>  ";
 
   int simdur = 10;
@@ -460,8 +451,7 @@ TEST(TwoRegionReactorTests, FullSpentInventory3) {
      "  <assem_size> <val>1</val> <val>1</val> </assem_size>  "
      "  <n_assem_region1>1</n_assem_region1>  "
      "  <n_assem_region2>1</n_assem_region2>"
-     "  <n_assem_batch1>1</n_assem_batch1>  "
-     "  <n_assem_batch2>1</n_assem_batch2>"
+     "  <n_assem_batch> <val>1</val> <val>1</val> </n_assem_batch>  "
      "  <n_assem_spent1>3</n_assem_spent1>  "
      "  <n_assem_spent2>3</n_assem_spent2>  ";
 
@@ -507,8 +497,7 @@ TEST(TwoRegionReactorTests, FullSpentInventoryShutdown) {
      "  <assem_size> <val>1</val> <val>1</val> </assem_size> "
      "  <n_assem_region1>1</n_assem_region1> "
      "  <n_assem_region2>1</n_assem_region2> "
-     "  <n_assem_batch1>1</n_assem_batch1> "
-     "  <n_assem_batch2>1</n_assem_batch2> "
+     "  <n_assem_batch> <val>1</val> <val>1</val> </n_assem_batch> "
      " <n_assem_spent1>1</n_assem_spent1> "
      " <power_cap>100</power_cap> ";
 
@@ -542,8 +531,7 @@ TEST(TwoRegionReactorTests, FullSpentInventoryShutdown2) {
      "  <assem_size> <val>1</val> <val>1</val> </assem_size> "
      "  <n_assem_region1>1</n_assem_region1> "
      "  <n_assem_region2>1</n_assem_region2> "
-     "  <n_assem_batch1>1</n_assem_batch1> "
-     "  <n_assem_batch2>1</n_assem_batch2> "
+     "  <n_assem_batch> <val>1</val> <val>1</val> </n_assem_batch> "
      " <n_assem_spent2>1</n_assem_spent2> "
      " <power_cap>100</power_cap> ";
 
@@ -573,8 +561,7 @@ TEST(TwoRegionReactorTests, FullSpentInventoryShutdown3) {
      "  <assem_size> <val>1</val> <val>1</val> </assem_size> "
      "  <n_assem_region1>1</n_assem_region1> "
      "  <n_assem_region2>1</n_assem_region2> "
-     "  <n_assem_batch1>1</n_assem_batch1> "
-     "  <n_assem_batch2>1</n_assem_batch2> "
+     "  <n_assem_batch> <val>1</val> <val>1</val> </n_assem_batch> "
      " <n_assem_spent1>1</n_assem_spent1> "
      " <n_assem_spent2>1</n_assem_spent2> "
      " <power_cap>100</power_cap> ";
@@ -610,8 +597,7 @@ TEST(TwoRegionReactorTests, FuelShortage1) {
      "  <assem_size> <val>1</val> <val>1</val> </assem_size>  "
      "  <n_assem_region1>3</n_assem_region1>  "
      "  <n_assem_region2>2</n_assem_region2>"
-     "  <n_assem_batch1>3</n_assem_batch1>  "
-     "  <n_assem_batch2>2</n_assem_batch2>";
+     "  <n_assem_batch> <val>3</val> <val>2</val> </n_assem_batch>  ";
 
   int simdur = 50;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
@@ -666,8 +652,7 @@ TEST(TwoRegionReactorTests, FuelShortage2) {
      "  <assem_size> <val>1</val> <val>1</val> </assem_size>  "
      "  <n_assem_region1>3</n_assem_region1>  "
      "  <n_assem_region2>2</n_assem_region2>"
-     "  <n_assem_batch1>3</n_assem_batch1>  "
-     "  <n_assem_batch2>2</n_assem_batch2>";
+     "  <n_assem_batch> <val>3</val> <val>2</val> </n_assem_batch>  ";
 
   int simdur = 50;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
@@ -720,8 +705,7 @@ TEST(TwoRegionReactorTests, FuelShortage3) {
      "  <assem_size> <val>1</val> <val>1</val> </assem_size>  "
      "  <n_assem_region1>3</n_assem_region1>  "
      "  <n_assem_region2>2</n_assem_region2>"
-     "  <n_assem_batch1>3</n_assem_batch1>  "
-     "  <n_assem_batch2>2</n_assem_batch2>";
+     "  <n_assem_batch> <val>3</val> <val>2</val> </n_assem_batch>  ";
 
   int simdur = 50;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
@@ -777,8 +761,7 @@ TEST(TwoRegionReactorTests, DischargedFuelTransmute) {
      "  <assem_size> <val>1</val> <val>1</val> </assem_size>  "
      "  <n_assem_region1>1</n_assem_region1>  "
      "  <n_assem_region2>2</n_assem_region2>"
-     "  <n_assem_batch1>1</n_assem_batch1>  "
-     "  <n_assem_batch2>1</n_assem_batch2>  ";
+     "  <n_assem_batch> <val>1</val> <val>1</val> </n_assem_batch>  ";
 
   int simdur = 7;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
@@ -825,8 +808,7 @@ TEST(TwoRegionReactorTests, SpentFuelProperCommodTracking) {
      "  <assem_size> <val>1</val> <val>1</val> </assem_size>  "
      "  <n_assem_region1>3</n_assem_region1>  "
      "  <n_assem_region2>2</n_assem_region2>"
-     "  <n_assem_batch1>3</n_assem_batch1>  "
-     "  <n_assem_batch2>2</n_assem_batch2>  ";
+     "  <n_assem_batch> <val>3</val> <val>2</val> </n_assem_batch>  ";
 
   int simdur = 7;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
@@ -873,8 +855,7 @@ TEST(TwoRegionReactorTests, Retire) {
      "  <n_assem_fresh1>1</n_assem_fresh1>  "
      "  <n_assem_region1>3</n_assem_region1>  "
      "  <n_assem_region2>2</n_assem_region2>  "
-     "  <n_assem_batch1>1</n_assem_batch1>  "
-     "  <n_assem_batch2>1</n_assem_batch2>  "
+     "  <n_assem_batch> <val>1</val> <val>1</val> </n_assem_batch>  "
      "  <power_cap>1</power_cap>  "
      "";
 
@@ -969,8 +950,7 @@ TEST(TwoRegionReactorTests, DecomTransmusteAll1) {
      "  <assem_size> <val>300</val> <val>150</val> </assem_size>  "
      "  <n_assem_region1>3</n_assem_region1>  "
      "  <n_assem_region2>2</n_assem_region2>  "
-     "  <n_assem_batch1>1</n_assem_batch1>  "
-     "  <n_assem_batch2>1</n_assem_batch2>  "
+     "  <n_assem_batch> <val>1</val> <val>1</val> </n_assem_batch>  "
      "  <power_cap>1</power_cap>  "
      "  <decom_transmute_all>1</decom_transmute_all>"
      "";
@@ -1022,8 +1002,7 @@ TEST(TwoRegionReactorTests, DecomTransmusteAll2) {
      "  <assem_size> <val>300</val> <val>150</val> </assem_size>  "
      "  <n_assem_region1>3</n_assem_region1>  "
      "  <n_assem_region2>2</n_assem_region2>  "
-     "  <n_assem_batch1>1</n_assem_batch1>  "
-     "  <n_assem_batch2>1</n_assem_batch2>  "
+     "  <n_assem_batch> <val>1</val> <val>1</val> </n_assem_batch>  "
      "  <power_cap>1</power_cap>  "
      "  <decom_transmute_all>0</decom_transmute_all>"
      "";
@@ -1075,8 +1054,7 @@ TEST(TwoRegionReactorTests, PositionInitialize) {
      "  <assem_size> <val>300</val> <val>150</val> </assem_size>  "
      "  <n_assem_region1>1</n_assem_region1>  "
      "  <n_assem_region2>2</n_assem_region2>  "
-     "  <n_assem_batch1>1</n_assem_batch1>  "
-     "  <n_assem_batch2>1</n_assem_batch2>  ";
+     "  <n_assem_batch> <val>1</val> <val>1</val> </n_assem_batch>  ";
 
   int simdur = 50;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
@@ -1105,8 +1083,7 @@ TEST(TwoRegionReactorTests, PositionInitialize2) {
      "  <assem_size> <val>300</val> <val>150</val> </assem_size>  "
      "  <n_assem_region1>1</n_assem_region1>  "
      "  <n_assem_region2>2</n_assem_region2>  "
-     "  <n_assem_batch1>1</n_assem_batch1>  "
-     "  <n_assem_batch2>1</n_assem_batch2>  "
+     "  <n_assem_batch> <val>1</val> <val>1</val> </n_assem_batch>  "
      "  <longitude>30.0</longitude>  "
      "  <latitude>30.0</latitude>  ";
 
@@ -1139,8 +1116,7 @@ TEST(TwoRegionReactorTests, TwoRegionOutcommodMissing) {
      "  <assem_size> <val>1</val> <val>1</val> </assem_size>  "
      "  <n_assem_region1>7</n_assem_region1>  "
      "  <n_assem_region2>7</n_assem_region2>"
-     "  <n_assem_batch1>3</n_assem_batch1>  "
-     "  <n_assem_batch2>3</n_assem_batch2>";
+     "  <n_assem_batch> <val>3</val> <val>3</val> </n_assem_batch>  ";
 
   int simdur = 50;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
@@ -1168,8 +1144,7 @@ TEST(TwoRegionReactorTests, InrecipesMissing) {
      "  <assem_size> <val>1</val> <val>1</val> </assem_size>  "
      "  <n_assem_region1>7</n_assem_region1>  "
      "  <n_assem_region2>7</n_assem_region2>"
-     "  <n_assem_batch1>3</n_assem_batch1>  "
-     "  <n_assem_batch2>3</n_assem_batch2>";
+     "  <n_assem_batch> <val>3</val> <val>3</val> </n_assem_batch>  ";
 
   int simdur = 50;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
@@ -1197,8 +1172,7 @@ TEST(TwoRegionReactorTests, OutrecipesMissing) {
      "  <assem_size> <val>1</val> <val>1</val> </assem_size>  "
      "  <n_assem_region1>7</n_assem_region1>  "
      "  <n_assem_region2>7</n_assem_region2>"
-     "  <n_assem_batch1>3</n_assem_batch1>  "
-     "  <n_assem_batch2>3</n_assem_batch2>";
+     "  <n_assem_batch> <val>3</val> <val>3</val> </n_assem_batch>  ";
 
   int simdur = 50;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
@@ -1226,8 +1200,34 @@ TEST(TwoRegionReactorTests, AssemsizeMissing) {
      "  <assem_size> <val>1</val> </assem_size>  "
      "  <n_assem_region1>7</n_assem_region1>  "
      "  <n_assem_region2>7</n_assem_region2>"
-     "  <n_assem_batch1>3</n_assem_batch1>  "
-     "  <n_assem_batch2>3</n_assem_batch2>";
+     "  <n_assem_batch> <val>3</val> <val>3</val> </n_assem_batch>  ";
+
+  int simdur = 50;
+  cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
+  sim.AddSource("uox").Finalize();
+  sim.AddRecipe("uox", c_uox());
+  sim.AddRecipe("mox", c_mox());
+  sim.AddRecipe("spentuox", c_spentuox());
+  sim.AddRecipe("spentmox", c_spentmox());
+  int id;
+  // Testing for an error thrown
+  EXPECT_THROW(id = sim.Run(), cyclus::ValueError);
+}
+// tests that an error is thrown if assem_size input does not have the correct number 
+// of entries
+TEST(TwoRegionReactorTests, NAssemBatchMissing) {
+  std::string config =
+     "  <fuel_inrecipes>  <val>uox</val>  <val>mox</val>    </fuel_inrecipes>  "
+     "  <fuel_outrecipes> <val>spentuox</val> <val>spentmox</val> </fuel_outrecipes>  "
+     "  <fuel_incommods>  <val>uox</val>  <val>mox</val>   </fuel_incommods>  "
+     "  <fuel_outcommods> <val>waste</val> <val>mox_waste</val>   </fuel_outcommods>  "
+     ""
+    "  <cycle_time>1</cycle_time>  "
+     "  <refuel_time>0</refuel_time>  "
+     "  <assem_size> <val>1</val> <val>1</val> </assem_size>  "
+     "  <n_assem_region1>7</n_assem_region1>  "
+     "  <n_assem_region2>7</n_assem_region2>"
+     "  <n_assem_batch> <val>3</val> </n_assem_batch>  ";
 
   int simdur = 50;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
@@ -1255,8 +1255,7 @@ TEST(TwoRegionReactorTests, IncommodMissing) {
      "  <assem_size> <val>1</val> <val>1</val> </assem_size>  "
      "  <n_assem_region1>7</n_assem_region1>  "
      "  <n_assem_region2>7</n_assem_region2>"
-     "  <n_assem_batch1>3</n_assem_batch1>  "
-     "  <n_assem_batch2>3</n_assem_batch2>";
+     "  <n_assem_batch> <val>3</val> <val>3</val> </n_assem_batch>  ";
 
   int simdur = 50;
   cyclus::MockSim sim(cyclus::AgentSpec(":areal:TwoRegionReactor"), config, simdur);
