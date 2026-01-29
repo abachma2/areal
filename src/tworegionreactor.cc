@@ -366,20 +366,19 @@ void TwoRegionReactor::Tock() {
   // Check that irradiation and refueling periods are over, that 
   // the core is full and that fuel was successfully discharged in this refueling time.
   // If this is the case, then a new cycle will be initiated.
-  if (cycle_step >= cycle_time + refuel_time && core1.count() == n_assem_region1 && 
-      core2.count() == n_assem_region2 && discharged1 == true && discharged2 == true) {
+  if (ReadyToRefuel() && FullRegion(region1_ID) && FullRegion(region2_ID) && discharged1 == true && discharged2 == true) {
     discharged1 = false;
     discharged2 = false; 
     cycle_step = 0;
   }
 
-  if (cycle_step == 0 && core1.count() == n_assem_region1 && core2.count() == n_assem_region2) {
+  if (cycle_step == 0 && FullRegion(region1_ID) && FullRegion(region2_ID)) {
     Record("CYCLE_START", "");
   }
 
   // record power generation if we're in the middle of a cycle. 
   if (cycle_step >= 0 && cycle_step < cycle_time &&
-      core1.count() == n_assem_region1 && core2.count() == n_assem_region2) {
+      FullRegion(region1_ID) && FullRegion(region2_ID)) {
     cyclus::toolkit::RecordTimeSeries<cyclus::toolkit::POWER>(this, power_cap);
     cyclus::toolkit::RecordTimeSeries<double>("supplyPOWER", this, power_cap);
   } else {
@@ -389,7 +388,7 @@ void TwoRegionReactor::Tock() {
 
   // "if" prevents starting cycle after initial deployment until core is full
   // even though cycle_step is its initial zero.
-  if ((cycle_step > 0) || (core1.count() == n_assem_region1 && core2.count() == n_assem_region2)){
+  if ((cycle_step > 0) || (FullRegion(region1_ID) && FullREgion(region2_ID))){
       cycle_step++;
   }
 }
@@ -596,6 +595,19 @@ void TwoRegionReactor::PushSpent(std::map<std::string, MatVec> leftover, int reg
     if (region_num == 1){
       spent2.Push(it->second);
     }
+  }
+}
+
+bool TwoRegionReactor::ReadyToRefuel() {
+  return cycle_step >= cycle_time + refuel_time;
+}
+
+bool TwoRegionReactor::FullRegion(int region_num) {
+  if (region_num == 0){
+    return core1.count() == n_assem_region1;
+  }
+  if (region_num == 1){
+    return core2.count() == n_assem_region2;
   }
 }
 

@@ -185,6 +185,13 @@ class TwoRegionReactor : public cyclus::Facility,
   /// from the spent fuel buffer.
   std::map<std::string, cyclus::toolkit::MatVec> PeekSpent(int region_num);
 
+  // check if the cycle step has reached a time 
+  // to refuel the core
+  bool ReadyToRefuel(); 
+
+  // check if a region is full
+  bool FullRegion(int region_num);
+
   /////// fuel specifications /////////
   #pragma cyclus var { \
     "uitype": ["oneormore", "incommodity"], \
