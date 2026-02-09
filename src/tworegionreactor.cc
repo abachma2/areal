@@ -142,10 +142,10 @@ void TwoRegionReactor::Tick() {
     // in case a cycle lands exactly on our last time step, we will need to
     // burn a batch from fresh inventory on this time step.  When retired,
     // this batch also needs to be discharged to spent fuel inventory.
-    while (fresh1.count() > 0 && spent1.space() >= assem_size[0]) {
+    while (fresh1.count() > 0 && spent1.space() >= assem_size[region1_ID]) {
       spent1.Push(fresh1.Pop());
     }
-    while (fresh2.count() > 0 && spent2.space() >= assem_size[1]) {
+    while (fresh2.count() > 0 && spent2.space() >= assem_size[region2_ID]) {
       spent2.Push(fresh2.Pop());
     }
     if(CheckDecommissionCondition()) {
@@ -209,13 +209,13 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlReque
     // building request portfolio for region 1 and recording demand
     for (int i = 0; i < n_assem_order1; i++) {
       RequestPortfolio<Material>::Ptr port(new RequestPortfolio<Material>());
-      std::string commod = fuel_incommods[0];
-      cyclus::Composition::Ptr recipe = context()->GetRecipe(fuel_inrecipes[0]);
-      m = Material::CreateUntracked(assem_size[0], recipe);
+      std::string commod = fuel_incommods[region1_ID];
+      cyclus::Composition::Ptr recipe = context()->GetRecipe(fuel_inrecipes[region1_ID]);
+      m = Material::CreateUntracked(assem_size[region1_ID], recipe);
 
       Request<Material>* r = port->AddRequest(m, this, commod, 1.0, true);
-      cyclus::toolkit::RecordTimeSeries<double>("demand"+fuel_incommods[0], this,
-                                            assem_size[0]) ;
+      cyclus::toolkit::RecordTimeSeries<double>("demand"+fuel_incommods[region1_ID], this,
+                                            assem_size[region1_ID]) ;
 
       ports.insert(port);
     }
@@ -225,13 +225,13 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlReque
     // building request portfolio for region 2 and recording demand
     for (int i = 0; i < n_assem_order2; i++) {
       RequestPortfolio<Material>::Ptr port(new RequestPortfolio<Material>());
-      std::string commod = fuel_incommods[1];
-      cyclus::Composition::Ptr recipe = context()->GetRecipe(fuel_inrecipes[1]);
-      m = Material::CreateUntracked(assem_size[1], recipe);
+      std::string commod = fuel_incommods[region2_ID];
+      cyclus::Composition::Ptr recipe = context()->GetRecipe(fuel_inrecipes[region2_ID]);
+      m = Material::CreateUntracked(assem_size[region2_ID], recipe);
 
       Request<Material>* r = port->AddRequest(m, this, commod, 1.0, true);
-      cyclus::toolkit::RecordTimeSeries<double>("demand"+fuel_incommods[1], this,
-                                            assem_size[1]) ;
+      cyclus::toolkit::RecordTimeSeries<double>("demand"+fuel_incommods[region2_ID], this,
+                                            assem_size[region2_ID]) ;
 
       ports.insert(port);
     }
@@ -274,10 +274,10 @@ void TwoRegionReactor::AcceptMatlTrades(const std::vector<
   int num_response2 = 0; 
   for (trade = responses.begin(); trade != responses.end(); ++trade){
     std::string commod = trade->first.request->commodity();
-    if (commod == fuel_incommods[0]){
+    if (commod == fuel_incommods[region1_ID]){
       ++num_response1;
     }
-    if (commod == fuel_incommods[1]){
+    if (commod == fuel_incommods[region2_ID]){
       ++num_response2;
     }
   }
@@ -297,14 +297,14 @@ void TwoRegionReactor::AcceptMatlTrades(const std::vector<
     std::string commod = trade->first.request->commodity();
     Material::Ptr m = trade->second;
     index_res(m, commod);
-    if (commod == fuel_incommods[0]){
+    if (commod == fuel_incommods[region1_ID]){
       if (core1.count() < n_assem_region[region1_ID]) {
         core1.Push(m);
       } else {
         fresh1.Push(m);
       }
     }
-    if (commod == fuel_incommods[1]){
+    if (commod == fuel_incommods[region2_ID]){
       if (core2.count() < n_assem_region[region2_ID]) {
         core2.Push(m);
       } else {
