@@ -261,8 +261,8 @@ class TwoRegionReactor : public cyclus::Facility,
     "default": [0,0], \
     "uilabel": "Minimum Fresh Fuel Inventory for each region",\
     "units": "assemblies", \
-    "doc": "Number of fresh fuel assemblies to keep on-hand if possible. "
-           "The first entry is for region 1 and he second is for region 2. "
+    "doc": "Number of fresh fuel assemblies to keep on-hand if possible. "\
+           "The first entry is for region 1 and he second is for region 2. "\
            "The default values are 0 for each region.", \
   }
   std::vector<int> n_assem_fresh;
