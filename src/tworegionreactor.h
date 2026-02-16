@@ -143,6 +143,12 @@ class TwoRegionReactor : public cyclus::Facility,
   std::string fuel_inrecipe(cyclus::Material::Ptr m);
   std::string fuel_outrecipe(cyclus::Material::Ptr m);
 
+  // vector index for each region. Want to variables 
+  // to prevent confusing with the 0-indexing for 
+  // the vectors
+  int region1_ID = 0;
+  int region2_ID = 1;
+
   bool retired() {
     return exit_time() != -1 && context()->time() > exit_time();
   }
@@ -179,6 +185,13 @@ class TwoRegionReactor : public cyclus::Facility,
   /// Returns all spent assemblies indexed by outcommod without removing them
   /// from the spent fuel buffer.
   std::map<std::string, cyclus::toolkit::MatVec> PeekSpent(int region_num);
+
+  // check if the cycle step has reached a time 
+  // to refuel the core
+  bool ReadyToRefuel(); 
+
+  // check if a region is full
+  bool FullRegion(int region_num);
 
   /////// fuel specifications /////////
   #pragma cyclus var { \
@@ -229,82 +242,42 @@ class TwoRegionReactor : public cyclus::Facility,
   std::vector<double> assem_size;
 
   #pragma cyclus var { \
-    "uilabel": "Number of Assemblies per Batch in Region 1", \
-    "doc": "Number of assemblies that constitute a single batch.  " \
+    "uilabel": "Number of Assemblies per Batch in each region", \
+    "doc": "Number of assemblies that constitute a single batch in each region.  " \
+           "The first entry is for region 1, the second is for region 2. " \
            "This is the number of assemblies discharged from the core fully " \
            "burned each cycle."           \
            "Batch size is equivalent to ``n_assem_batch / n_assem_core``.", \
   }
-  int n_assem_batch1;
+  std::vector<int> n_assem_batch;
 
   #pragma cyclus var { \
-    "uilabel": "Number of Assemblies per Batch in Region 2", \
-    "doc": "Number of assemblies that constitute a single batch.  " \
-           "This is the number of assemblies discharged from the core fully " \
-           "burned each cycle."           \
-           "Batch size is equivalent to ``n_assem_batch / n_assem_core``.", \
+    "uilabel": "Number of Assemblies in each region", \
+    "doc": "Number of assemblies that constitute a full region. "\
+           "The first entry is for region 1 and he second is for region 2.", \
   }
-  int n_assem_batch2;
+  std::vector<int> n_assem_region;
 
   #pragma cyclus var { \
-    "default": 3, \
-    "uilabel": "Number of Assemblies in Region1", \
-    "uitype": "range", \
-    "range": [1,3], \
-    "doc": "Number of assemblies that constitute a full core.", \
-  }
-  int n_assem_region1;
-
-  #pragma cyclus var { \
-    "default": 3, \
-    "uilabel": "Number of Assemblies in Region2", \
-    "uitype": "range", \
-    "range": [1,3], \
-    "doc": "Number of assemblies that constitute a full core.", \
-  }
-  int n_assem_region2;
-
-  #pragma cyclus var { \
-    "default": 0, \
-    "uilabel": "Minimum Fresh Fuel Inventory for Region 1", \
-    "uitype": "range", \
-    "range": [0,3], \
+    "default": [0,0], \
+    "uilabel": "Minimum Fresh Fuel Inventory for each region",\
     "units": "assemblies", \
-    "doc": "Number of fresh fuel assemblies to keep on-hand if possible.", \
+    "doc": "Number of fresh fuel assemblies to keep on-hand if possible. "\
+           "The first entry is for region 1 and he second is for region 2. "\
+           "The default values are 0 for each region.", \
   }
-  int n_assem_fresh1;
+  std::vector<int> n_assem_fresh;
 
   #pragma cyclus var { \
-    "default": 0, \
-    "uilabel": "Minimum Fresh Fuel Inventory for Region 2", \
-    "uitype": "range", \
-    "range": [0,3], \
-    "units": "assemblies", \
-    "doc": "Number of fresh fuel assemblies to keep on-hand if possible.", \
-  }
-  int n_assem_fresh2;
-
-  #pragma cyclus var { \
-    "default": 1000000000, \
-    "uilabel": "Maximum Spent Fuel Inventory for Region 1", \
-    "uitype": "range", \
-    "range": [0, 1000000000], \
+    "default": [1000000000, 1000000000], \
+    "uilabel": "Maximum Spent Fuel Inventory for each region",\
     "units": "assemblies", \
     "doc": "Number of spent fuel assemblies that can be stored on-site before" \
-           " reactor operation stalls.", \
+           " reactor operation stalls. " \
+           "The first entry is for region 1 and he second is for region 2. "\
+           "The default value for both regions is 1000000000.", \
   }
-  int n_assem_spent1;
-
-  #pragma cyclus var { \
-    "default": 1000000000, \
-    "uilabel": "Maximum Spent Fuel Inventory for Region 2", \
-    "uitype": "range", \
-    "range": [0, 1000000000], \
-    "units": "assemblies", \
-    "doc": "Number of spent fuel assemblies that can be stored on-site before" \
-           " reactor operation stalls.", \
-  }
-  int n_assem_spent2;
+  std::vector<int> n_assem_spent;
 
    ///////// cycle params ///////////
   #pragma cyclus var { \
@@ -377,17 +350,17 @@ class TwoRegionReactor : public cyclus::Facility,
 
   // Resource inventories - these must be defined AFTER/BELOW the member vars
   // referenced (e.g. n_batch_fresh, assem_size, etc.).
-  #pragma cyclus var {"capacity": "n_assem_fresh1 * assem_size[0]"}
+  #pragma cyclus var {"capacity": "n_assem_fresh[0] * assem_size[0]"}
   cyclus::toolkit::ResBuf<cyclus::Material> fresh1;
-  #pragma cyclus var {"capacity": "n_assem_region1 * assem_size[0]"}
+  #pragma cyclus var {"capacity": "n_assem_region[0] * assem_size[0]"}
   cyclus::toolkit::ResBuf<cyclus::Material> core1;
-  #pragma cyclus var {"capacity": "n_assem_spent1 * assem_size[0]"}
+  #pragma cyclus var {"capacity": "n_assem_spent[0] * assem_size[0]"}
   cyclus::toolkit::ResBuf<cyclus::Material> spent1;
-  #pragma cyclus var {"capacity": "n_assem_fresh2 * assem_size[1]"}
+  #pragma cyclus var {"capacity": "n_assem_fresh[1] * assem_size[1]"}
   cyclus::toolkit::ResBuf<cyclus::Material> fresh2;
-  #pragma cyclus var {"capacity": "n_assem_region2 * assem_size[1]"}
+  #pragma cyclus var {"capacity": "n_assem_region[1] * assem_size[1]"}
   cyclus::toolkit::ResBuf<cyclus::Material> core2;
-  #pragma cyclus var {"capacity": "n_assem_spent2 * assem_size[1]"}
+  #pragma cyclus var {"capacity": "n_assem_spent[1] * assem_size[1]"}
   cyclus::toolkit::ResBuf<cyclus::Material> spent2;
 
 
