@@ -1,3 +1,7 @@
+*******
+LICENSE
+*******
+
 Copyright © 2025, UChicago Argonne, LLC
 All Rights Reserved
  Software Name: Advanced REactor Archetype Library
