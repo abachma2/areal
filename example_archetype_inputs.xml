@@ -1,0 +1,166 @@
+<simulation>
+  <control>
+    <duration>10</duration>
+    <startmonth>1</startmonth>
+    <startyear>2000</startyear>
+  </control>
+
+  <archetypes>
+    <spec><lib>areal</lib><name>TwoRegionReactor</name></spec>
+    <spec><lib>cycamore</lib><name>Source</name></spec>
+    <spec><lib>cycamore</lib><name>Sink</name></spec>
+    <spec><lib>agents</lib><name>NullInst</name></spec>
+    <spec><lib>agents</lib><name>NullRegion</name></spec>
+  </archetypes>
+
+  <facility>
+    <name>USource</name>
+    <config>
+      <Source>
+        <outcommod>fresh_u</outcommod>
+      </Source>
+    </config>
+  </facility>
+  <facility>
+    <name>BlanketSource</name>
+    <config>
+      <Source>
+        <outcommod>fresh_blanket</outcommod>
+      </Source>
+    </config>
+  </facility>
+
+  <facility>
+    <name>OneFacility</name>
+    <config>
+      <TwoRegionReactor>
+        <fuel_incommods> 
+          <val>fresh_u</val>
+          <val>fresh_blanket</val>
+        </fuel_incommods>
+        <fuel_inrecipes> 
+          <val>fresh_uranium</val>
+          <val>fresh_blanket</val>
+        </fuel_inrecipes>
+        <fuel_outcommods> 
+          <val>spent_u</val>
+          <val>spent_blanket</val>
+        </fuel_outcommods>
+        <fuel_outrecipes> 
+          <val>spent_uranium</val>
+          <val>spent_blanket</val>
+        </fuel_outrecipes>
+        <cycle_time>1</cycle_time>
+        <refuel_time>0</refuel_time>
+        <assem_size> 
+          <val>100</val>
+          <val>50</val>
+        </assem_size>
+        <n_assem_region>
+          <val>3</val>
+          <val>3</val>
+        </n_assem_region>
+        <n_assem_batch>
+          <val>1</val>
+          <val>1</val>
+        </n_assem_batch>
+        <power_cap>100</power_cap>
+        <!-- Optional inputs, with defaults
+        <n_assem_fresh>
+          <val>0</val>
+          <val>0</val>
+        </n_assem_fresh>
+        <n_assem_spent>
+          <val>1e9</val>
+          <val>1e9</val>
+        </n_assem_spent>
+        <decom_transmute_all>0</decom_transmute_all>
+        
+        -->
+        
+      </TwoRegionReactor>
+    </config>
+  </facility>
+
+  <facility>
+    <name>USink</name>
+    <config>
+      <Sink>
+        <in_commods>
+          <val>spent_u</val>
+        </in_commods>
+      </Sink>
+    </config>
+  </facility>
+
+  <facility>
+    <name>BlanketSink</name>
+    <config>
+      <Sink>
+        <in_commods>
+          <val>spent_blanket</val>
+        </in_commods>
+      </Sink>
+    </config>
+  </facility>
+
+  <region>
+    <name>OneRegion</name>
+    <config> <NullRegion /> </config>
+    <institution>
+      <name>OneInst</name>
+      <initialfacilitylist>
+        <entry>
+          <prototype>USource</prototype>
+          <number>1</number>
+        </entry>
+        <entry>
+          <prototype>BlanketSource</prototype>
+          <number>1</number>
+        </entry>
+        <entry>
+          <prototype>OneFacility</prototype>
+          <number>1</number>
+        </entry>
+        <entry>
+          <prototype>USink</prototype>
+          <number>1</number>
+        </entry>
+        <entry>
+          <prototype>BlanketSink</prototype>
+          <number>1</number>
+        </entry>
+      </initialfacilitylist>
+      <config> <NullInst /> </config>
+    </institution>
+  </region>
+
+  <recipe>
+    <name>fresh_uranium</name>
+    <basis>mass</basis>
+    <nuclide> <id>92235</id> <comp>0.00710971</comp> </nuclide>
+    <nuclide> <id>92238</id> <comp>0.99283720</comp> </nuclide>
+  </recipe>
+
+  <recipe>
+    <name>spent_uranium</name>
+    <basis>mass</basis>
+    <nuclide> <id>94241</id> <comp>0.00710971</comp> </nuclide>
+    <nuclide> <id>94239</id> <comp>0.99283720</comp> </nuclide>
+  </recipe>
+
+  <recipe>
+    <name>fresh_blanket</name>
+    <basis>mass</basis>
+    <nuclide> <id>92235</id> <comp>0.00710971</comp> </nuclide>
+    <nuclide> <id>92238</id> <comp>0.99283720</comp> </nuclide>
+  </recipe>
+
+  <recipe>
+    <name>spent_blanket</name>
+    <basis>mass</basis>
+    <nuclide> <id>94241</id> <comp>0.00710971</comp> </nuclide>
+    <nuclide> <id>94239</id> <comp>0.99283720</comp> </nuclide>
+  </recipe>
+
+</simulation>
