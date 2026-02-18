@@ -11,12 +11,16 @@ Since last release:
 * Testing infrastructure (#3)
 * TwoRegionReactor archetype and associated unit tests (#4)
 * LICENSE from Argonne/UChicago-Argonne LLC (#5)
+* 
 
 
 
 **Changed:**
 * Build edited to match the Cycamore build process (#4)
-* Variable names for each region I (#9)
+* Variable names for each region (#9)
+* Updated docstrings for TwoRegionReactor (TRR) archetype (#10)
+* Changed `example_tworegion_reactor.xml` to `example_archetype_inputs.xml`,
+  and added optional input parameters for TRR to be used as a user guide. 
 
 
 **Removed:**
