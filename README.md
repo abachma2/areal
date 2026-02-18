@@ -25,6 +25,19 @@ To run the unit tests:
     ```
     $ areal_unit_tests
     ```
+
+## Using archetypes
+Within the archetype library section of the Cyclus input, you use
+
+```
+<spec> <lib>areal</lib> <name>ArchetypeName</name> </spec>
+```
+in which `ArcheytpeName` is the name of the archetype from 
+this library that you wish to use. The file `example_archetype_inputs.xml` 
+includes the required and optional (commented out) input parameters to 
+define a prototype of each archetype in this library. 
+
+
 ## Contributing
 1. Fork this repository
 2. Create a working branch on your fork 
