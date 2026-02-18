@@ -16,10 +16,11 @@ Since last release:
 
 **Changed:**
 * Build edited to match the Cycamore build process (#4)
+* Variable names for each region I (#9)
 
 
 **Removed:**
-
+* Files generated during build process (#9)
 
 **Fixed:**
 
