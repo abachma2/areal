@@ -58,7 +58,7 @@ jobs:
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
-            cyclus_tag=ci-layer-cache
+            cyclus_tag=${{ matrix.cyclus_tag }}
 
       - name: Export Environment Variables
         if: github.event_name == 'pull_request'
