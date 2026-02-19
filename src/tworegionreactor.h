@@ -145,8 +145,8 @@ class TwoRegionReactor : public cyclus::Facility,
   // vector index for each region. Want to variables 
   // to prevent confusing with the 0-indexing for 
   // the vectors
-  int region1_ID = 0;
-  int region2_ID = 1;
+  int regionA_ID = 0;
+  int regionB_ID = 1;
 
   bool retired() {
     return exit_time() != -1 && context()->time() > exit_time();
@@ -348,18 +348,18 @@ class TwoRegionReactor : public cyclus::Facility,
   bool keep_packaging;
 
   // Resource inventories - these must be defined AFTER/BELOW the member vars
-  // referenced (e.g. n_batch_fresh, assem_size, etc.).
-  #pragma cyclus var {"capacity": "n_assem_fresh[0] * assem_size[0]"}
+  // referenced (e.g. n_assem_fresh, assem_size, etc.).
+  #pragma cyclus var {"capacity": "n_assem_fresh[regionA_ID] * assem_size[regionA_ID]"}
   cyclus::toolkit::ResBuf<cyclus::Material> fresh1;
-  #pragma cyclus var {"capacity": "n_assem_region[0] * assem_size[0]"}
+  #pragma cyclus var {"capacity": "n_assem_region[regionA_ID] * assem_size[regionA_ID]"}
   cyclus::toolkit::ResBuf<cyclus::Material> core1;
-  #pragma cyclus var {"capacity": "n_assem_spent[0] * assem_size[0]"}
+  #pragma cyclus var {"capacity": "n_assem_spent[regionA_ID] * assem_size[regionA_ID]"}
   cyclus::toolkit::ResBuf<cyclus::Material> spent1;
-  #pragma cyclus var {"capacity": "n_assem_fresh[1] * assem_size[1]"}
+  #pragma cyclus var {"capacity": "n_assem_fresh[regionB_ID] * assem_size[regionB_ID]"}
   cyclus::toolkit::ResBuf<cyclus::Material> fresh2;
-  #pragma cyclus var {"capacity": "n_assem_region[1] * assem_size[1]"}
+  #pragma cyclus var {"capacity": "n_assem_region[regionB_ID] * assem_size[regionB_ID]"}
   cyclus::toolkit::ResBuf<cyclus::Material> core2;
-  #pragma cyclus var {"capacity": "n_assem_spent[1] * assem_size[1]"}
+  #pragma cyclus var {"capacity": "n_assem_spent[regionB_ID] * assem_size[regionB_ID]"}
   cyclus::toolkit::ResBuf<cyclus::Material> spent2;
 
 
