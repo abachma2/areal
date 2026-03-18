@@ -50,13 +50,12 @@ void TwoRegionReactor::InitFrom(cyclus::QueryableBackend* b) {
 void TwoRegionReactor::EnterNotify() {
   cyclus::Facility::EnterNotify();
   // Set keep packaging parameter in all ResBufs
-  fresh1.keep_packaging(keep_packaging);
-  core1.keep_packaging(keep_packaging);
-  spent1.keep_packaging(keep_packaging);
-  fresh2.keep_packaging(keep_packaging);
-  core2.keep_packaging(keep_packaging);
-  spent2.keep_packaging(keep_packaging);
-
+  for (int i; i<2; ++i){
+    fresh_vector[i]->keep_packaging(keep_packaging);
+    core_vector[i]->keep_packaging(keep_packaging);
+    spent_vector[i]->keep_packaging(keep_packaging);
+  }
+  
   // Throw error if vectors do not have size 2
   if (fuel_incommods.size() != 2) {
     throw cyclus::ValueError("areal::TwoRegionReactor fuel_incommods "\
