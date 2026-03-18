@@ -145,8 +145,8 @@ class TwoRegionReactor : public cyclus::Facility,
   // vector index for each region. Want to variables 
   // to prevent confusing with the 0-indexing for 
   // the vectors
-  int regionA_ID = 0;
-  int regionB_ID = 1;
+  const int regionA_ID = 0;
+  const int regionB_ID = 1;
 
   bool retired() {
     return exit_time() != -1 && context()->time() > exit_time();
