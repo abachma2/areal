@@ -362,7 +362,11 @@ class TwoRegionReactor : public cyclus::Facility,
   #pragma cyclus var {"capacity": "n_assem_spent[regionB_ID] * assem_size[regionB_ID]"}
   cyclus::toolkit::ResBuf<cyclus::Material> spent2;
 
-
+  // Create vectors of pointers to avoid creating a new data type
+  std::vector<cyclus::toolkit::ResBuf<cyclus::Material>*> fresh_vector = {&fresh1, &fresh2};
+  std::vector<cyclus::toolkit::ResBuf<cyclus::Material>*> core_vector = {&core1, &core2};
+  std::vector<cyclus::toolkit::ResBuf<cyclus::Material>*> spent_vector = {&spent1, &spent2};
+  
   // should be hidden in ui (internal only). True if fuel has already been
   // discharged this cycle.
   #pragma cyclus var {"default": 0, "doc": "This should NEVER be set manually",\
