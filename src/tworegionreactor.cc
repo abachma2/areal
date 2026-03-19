@@ -284,7 +284,7 @@ void TwoRegionReactor::AcceptMatlTrades(const std::vector<
   }
   for (int i; i<2; ++i){
     if (nload[i] > 0) {
-      ss << nload[i] << " assemblies in Region " + std::to_string(i);
+      ss << nload[i] << " assemblies in Region " + region_ID_map[i];
       Record("LOAD", ss.str());
     }
   }
@@ -471,17 +471,15 @@ bool TwoRegionReactor::Discharge(int region_num) {
 }
 
 void TwoRegionReactor::Load(int region_num) {
-  for (int i; i<2; ++i){
-    int n = std::min(n_assem_region[i] - core_vector[i]->count(), fresh_vector[i]->count());
-    if (n == 0) {
-      return;
-    }
-
-    std::stringstream ss;
-    ss << n << " assemblies into Region " + std::to_string(i);
-    Record("LOAD", ss.str());
-    core_vector[i]->Push(fresh_vector[i]->PopN(n));
+  int n = std::min(n_assem_region[region_num] - core_vector[region_num]->count(), fresh_vector[region_num]->count());
+  if (n == 0) {
+    return;
   }
+
+  std::stringstream ss;
+  ss << n << " assemblies into Region " + region_ID_map[region_num];
+  Record("LOAD", ss.str());
+  core_vector[region_num]->Push(fresh_vector[region_num]->PopN(n));
 }
 
 std::string TwoRegionReactor::fuel_incommod(Material::Ptr m) {
