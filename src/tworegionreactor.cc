@@ -433,14 +433,10 @@ std::map<std::string, MatVec> TwoRegionReactor::PeekSpent(int region_num) {
   // looking at the number and commodity name of the materials in each region
   std::map<std::string, MatVec> mapped;
   MatVec mats; 
-  if (region_num == 0){
-    mats = spent1.PopN(spent1.count());
-    spent1.Push(mats);
-  }
-  if (region_num == 1){
-    mats = spent2.PopN(spent2.count());
-    spent2.Push(mats);
-  }
+  //if (region_num == 0){
+    mats = spent_vector[region_num]->PopN(spent_vector[region_num]->count());
+    spent_vector[region_num]->Push(mats);
+  
   for (int i = 0; i < mats.size(); i++) {
     std::string commod = fuel_outcommod(mats[i]);
     mapped[commod].push_back(mats[i]);
