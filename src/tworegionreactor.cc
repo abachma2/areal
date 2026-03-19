@@ -55,7 +55,7 @@ void TwoRegionReactor::EnterNotify() {
     core_vector[i]->keep_packaging(keep_packaging);
     spent_vector[i]->keep_packaging(keep_packaging);
   }
-  
+
   // Throw error if vectors do not have size 2
   if (fuel_incommods.size() != 2) {
     throw cyclus::ValueError("areal::TwoRegionReactor fuel_incommods "\
@@ -128,14 +128,11 @@ void TwoRegionReactor::Tick() {
     // separate loops because if the regions have different numbers of 
     // assemblies then it might break before both regions are fully 
     // discharged. 
-    while (core1.count() > 0){
-      if (!Discharge(regionA_ID)) {
-        break;
-      }
-    }
-    while (core2.count() > 0){
-      if (!Discharge(regionB_ID)) {
-        break;
+    for (int i; i<2; ++i){
+      while (core_vector[i]->count() > 0){
+        if (!Discharge(i)) {
+          break;
+        }
       }
     }
     // in case a cycle lands exactly on our last time step, we will need to
