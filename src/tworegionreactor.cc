@@ -203,36 +203,21 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlReque
   } else if (retired()) {
     return ports;
   }
-  
-  if (n_assem_order[0] > 0){
-    // building request portfolio for region 1 and recording demand
-    for (int i = 0; i < n_assem_order[0]; i++) {
-      RequestPortfolio<Material>::Ptr port(new RequestPortfolio<Material>());
-      std::string commod = fuel_incommods[regionA_ID];
-      cyclus::Composition::Ptr recipe = context()->GetRecipe(fuel_inrecipes[regionA_ID]);
-      m = Material::CreateUntracked(assem_size[regionA_ID], recipe);
+  for (int i; i<2; ++i){ 
+    if (n_assem_order[i] > 0){
+      // building request portfolio for region 1 and recording demand
+      for (int j = 0; j < n_assem_order[i]; j++) {
+        RequestPortfolio<Material>::Ptr port(new RequestPortfolio<Material>());
+        std::string commod = fuel_incommods[i];
+        cyclus::Composition::Ptr recipe = context()->GetRecipe(fuel_inrecipes[i]);
+        m = Material::CreateUntracked(assem_size[i], recipe);
 
-      Request<Material>* r = port->AddRequest(m, this, commod, 1.0, true);
-      cyclus::toolkit::RecordTimeSeries<double>("demand"+fuel_incommods[regionA_ID], this,
-                                            assem_size[regionA_ID]) ;
+        Request<Material>* r = port->AddRequest(m, this, commod, 1.0, true);
+        cyclus::toolkit::RecordTimeSeries<double>("demand"+fuel_incommods[i], this,
+                                              assem_size[i]) ;
 
-      ports.insert(port);
-    }
-  }
-
-  if (n_assem_order[1] > 0){
-    // building request portfolio for region 2 and recording demand
-    for (int i = 0; i < n_assem_order[1]; i++) {
-      RequestPortfolio<Material>::Ptr port(new RequestPortfolio<Material>());
-      std::string commod = fuel_incommods[regionB_ID];
-      cyclus::Composition::Ptr recipe = context()->GetRecipe(fuel_inrecipes[regionB_ID]);
-      m = Material::CreateUntracked(assem_size[regionB_ID], recipe);
-
-      Request<Material>* r = port->AddRequest(m, this, commod, 1.0, true);
-      cyclus::toolkit::RecordTimeSeries<double>("demand"+fuel_incommods[regionB_ID], this,
-                                            assem_size[regionB_ID]) ;
-
-      ports.insert(port);
+        ports.insert(port);
+      }
     }
   }
 
@@ -288,25 +273,21 @@ void TwoRegionReactor::AcceptMatlTrades(const std::vector<
       Record("LOAD", ss.str());
     }
   }
+  
+  for (int i; i<2; ++i){
+    for (trade = responses.begin(); trade != responses.end(); ++trade) {
+      std::string commod = trade->first.request->commodity();
+      Material::Ptr m = trade->second;
+      index_res(m, commod);
+        if (commod == fuel_incommods[i]){
+          if (core_vector[i]->count() < n_assem_region[i]) {
+            core_vector[i]->Push(m);
+          } else {
+            fresh_vector[i]->Push(m);
+          }
+        }
+      }
 
-  for (trade = responses.begin(); trade != responses.end(); ++trade) {
-    std::string commod = trade->first.request->commodity();
-    Material::Ptr m = trade->second;
-    index_res(m, commod);
-    if (commod == fuel_incommods[regionA_ID]){
-      if (core1.count() < n_assem_region[regionA_ID]) {
-        core1.Push(m);
-      } else {
-        fresh1.Push(m);
-      }
-    }
-    if (commod == fuel_incommods[regionB_ID]){
-      if (core2.count() < n_assem_region[regionB_ID]) {
-        core2.Push(m);
-      } else {
-        fresh2.Push(m);
-      }
-    }
   }
 }
 
