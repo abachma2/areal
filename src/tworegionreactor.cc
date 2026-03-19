@@ -57,42 +57,33 @@ void TwoRegionReactor::EnterNotify() {
   }
 
   // Throw error if vectors do not have size 2
-  if (fuel_incommods.size() != 2) {
-    throw cyclus::ValueError("areal::TwoRegionReactor fuel_incommods "\
-                             "does not have 2 entries");
-  }
-  if (fuel_outcommods.size() != 2) {
-    throw cyclus::ValueError("areal::TwoRegionReactor fuel_outcommods "\
-                             "does not have 2 entries");
-  }
-  if (fuel_inrecipes.size() != 2) {
-    throw cyclus::ValueError("areal::TwoRegionReactor fuel_inrecipes "\
-                             "does not have 2 entries");
-  }
-  if (fuel_outrecipes.size() != 2) {
-    throw cyclus::ValueError("areal::TwoRegionReactor fuel_outrecipes "\
-                             "does not have 2 entries");
-  }
-  if (assem_size.size() != 2) {
-    throw cyclus::ValueError("areal::TwoRegionReactor assem_size "\
-                             "does not have 2 entries");
-  }
-  if (n_assem_batch.size() != 2) {
-    throw cyclus::ValueError("areal::TwoRegionReactor n_assem_batch "\
-                             "does not have 2 entries");
-  }
-  if (n_assem_region.size() != 2) {
-    throw cyclus::ValueError("areal::TwoRegionReactor n_assem_region "\
-                             "does not have 2 entries");
-  }
-  if (n_assem_fresh.size() != 2) {
-    throw cyclus::ValueError("areal::TwoRegionReactor n_assem_fresh "\
-                             "does not have 2 entries");
-  }
-  if (n_assem_spent.size() != 2) {
-    throw cyclus::ValueError("areal::TwoRegionReactor n_assem_spent "\
-                             "does not have 2 entries");
-  }
+  std::map< std::vector<std::string>, std::string> input_check1 = {
+   {fuel_incommods, "fuel_incommods"},
+   {fuel_outcommods, "fuel_outcommods"},
+   {fuel_inrecipes, "fuel_inrecipes"},
+   {fuel_outrecipes, "fuel_outrecipes"},
+   //{assem_size, "assem_size"}
+   };
+
+for (auto const pair : input_check1) {
+   if (pair.first.size() != 2) {
+      throw cyclus::ValueError("areal::TwoRegionReactor " + pair.second + 
+                               " does not have 2 entries.");
+   }
+}
+
+std::map< std::vector<int>, std::string> input_check2 = {
+   {n_assem_batch, "n_assem_batch"},
+   {n_assem_region, "n_assem_region"},
+   {n_assem_fresh, "n_assem_fresh"},
+   {n_assem_spent, "n_assem_spent"} };
+
+for (auto const& pair : input_check2) {
+   if (pair.first.size() != 2) {
+      throw cyclus::ValueError("areal::TwoRegionReactor " + pair.second + 
+                               " does not have 2 entries.");
+   }
+}
   InitializePosition();
 }
 
