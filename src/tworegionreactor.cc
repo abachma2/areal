@@ -57,28 +57,39 @@ void TwoRegionReactor::EnterNotify() {
   }
 
   // Throw error if vectors do not have size 2
+  
   std::map< std::vector<std::string>, std::string> input_check1 = {
    {fuel_incommods, "fuel_incommods"},
    {fuel_outcommods, "fuel_outcommods"},
    {fuel_inrecipes, "fuel_inrecipes"},
    {fuel_outrecipes, "fuel_outrecipes"},
-   //{assem_size, "assem_size"}
    };
 
-for (auto const pair : input_check1) {
+for (auto const& pair : input_check1) {
    if (pair.first.size() != 2) {
       throw cyclus::ValueError("areal::TwoRegionReactor " + pair.second + 
                                " does not have 2 entries.");
    }
 }
 
-std::map< std::vector<int>, std::string> input_check2 = {
+std::map<std::vector<int>, std::string> input_check2 = {
    {n_assem_batch, "n_assem_batch"},
    {n_assem_region, "n_assem_region"},
    {n_assem_fresh, "n_assem_fresh"},
-   {n_assem_spent, "n_assem_spent"} };
+   {n_assem_spent, "n_assem_spent"}
+  };
 
 for (auto const& pair : input_check2) {
+   if (pair.first.size() != 2) {
+      throw cyclus::ValueError("areal::TwoRegionReactor " + pair.second + 
+                               " does not have 2 entries.");
+   }
+}
+
+std::map< std::vector<double>, std::string> input_check3 = {
+   {assem_size, "assem_size"} };
+
+for (auto const& pair : input_check3) {
    if (pair.first.size() != 2) {
       throw cyclus::ValueError("areal::TwoRegionReactor " + pair.second + 
                                " does not have 2 entries.");
