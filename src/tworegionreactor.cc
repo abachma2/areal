@@ -138,11 +138,10 @@ void TwoRegionReactor::Tick() {
     // in case a cycle lands exactly on our last time step, we will need to
     // burn a batch from fresh inventory on this time step.  When retired,
     // this batch also needs to be discharged to spent fuel inventory.
-    while (fresh1.count() > 0 && spent1.space() >= assem_size[regionA_ID]) {
-      spent1.Push(fresh1.Pop());
-    }
-    while (fresh2.count() > 0 && spent2.space() >= assem_size[regionB_ID]) {
-      spent2.Push(fresh2.Pop());
+    for (int i; i<2; ++i){
+      while (fresh_vector[i]->count() > 0 && spent_vector[i]->space() >= assem_size[i]) {
+        spent_vector[i]->Push(fresh_vector[i]->Pop());
+      }
     }
     if(CheckDecommissionCondition()) {
       context()->SchedDecom(this);    
@@ -160,8 +159,9 @@ void TwoRegionReactor::Tick() {
     discharged2 = Discharge(regionB_ID);
   }
   if (cycle_step >= cycle_time) {
-    Load(regionA_ID);
-    Load(regionB_ID);
+    for (int i; i<2; ++i) {
+      Load(i);
+    }
   }
 
 }
