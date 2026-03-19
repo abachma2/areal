@@ -191,12 +191,8 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlReque
                          static_cast<double>(cycle_time + refuel_time);
     n_cycles_left = ceil(n_cycles_left);
 
-    std::vector<int> n_need;
     for (int i; i<2; ++i){
-      n_need.push_back(std::max(0.0, n_cycles_left * n_assem_batch[i] - n_assem_fresh[i] + n_assem_region[i] - core_vector[i]->count()));
-    }
-    for (int i; i<2; ++i){
-    n_assem_order[i] = std::min(n_assem_order[i], n_need[i]);
+      int n_need = std::max(0.0, n_cycles_left * n_assem_batch[i] - n_assem_fresh[i] + n_assem_region[i] - core_vector[i]->count());      n_assem_order[i] = std::min(n_assem_order[i], n_need);
     }
   }
   
