@@ -471,27 +471,16 @@ bool TwoRegionReactor::Discharge(int region_num) {
 }
 
 void TwoRegionReactor::Load(int region_num) {
-  if (region_num == 0){
-    int n = std::min(n_assem_region[regionA_ID] - core1.count(), fresh1.count());
+  for (int i; i<2; ++i){
+    int n = std::min(n_assem_region[i] - core_vector[i]->count(), fresh_vector[i]->count());
     if (n == 0) {
       return;
     }
 
     std::stringstream ss;
-    ss << n << " assemblies into Region 1";
+    ss << n << " assemblies into Region " + std::to_string(i);
     Record("LOAD", ss.str());
-    core1.Push(fresh1.PopN(n));
-  }
-  if (region_num == 1){
-    int n = std::min(n_assem_region[regionB_ID] - core2.count(), fresh2.count());
-    if (n == 0) {
-      return;
-    }
-
-    std::stringstream ss;
-    ss << n << " assemblies into Region 2";
-    Record("LOAD", ss.str());
-    core2.Push(fresh2.PopN(n));
+    core_vector[i]->Push(fresh_vector[i]->PopN(n));
   }
 }
 
@@ -547,12 +536,7 @@ void TwoRegionReactor::index_res(cyclus::Resource::Ptr m, std::string incommod) 
 std::map<std::string, MatVec> TwoRegionReactor::PopSpent(int region_num) {
   std::map<std::string, MatVec> mapped;
   MatVec mats; 
-  if (region_num == 0){
-    mats = spent1.PopN(spent1.count());
-  }
-  if (region_num == 1){
-    mats = spent2.PopN(spent2.count());
-  }
+  mats = spent_vector[region_num]->PopN(spent_vector[region_num]->count());
   for (int i = 0; i < mats.size(); i++) {
     std::string commod = fuel_outcommod(mats[i]);
     mapped[commod].push_back(mats[i]);
@@ -572,12 +556,7 @@ void TwoRegionReactor::PushSpent(std::map<std::string, MatVec> leftover, int reg
   for (it = leftover.begin(); it != leftover.end(); ++it) {
     // undo reverse in PopSpent to make sure oldest assemblies come out first
     std::reverse(it->second.begin(), it->second.end());
-    if (region_num == 0){
-      spent1.Push(it->second);
-    }
-    if (region_num == 1){
-      spent2.Push(it->second);
-    }
+    spent_vector[region_num]->Push(it->second);
   }
 }
 
@@ -586,12 +565,7 @@ bool TwoRegionReactor::ReadyToRefuel() {
 }
 
 bool TwoRegionReactor::FullRegion(int region_num) {
-  if (region_num == 0){
-    return core1.count() == n_assem_region[regionA_ID];
-  }
-  if (region_num == 1){
-    return core2.count() == n_assem_region[regionB_ID];
-  }
+  return core_vector[region_num]->count() == n_assem_region[region_num];
 }
 
 void TwoRegionReactor::Record(std::string name, std::string val) {
