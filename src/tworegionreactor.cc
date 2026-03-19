@@ -433,7 +433,6 @@ std::map<std::string, MatVec> TwoRegionReactor::PeekSpent(int region_num) {
   // looking at the number and commodity name of the materials in each region
   std::map<std::string, MatVec> mapped;
   MatVec mats; 
-  //if (region_num == 0){
     mats = spent_vector[region_num]->PopN(spent_vector[region_num]->count());
     spent_vector[region_num]->Push(mats);
   
@@ -446,31 +445,17 @@ std::map<std::string, MatVec> TwoRegionReactor::PeekSpent(int region_num) {
 }
 
 bool TwoRegionReactor::Discharge(int region_num) {
-  if (region_num == 0){
-    int npop = std::min(n_assem_batch[regionA_ID], core1.count());
-    if (n_assem_spent[regionA_ID] - spent1.count() < npop) {
-      Record("DISCHARGE", "failed");
-      return false;  // not enough room in spent buffer
-    }
-
-    std::stringstream ss;
-    ss << npop << " assemblies from Region 1";
-    Record("DISCHARGE", ss.str());
-    spent1.Push(core1.PopN(npop));
+  int npop = std::min(n_assem_batch[region_num], core_vector[region_num]->count());
+  if (n_assem_spent[region_num] - spent_vector[region_num]->count() < npop) {
+    Record("DISCHARGE", "failed");
+    return false;  // not enough room in spent buffer
   }
 
-  if (region_num == 1){
-    int npop = std::min(n_assem_batch[regionB_ID], core2.count());
-    if (n_assem_spent[regionB_ID] - spent2.count() < npop) {
-      Record("DISCHARGE", "failed");
-      return false;  // not enough room in spent buffer
-    }
-
     std::stringstream ss;
-    ss << npop << " assemblies from Region 2";
+    ss << npop << " assemblies from Region 1"; // get region num into string
     Record("DISCHARGE", ss.str());
-    spent2.Push(core2.PopN(npop));
-  }
+    spent_vector[region_num]->Push(core_vector[region_num]->PopN(npop));
+
 
   std::map<std::string, MatVec> spent_mats;
   spent_mats = PeekSpent(region_num);
