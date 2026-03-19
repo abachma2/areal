@@ -175,8 +175,10 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlReque
 
   // second min expression reduces assembles to amount needed until
   // retirement if it is near.
-  int n_assem_order1 = n_assem_region[regionA_ID] - core1.count() + n_assem_fresh[regionA_ID] - fresh1.count();
-  int n_assem_order2 = n_assem_region[regionB_ID] - core2.count() + n_assem_fresh[regionB_ID] - fresh2.count(); 
+  std::vector<int> n_assem_order;
+  for (int i; i<2; ++i){
+    n_assem_order.push_back(n_assem_region[i] - core_vector[i]->count() + n_assem_fresh[i] - fresh_vector[i]->count());
+  }
 
   if (exit_time() != -1) {
     // the +1 accounts for the fact that the reactor is alive and gets to
@@ -187,23 +189,24 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlReque
                          static_cast<double>(cycle_time + refuel_time);
     n_cycles_left = ceil(n_cycles_left);
 
-    int n_need1 = std::max(0.0, n_cycles_left * n_assem_batch[regionA_ID] - n_assem_fresh[regionA_ID] + n_assem_region[regionA_ID] - core1.count());
-
-    int n_need2 = std::max(0.0, n_cycles_left * n_assem_batch[regionB_ID] - n_assem_fresh[regionB_ID] + n_assem_region[regionB_ID] - core2.count());
-
-    n_assem_order1 = std::min(n_assem_order1, n_need1);
-    n_assem_order2 = std::min(n_assem_order2, n_need2); 
+    std::vector<int> n_need;
+    for (int i; i<2; ++i){
+      n_need.push_back(std::max(0.0, n_cycles_left * n_assem_batch[i] - n_assem_fresh[i] + n_assem_region[i] - core_vector[i]->count()));
+    }
+    for (int i; i<2; ++i){
+    n_assem_order[i] = std::min(n_assem_order[i], n_need[i]);
+    }
   }
   
-  if (n_assem_order1 == 0 && n_assem_order2 == 0) {
+  if (n_assem_order[0] == 0 && n_assem_order[1] == 0) {
     return ports;
   } else if (retired()) {
     return ports;
   }
   
-  if (n_assem_order1 > 0){
+  if (n_assem_order[0] > 0){
     // building request portfolio for region 1 and recording demand
-    for (int i = 0; i < n_assem_order1; i++) {
+    for (int i = 0; i < n_assem_order[0]; i++) {
       RequestPortfolio<Material>::Ptr port(new RequestPortfolio<Material>());
       std::string commod = fuel_incommods[regionA_ID];
       cyclus::Composition::Ptr recipe = context()->GetRecipe(fuel_inrecipes[regionA_ID]);
@@ -217,9 +220,9 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlReque
     }
   }
 
-  if (n_assem_order2 > 0){
+  if (n_assem_order[1] > 0){
     // building request portfolio for region 2 and recording demand
-    for (int i = 0; i < n_assem_order2; i++) {
+    for (int i = 0; i < n_assem_order[1]; i++) {
       RequestPortfolio<Material>::Ptr port(new RequestPortfolio<Material>());
       std::string commod = fuel_incommods[regionB_ID];
       cyclus::Composition::Ptr recipe = context()->GetRecipe(fuel_inrecipes[regionB_ID]);
@@ -266,27 +269,24 @@ void TwoRegionReactor::AcceptMatlTrades(const std::vector<
                         Material::Ptr> >::const_iterator trade;
 
   std::stringstream ss;
-  int num_response1 = 0;
-  int num_response2 = 0; 
+  std::vector<int> num_response = {0, 0};
   for (trade = responses.begin(); trade != responses.end(); ++trade){
     std::string commod = trade->first.request->commodity();
-    if (commod == fuel_incommods[regionA_ID]){
-      ++num_response1;
-    }
-    if (commod == fuel_incommods[regionB_ID]){
-      ++num_response2;
+    for (int i; i<2; ++i){
+      if (commod == fuel_incommods[i]){
+        ++num_response[i];
+      }
     }
   }
-  int nload1 = std::min(num_response1, n_assem_region[regionA_ID] - core1.count());
-  int nload2 = std::min(num_response2, n_assem_region[regionB_ID] - core2.count());
-
-  if (nload1 > 0) {
-    ss << nload1 << " assemblies in Region 1";
-    Record("LOAD", ss.str());
+  std::vector<int> nload;
+  for (int i; i<2; ++i){
+    nload.push_back(std::min(num_response[i], n_assem_region[i] - core_vector[i]->count()));
   }
-  if (nload2 > 0 ) {
-    ss << nload2 << "assemblies in Region 2";
-    Record("LOAD", ss.str());
+  for (int i; i<2; ++i){
+    if (nload[i] > 0) {
+      ss << nload[i] << " assemblies in Region " + std::to_string(i);
+      Record("LOAD", ss.str());
+    }
   }
 
   for (trade = responses.begin(); trade != responses.end(); ++trade) {
