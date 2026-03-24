@@ -180,9 +180,9 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlReque
 
   // second min expression reduces assembles to amount needed until
   // retirement if it is near.
-  std::vector<int> n_assem_order;
+  std::vector<int> n_assem_order = {0, 0};
   for (int r; r<n_regions; ++r){
-    n_assem_order.push_back(n_assem_region[r] - core_vector[r]->count() + n_assem_fresh[r] - fresh_vector[r]->count());
+    n_assem_order[r] += n_assem_region[r] - core_vector[r]->count() + n_assem_fresh[r] - fresh_vector[r]->count();
   }
 
   if (exit_time() != -1) {
