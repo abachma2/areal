@@ -203,7 +203,7 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlReque
   }
   for (int i; i<2; ++i){ 
     if (n_assem_order[i] > 0){
-      // building request portfolio for region 1 and recording demand
+      // building request portfolio for each region and recording demand
       for (int j = 0; j < n_assem_order[i]; j++) {
         RequestPortfolio<Material>::Ptr port(new RequestPortfolio<Material>());
         std::string commod = fuel_incommods[i];
@@ -431,7 +431,7 @@ bool TwoRegionReactor::Discharge(int region_num) {
   }
 
     std::stringstream ss;
-    ss << npop << " assemblies from Region 1"; // get region num into string
+    ss << npop << " assemblies from Region " << region_ID_map[region_num];
     Record("DISCHARGE", ss.str());
     spent_vector[region_num]->Push(core_vector[region_num]->PopN(npop));
 
