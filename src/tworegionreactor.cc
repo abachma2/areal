@@ -50,10 +50,10 @@ void TwoRegionReactor::InitFrom(cyclus::QueryableBackend* b) {
 void TwoRegionReactor::EnterNotify() {
   cyclus::Facility::EnterNotify();
   // Set keep packaging parameter in all ResBufs
-  for (int i; i<n_regions; ++i){
-    fresh_vector[i]->keep_packaging(keep_packaging);
-    core_vector[i]->keep_packaging(keep_packaging);
-    spent_vector[i]->keep_packaging(keep_packaging);
+  for (int r; r<n_regions; ++r){
+    fresh_vector[r]->keep_packaging(keep_packaging);
+    core_vector[r]->keep_packaging(keep_packaging);
+    spent_vector[r]->keep_packaging(keep_packaging);
   }
 
   // Throw error if vectors do not have size n_regions
@@ -118,14 +118,14 @@ void TwoRegionReactor::Tick() {
     if (context()->time() == exit_time() + 1) { // only need to transmute once
       if (decom_transmute_all == true) {
         /// transmute all the fuel in each region
-        for (int i=0; i<n_regions; i++){
-          Transmute(n_assem_region[i], i);
+        for (int r=0; r<n_regions; r++){
+          Transmute(n_assem_region[r], r);
         }
       }
       else {
         /// transmute half the fuel in each region
-        for (int i=0; i<n_regions; i++){
-          Transmute(ceil(static_cast<double>(n_assem_region[i]) / 2.0), i);
+        for (int r; r<n_regions; r++){
+          Transmute(ceil(static_cast<double>(n_assem_region[r]) / 2.0), r);
         }
       }
     }
@@ -133,9 +133,9 @@ void TwoRegionReactor::Tick() {
     // separate loops because if the regions have different numbers of 
     // assemblies then it might break before both regions are fully 
     // discharged. 
-    for (int i; i<n_regions; ++i){
-      while (core_vector[i]->count() > 0){
-        if (!Discharge(i)) {
+    for (int r; r<n_regions; ++r){
+      while (core_vector[r]->count() > 0){
+        if (!Discharge(r)) {
           break;
         }
       }
@@ -143,9 +143,9 @@ void TwoRegionReactor::Tick() {
     // in case a cycle lands exactly on our last time step, we will need to
     // burn a batch from fresh inventory on this time step.  When retired,
     // this batch also needs to be discharged to spent fuel inventory.
-    for (int i; i<n_regions; ++i){
-      while (fresh_vector[i]->count() > 0 && spent_vector[i]->space() >= assem_size[i]) {
-        spent_vector[i]->Push(fresh_vector[i]->Pop());
+    for (int r; r<n_regions; ++r){
+      while (fresh_vector[r]->count() > 0 && spent_vector[r]->space() >= assem_size[r]) {
+        spent_vector[r]->Push(fresh_vector[r]->Pop());
       }
     }
     if(CheckDecommissionCondition()) {
@@ -164,8 +164,8 @@ void TwoRegionReactor::Tick() {
     discharged2 = Discharge(regionB_ID);
   }
   if (cycle_step >= cycle_time) {
-    for (int i; i<n_regions; ++i) {
-      Load(i);
+    for (int r; r<n_regions; ++r) {
+      Load(r);
     }
   }
 
@@ -181,8 +181,8 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlReque
   // second min expression reduces assembles to amount needed until
   // retirement if it is near.
   std::vector<int> n_assem_order;
-  for (int i; i<n_regions; ++i){
-    n_assem_order.push_back(n_assem_region[i] - core_vector[i]->count() + n_assem_fresh[i] - fresh_vector[i]->count());
+  for (int r; r<n_regions; ++r){
+    n_assem_order.push_back(n_assem_region[r] - core_vector[r]->count() + n_assem_fresh[r] - fresh_vector[r]->count());
   }
 
   if (exit_time() != -1) {
@@ -194,8 +194,9 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlReque
                          static_cast<double>(cycle_time + refuel_time);
     n_cycles_left = ceil(n_cycles_left);
 
-    for (int i; i<n_regions; ++i){
-      int n_need = std::max(0.0, n_cycles_left * n_assem_batch[i] - n_assem_fresh[i] + n_assem_region[i] - core_vector[i]->count());      n_assem_order[i] = std::min(n_assem_order[i], n_need);
+    for (int r; r<n_regions; ++r){
+      int n_need = std::max(0.0, n_cycles_left * n_assem_batch[r] - n_assem_fresh[r] + n_assem_region[r] - core_vector[r]->count());      
+      n_assem_order[r] = std::min(n_assem_order[r], n_need);
     }
   }
   
@@ -204,18 +205,18 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlReque
   } else if (retired()) {
     return ports;
   }
-  for (int i; i<n_regions; ++i){ 
-    if (n_assem_order[i] > 0){
+  for (int r; r<n_regions; ++r){ 
+    if (n_assem_order[r] > 0){
       // building request portfolio for each region and recording demand
-      for (int j = 0; j < n_assem_order[i]; j++) {
+      for (int j = 0; j < n_assem_order[r]; j++) {
         RequestPortfolio<Material>::Ptr port(new RequestPortfolio<Material>());
-        std::string commod = fuel_incommods[i];
-        cyclus::Composition::Ptr recipe = context()->GetRecipe(fuel_inrecipes[i]);
-        m = Material::CreateUntracked(assem_size[i], recipe);
+        std::string commod = fuel_incommods[r];
+        cyclus::Composition::Ptr recipe = context()->GetRecipe(fuel_inrecipes[r]);
+        m = Material::CreateUntracked(assem_size[r], recipe);
 
-        Request<Material>* r = port->AddRequest(m, this, commod, 1.0, true);
-        cyclus::toolkit::RecordTimeSeries<double>("demand"+fuel_incommods[i], this,
-                                              assem_size[i]) ;
+        Request<Material>* req = port->AddRequest(m, this, commod, 1.0, true);
+        cyclus::toolkit::RecordTimeSeries<double>("demand"+fuel_incommods[r], this,
+                                              assem_size[r]) ;
 
         ports.insert(port);
       }
@@ -232,11 +233,11 @@ void TwoRegionReactor::GetMatlTrades(
         responses) {
   using cyclus::Trade;
 
-  for (int i = 0; i < n_regions; i++){
-    std::map<std::string, MatVec> mats = PopSpent(i);
+  for (int r=0; r< n_regions; r++){
+    std::map<std::string, MatVec> mats = PopSpent(r);
     for (int j = 0; j < trades.size(); j++) {
       std::string commod = trades[j].request->commodity();
-      if (commod != fuel_outcommods[i]) {
+      if (commod != fuel_outcommods[r]) {
         continue;
       }
       Material::Ptr m = mats[commod].back();
@@ -244,7 +245,7 @@ void TwoRegionReactor::GetMatlTrades(
       responses.push_back(std::make_pair(trades[j], m));
       res_indexes.erase(m->obj_id());
     }
-    PushSpent(mats, i);  // return leftovers back to spent buffer
+    PushSpent(mats, r);  // return leftovers back to spent buffer
   }
 }
 
@@ -258,33 +259,33 @@ void TwoRegionReactor::AcceptMatlTrades(const std::vector<
   std::vector<int> num_response = {0, 0};
   for (trade = responses.begin(); trade != responses.end(); ++trade){
     std::string commod = trade->first.request->commodity();
-    for (int i; i<n_regions; ++i){
-      if (commod == fuel_incommods[i]){
-        ++num_response[i];
+    for (int r; r<n_regions; ++r){
+      if (commod == fuel_incommods[r]){
+        ++num_response[r];
       }
     }
   }
   std::vector<int> nload;
-  for (int i; i<n_regions; ++i){
-    nload.push_back(std::min(num_response[i], n_assem_region[i] - core_vector[i]->count()));
+  for (int r; r<n_regions; ++r){
+    nload.push_back(std::min(num_response[r], n_assem_region[r] - core_vector[r]->count()));
   }
-  for (int i; i<n_regions; ++i){
-    if (nload[i] > 0) {
-      ss << nload[i] << " assemblies in Region " + region_ID_map[i];
+  for (int r; r<n_regions; ++r){
+    if (nload[r] > 0) {
+      ss << nload[r] << " assemblies in Region " + region_ID_map[r];
       Record("LOAD", ss.str());
     }
   }
   
-  for (int i; i<n_regions; ++i){
+  for (int r; r<n_regions; ++r){
     for (trade = responses.begin(); trade != responses.end(); ++trade) {
       std::string commod = trade->first.request->commodity();
       Material::Ptr m = trade->second;
       index_res(m, commod);
-        if (commod == fuel_incommods[i]){
-          if (core_vector[i]->count() < n_assem_region[i]) {
-            core_vector[i]->Push(m);
+        if (commod == fuel_incommods[r]){
+          if (core_vector[r]->count() < n_assem_region[r]) {
+            core_vector[r]->Push(m);
           } else {
-            fresh_vector[i]->Push(m);
+            fresh_vector[r]->Push(m);
           }
         }
       }
@@ -307,10 +308,10 @@ std::set<cyclus::BidPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlBids(
     }
   }
 
-  for (int i = 0; i < n_regions; i++) {
-    std::string commod = fuel_outcommods[i];
+  for (int r; r<n_regions; r++) {
+    std::string commod = fuel_outcommods[r];
     std::vector<Request<Material>*>& reqs = commod_requests[commod];
-    all_mats = PeekSpent(i);
+    all_mats = PeekSpent(r);
     if (reqs.size() == 0) {
       continue;
     }
@@ -383,9 +384,9 @@ void TwoRegionReactor::Tock() {
 }
 
 void TwoRegionReactor::Transmute() { 
-  for (int i=0; i < n_regions; i++){
+  for (int r; r<n_regions; r++){
     // transmute in each region of the core
-    Transmute(n_assem_batch[i], i);
+    Transmute(n_assem_batch[r], r);
   }
 }
 
@@ -405,8 +406,8 @@ void TwoRegionReactor::Transmute(int n_assem, int region_num) {
   ss << old.size() << " assemblies in region " << region_num;
   Record("TRANSMUTE", ss.str());
 
-  for (int i = 0; i < old.size(); i++) {
-    old[i]->Transmute(context()->GetRecipe(fuel_outrecipe(old[i])));
+  for (int r; r<old.size(); r++) {
+    old[r]->Transmute(context()->GetRecipe(fuel_outrecipe(old[r])));
   }
 }
 
@@ -545,8 +546,8 @@ bool TwoRegionReactor::ReadyToRefuel() {
 
 bool TwoRegionReactor::FullRegions() {
   bool full_region;
-  for (int i; i<n_regions; ++i){
-    full_region = core_vector[i]->count() == n_assem_region[i];
+  for (int r; r<n_regions; ++r){
+    full_region = core_vector[r]->count() == n_assem_region[r];
     if (full_region == false){
       break;
     }
