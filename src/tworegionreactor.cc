@@ -392,14 +392,12 @@ void TwoRegionReactor::Transmute() {
 
 void TwoRegionReactor::Transmute(int n_assem, int region_num) {
   MatVec old; 
-  
-  //if (region_num == 0){
-    old = core_vector[region_num]->PopN(std::min(n_assem, core_vector[region_num]->count()));
-    core_vector[region_num]->Push(old);
-    if (core_vector[region_num]->count() > old.size()) {
-      // rotate untransmuted mats back to back of buffer
-      core_vector[region_num]->Push(core_vector[region_num]->PopN(core_vector[region_num]->count() - old.size()));
-    }
+  old = core_vector[region_num]->PopN(std::min(n_assem, core_vector[region_num]->count()));
+  core_vector[region_num]->Push(old);
+  if (core_vector[region_num]->count() > old.size()) {
+    // rotate untransmuted mats back to back of buffer
+    core_vector[region_num]->Push(core_vector[region_num]->PopN(core_vector[region_num]->count() - old.size()));
+  }
   
 
   std::stringstream ss;
