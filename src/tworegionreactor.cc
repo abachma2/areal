@@ -265,13 +265,11 @@ void TwoRegionReactor::AcceptMatlTrades(const std::vector<
       }
     }
   }
-  std::vector<int> nload;
+  int nload;
   for (int r; r<n_regions; ++r){
-    nload.push_back(std::min(num_response[r], n_assem_region[r] - core_vector[r]->count()));
-  }
-  for (int r; r<n_regions; ++r){
-    if (nload[r] > 0) {
-      ss << nload[r] << " assemblies in Region " + region_ID_map[r];
+    nload = std::min(num_response[r], n_assem_region[r] - core_vector[r]->count());
+    if (nload > 0) {
+      ss << nload << " assemblies in Region " + region_ID_map[r];
       Record("LOAD", ss.str());
     }
   }
