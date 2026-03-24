@@ -148,6 +148,7 @@ class TwoRegionReactor : public cyclus::Facility,
   const int regionA_ID = 0;
   const int regionB_ID = 1;
   std::map<int, std::string> region_ID_map = {{0,"A"}, {1,"B"}};
+  const static int n_regions = 2;
 
   bool retired() {
     return exit_time() != -1 && context()->time() > exit_time();
