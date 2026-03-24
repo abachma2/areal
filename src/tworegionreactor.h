@@ -191,7 +191,7 @@ class TwoRegionReactor : public cyclus::Facility,
   bool ReadyToRefuel(); 
 
   // check if a region is full
-  bool FullRegion(int region_num);
+  bool FullRegions();
 
   /////// fuel specifications /////////
   #pragma cyclus var { \

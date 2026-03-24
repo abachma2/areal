@@ -353,19 +353,18 @@ void TwoRegionReactor::Tock() {
   // Check that irradiation and refueling periods are over, that 
   // the core is full and that fuel was successfully discharged in this refueling time.
   // If this is the case, then a new cycle will be initiated.
-  if (ReadyToRefuel() && FullRegion(regionA_ID) && FullRegion(regionB_ID) && discharged1 == true && discharged2 == true) {
+  if (ReadyToRefuel() && FullRegions() && discharged1 == true && discharged2 == true) {
     discharged1 = false;
     discharged2 = false; 
     cycle_step = 0;
   }
 
-  if (cycle_step == 0 && FullRegion(regionA_ID) && FullRegion(regionB_ID)) {
+  if (cycle_step == 0 && FullRegions()) {
     Record("CYCLE_START", "");
   }
 
   // record power generation if we're in the middle of a cycle. 
-  if (cycle_step >= 0 && cycle_step < cycle_time &&
-      FullRegion(regionA_ID) && FullRegion(regionB_ID)) {
+  if (cycle_step >= 0 && cycle_step < cycle_time && FullRegions()) {
     cyclus::toolkit::RecordTimeSeries<cyclus::toolkit::POWER>(this, power_cap);
     cyclus::toolkit::RecordTimeSeries<double>("supplyPOWER", this, power_cap);
   } else {
@@ -375,7 +374,7 @@ void TwoRegionReactor::Tock() {
 
   // "if" prevents starting cycle after initial deployment until core is full
   // even though cycle_step is its initial zero.
-  if ((cycle_step > 0) || (FullRegion(regionA_ID) && FullRegion(regionB_ID))){
+  if ((cycle_step > 0) || (FullRegions())){
       cycle_step++;
   }
 }
@@ -541,8 +540,15 @@ bool TwoRegionReactor::ReadyToRefuel() {
   return cycle_step >= cycle_time + refuel_time;
 }
 
-bool TwoRegionReactor::FullRegion(int region_num) {
-  return core_vector[region_num]->count() == n_assem_region[region_num];
+bool TwoRegionReactor::FullRegions() {
+  bool full_region;
+  for (int i; i<2; ++i){
+    full_region = core_vector[i]->count() == n_assem_region[i];
+    if (full_region == false){
+      break;
+    }
+  }
+  return full_region;
 }
 
 void TwoRegionReactor::Record(std::string name, std::string val) {
