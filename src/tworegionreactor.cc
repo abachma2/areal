@@ -125,7 +125,7 @@ void TwoRegionReactor::Tick() {
       else {
         /// transmute half the fuel in each region
         for (int r; r<n_regions; r++){
-          Transmute(n_assem_region[r]/2 + 1, r);
+          Transmute(std::ceil(n_assem_region[r]/2.0), r);
         }
       }
     }
