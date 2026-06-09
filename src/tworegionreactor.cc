@@ -134,10 +134,8 @@ void TwoRegionReactor::Tick() {
     // assemblies then it might break before both regions are fully 
     // discharged. 
     for (int r; r<n_regions; ++r){
-      while (core_vector[r]->count() > 0){
-        if (!Discharge(r)) {
-          break;
-        }
+      while (core_vector[r]->count() > 0 && Discharge(r)){
+        // continue to discharge fuel from region r
       }
     }
     // in case a cycle lands exactly on our last time step, we will need to
