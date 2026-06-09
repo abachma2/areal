@@ -116,18 +116,13 @@ void TwoRegionReactor::Tick() {
   if (retired()) {
     Record("RETIRED", "");
     if (context()->time() == exit_time() + 1) { // only need to transmute once
-      if (decom_transmute_all == true) {
-        /// transmute all the fuel in each region
+      double transmute_fraction = 1.0;
+      if (!decom_transmute_all){
+        transmute_fraction = 0.5;
+      }
         for (int r=0; r<n_regions; r++){
-          Transmute(n_assem_region[r], r);
+          Transmute(ceil(n_assem_region[r]*transmute_fraction), r);
         }
-      }
-      else {
-        /// transmute half the fuel in each region
-        for (int r; r<n_regions; r++){
-          Transmute(std::ceil(n_assem_region[r]/2.0), r);
-        }
-      }
     }
     // discharging fuel from each core region. This needs to be in 
     // separate loops because if the regions have different numbers of 
