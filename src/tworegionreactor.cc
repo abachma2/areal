@@ -65,39 +65,39 @@ void TwoRegionReactor::EnterNotify() {
    {fuel_outrecipes, "fuel_outrecipes"},
    };
 
-for (auto const& pair : input_check1) {
-   if (pair.first.size() != n_regions) {
-      throw cyclus::ValueError("areal::TwoRegionReactor " + pair.second + 
-                               " does not have " + std::to_string(n_regions) + 
-                               " entries.");
-   }
-}
+  for (auto const& pair : input_check1) {
+    if (pair.first.size() != n_regions) {
+        throw cyclus::ValueError("areal::TwoRegionReactor " + pair.second + 
+                                " does not have " + std::to_string(n_regions) + 
+                                " entries.");
+    }
+  }
 
-std::map<std::vector<int>, std::string> input_check2 = {
-   {n_assem_batch, "n_assem_batch"},
-   {n_assem_region, "n_assem_region"},
-   {n_assem_fresh, "n_assem_fresh"},
-   {n_assem_spent, "n_assem_spent"}
-  };
+  std::map<std::vector<int>, std::string> input_check2 = {
+    {n_assem_batch, "n_assem_batch"},
+    {n_assem_region, "n_assem_region"},
+    {n_assem_fresh, "n_assem_fresh"},
+    {n_assem_spent, "n_assem_spent"}
+    };
 
-for (auto const& pair : input_check2) {
-   if (pair.first.size() != n_regions) {
-      throw cyclus::ValueError("areal::TwoRegionReactor " + pair.second + 
-                               " does not have " + std::to_string(n_regions) + 
-                               " entries.");
-   }
-}
+  for (auto const& pair : input_check2) {
+    if (pair.first.size() != n_regions) {
+        throw cyclus::ValueError("areal::TwoRegionReactor " + pair.second + 
+                                " does not have " + std::to_string(n_regions) + 
+                                " entries.");
+    }
+  }
 
-std::map< std::vector<double>, std::string> input_check3 = {
-   {assem_size, "assem_size"} };
+  std::map< std::vector<double>, std::string> input_check3 = {
+    {assem_size, "assem_size"} };
 
-for (auto const& pair : input_check3) {
-   if (pair.first.size() != n_regions) {
-      throw cyclus::ValueError("areal::TwoRegionReactor " + pair.second + 
-                               " does not have " + std::to_string(n_regions) + 
-                               " entries.");
-   }
-}
+  for (auto const& pair : input_check3) {
+    if (pair.first.size() != n_regions) {
+        throw cyclus::ValueError("areal::TwoRegionReactor " + pair.second + 
+                                " does not have " + std::to_string(n_regions) + 
+                                " entries.");
+    }
+  }
   InitializePosition();
 }
 
