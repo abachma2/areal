@@ -125,7 +125,7 @@ void TwoRegionReactor::Tick() {
       else {
         /// transmute half the fuel in each region
         for (int r; r<n_regions; r++){
-          Transmute(ceil(static_cast<double>(n_assem_region[r]) / 2.0), r);
+          Transmute(n_assem_region[r]/2 + 1, r);
         }
       }
     }
@@ -200,10 +200,8 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlReque
     }
   }
   
-  if (n_assem_order[0] == 0 && n_assem_order[1] == 0) {
-    return ports;
-  } else if (retired()) {
-    return ports;
+  if ( (n_assem_order[0] == 0 && n_assem_order[1] == 0) || retired()) {
+     return ports;
   }
   for (int r; r<n_regions; ++r){ 
     if (n_assem_order[r] > 0){
