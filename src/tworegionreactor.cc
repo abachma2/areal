@@ -114,37 +114,7 @@ void TwoRegionReactor::Tick() {
   // can't go at the beginning of the Tock is so that resource exchange has 
   // chance to occur after the discharge on this same time step.
   if (retired()) {
-    Record("RETIRED", "");
-    if (context()->time() == exit_time() + 1) { // only need to transmute once
-      double transmute_fraction = 1.0;
-      if (!decom_transmute_all){
-        transmute_fraction = 0.5;
-      }
-        for (int r=0; r<n_regions; r++){
-          Transmute(ceil(n_assem_region[r]*transmute_fraction), r);
-        }
-    }
-    // discharging fuel from each core region. This needs to be in 
-    // separate loops because if the regions have different numbers of 
-    // assemblies then it might break before both regions are fully 
-    // discharged. 
-    for (int r; r<n_regions; ++r){
-      while (core_vector[r]->count() > 0 && Discharge(r)){
-        // continue to discharge fuel from region r
-      }
-    }
-    // in case a cycle lands exactly on our last time step, we will need to
-    // burn a batch from fresh inventory on this time step.  When retired,
-    // this batch also needs to be discharged to spent fuel inventory.
-    for (int r; r<n_regions; ++r){
-      while (fresh_vector[r]->count() > 0 && spent_vector[r]->space() >= assem_size[r]) {
-        spent_vector[r]->Push(fresh_vector[r]->Pop());
-      }
-    }
-    if(CheckDecommissionCondition()) {
-      context()->SchedDecom(this);    
-    }
-    return;
+    Retired();
   }
 
   if (cycle_step == cycle_time) {
@@ -437,6 +407,40 @@ bool TwoRegionReactor::Discharge(int region_num) {
   cyclus::toolkit::RecordTimeSeries<double>("supply"+fuel_outcommods[region_num], this, tot_spent);
 
   return true;
+}
+
+void TwoRegionReactor::Retired() {
+  Record("RETIRED", "");
+    if (context()->time() == exit_time() + 1) { // only need to transmute once
+      double transmute_fraction = 1.0;
+      if (!decom_transmute_all){
+        transmute_fraction = 0.5;
+      }
+        for (int r=0; r<n_regions; r++){
+          Transmute(ceil(n_assem_region[r]*transmute_fraction), r);
+        }
+    }
+    // discharging fuel from each core region. This needs to be in 
+    // separate loops because if the regions have different numbers of 
+    // assemblies then it might break before both regions are fully 
+    // discharged. 
+    for (int r; r<n_regions; ++r){
+      while (core_vector[r]->count() > 0 && Discharge(r)){
+        // continue to discharge fuel from region r
+      }
+    }
+    // in case a cycle lands exactly on our last time step, we will need to
+    // burn a batch from fresh inventory on this time step.  When retired,
+    // this batch also needs to be discharged to spent fuel inventory.
+    for (int r; r<n_regions; ++r){
+      while (fresh_vector[r]->count() > 0 && spent_vector[r]->space() >= assem_size[r]) {
+        spent_vector[r]->Push(fresh_vector[r]->Pop());
+      }
+    }
+    if(CheckDecommissionCondition()) {
+      context()->SchedDecom(this);    
+    }
+    return;
 }
 
 void TwoRegionReactor::Load(int region_num) {

@@ -164,6 +164,9 @@ class TwoRegionReactor : public cyclus::Facility,
   /// Top up core inventory as much as possible.
   void Load(int region_num);
 
+  /// Transmute and discharge fuel if the agent is retired
+  void Retired();
+
   /// Transmute the batch that is about to be discharged from the core to its
   /// fully burnt state as defined by its outrecipe.
   void Transmute();
@@ -380,6 +383,9 @@ class TwoRegionReactor : public cyclus::Facility,
                       "internal": True \
   }
   bool discharged2;
+
+  //#pragma cyclus var {}
+  //std::vector<bool> discharged3;
 
   // This variable should be hidden/unavailable in ui.  Maps resource object
   // id's to the index for the incommod through which they were received.
