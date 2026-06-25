@@ -360,7 +360,7 @@ void TwoRegionReactor::Transmute(int n_assem, int region_num) {
   
 
   std::stringstream ss;
-  ss << old.size() << " assemblies in region " << region_num;
+  ss << old.size() << " assemblies in Region " << region_ID_map[region_num];
   Record("TRANSMUTE", ss.str());
 
   for (int r; r<old.size(); r++) {
