@@ -17,10 +17,11 @@ Since last release:
 
 **Changed:**
 * Build edited to match the Cycamore build process (#4)
-* Variable names for each region (#9)
+* Variable names for each region, put ResBufs into pointers to put loops into the code, place some loops into separate functions, commodity demand time series recording (#9)
 * Updated docstrings for TwoRegionReactor (TRR) archetype (#10)
 * Changed `example_tworegion_reactor.xml` to `example_archetype_inputs.xml`,
   and added optional input parameters for TRR to be used as a user guide. 
+
 
 
 **Removed:**

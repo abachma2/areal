@@ -151,8 +151,10 @@ class TwoRegionReactor : public cyclus::Facility,
   // vector index for each region. Want to variables 
   // to prevent confusing with the 0-indexing for 
   // the vectors
-  int regionA_ID = 0;
-  int regionB_ID = 1;
+  const int regionA_ID = 0;
+  const int regionB_ID = 1;
+  std::map<int, std::string> region_ID_map = {{0,"A"}, {1,"B"}};
+  const static int n_regions = 2;
 
   bool retired() {
     return exit_time() != -1 && context()->time() > exit_time();
@@ -167,6 +169,9 @@ class TwoRegionReactor : public cyclus::Facility,
 
   /// Top up core inventory as much as possible.
   void Load(int region_num);
+
+  /// Transmute and discharge fuel if the agent is retired
+  void Retired();
 
   /// Transmute the batch that is about to be discharged from the core to its
   /// fully burnt state as defined by its outrecipe.
@@ -196,7 +201,7 @@ class TwoRegionReactor : public cyclus::Facility,
   bool ReadyToRefuel(); 
 
   // check if a region is full
-  bool FullRegion(int region_num);
+  bool FullRegions();
 
   /////// fuel specifications /////////
   #pragma cyclus var { \
@@ -368,7 +373,11 @@ class TwoRegionReactor : public cyclus::Facility,
   #pragma cyclus var {"capacity": "n_assem_spent[regionB_ID] * assem_size[regionB_ID]"}
   cyclus::toolkit::ResBuf<cyclus::Material> spent2;
 
-
+  // Create vectors of pointers to avoid creating a new data type
+  std::vector<cyclus::toolkit::ResBuf<cyclus::Material>*> fresh_vector = {&fresh1, &fresh2};
+  std::vector<cyclus::toolkit::ResBuf<cyclus::Material>*> core_vector = {&core1, &core2};
+  std::vector<cyclus::toolkit::ResBuf<cyclus::Material>*> spent_vector = {&spent1, &spent2};
+  
   // should be hidden in ui (internal only). True if fuel has already been
   // discharged this cycle.
   #pragma cyclus var {"default": 0, "doc": "This should NEVER be set manually",\
@@ -380,6 +389,9 @@ class TwoRegionReactor : public cyclus::Facility,
                       "internal": True \
   }
   bool discharged2;
+
+  //#pragma cyclus var {}
+  //std::vector<bool> discharged3;
 
   // This variable should be hidden/unavailable in ui.  Maps resource object
   // id's to the index for the incommod through which they were received.
