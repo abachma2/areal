@@ -154,7 +154,7 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlReque
     int t_left = exit_time() - context()->time() + 1;
     int t_left_cycle = cycle_time + refuel_time - cycle_step;
     double n_cycles_left = static_cast<double>(t_left - t_left_cycle) /
-                         static_cast<double>(cycle_time + refuel_time);
+                         (cycle_time + refuel_time);
     n_cycles_left = ceil(n_cycles_left);
 
     for (int r; r<n_regions; ++r){
