@@ -12,8 +12,6 @@ env:
 jobs:
   changelog_update:
     runs-on: ubuntu-latest
-    container:
-      image: alpine:latest
 
     name: Is Changelog up-to-date ?
     steps:
