@@ -163,7 +163,7 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlReque
     }
   }
   
-  if ( (n_assem_order[0] == 0 && n_assem_order[1] == 0) || retired()) {
+  if ( (n_assem_order[regionA_ID] == 0 && n_assem_order[regionB_ID] == 0) || retired()) {
      return ports;
   }
   for (int r; r<n_regions; ++r){ 
