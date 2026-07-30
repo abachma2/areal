@@ -17,7 +17,7 @@ Since last release:
 **Changed:**
 * Build edited to match the Cycamore build process (#4)
 * Variable names for each region, put ResBufs into pointers to put loops into the code, place some loops into separate functions, commodity demand time series recording (#9)
-
+* Update alpine version in CI to latest version ()
 
 **Removed:**
 * Files generated during build process (#9)
