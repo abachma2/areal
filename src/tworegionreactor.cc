@@ -175,10 +175,10 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlReque
       m = Material::CreateUntracked(assem_size[r], recipe);
 
       Request<Material>* req = port->AddRequest(m, this, commod, 1.0, true);
-      cyclus::toolkit::RecordTimeSeries<double>("demand"+fuel_incommods[r], this,
-                                            assem_size[r]) ;
       ports.insert(port);
     }
+    cyclus::toolkit::RecordTimeSeries<double>("demand"+fuel_incommods[r], this,
+                                            assem_size[r]*n_assem_order[r], "kg") ;
   }
 
   return ports;
