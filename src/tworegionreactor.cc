@@ -186,9 +186,9 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlReque
 
 void TwoRegionReactor::GetMatlTrades(
   // DRE phase 5.1 -- getting materials to trade away
-    const std::vector<cyclus::Trade<Material> >& trades,
-    std::vector<std::pair<cyclus::Trade<Material>, Material::Ptr> >&
-        responses) {
+  const std::vector<cyclus::Trade<Material> >& trades,
+  std::vector<std::pair<cyclus::Trade<Material>, Material::Ptr> >&
+      responses) {
   using cyclus::Trade;
 
   for (int r=0; r< n_regions; r++){
