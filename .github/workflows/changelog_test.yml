@@ -13,7 +13,7 @@ jobs:
   changelog_update:
     runs-on: ubuntu-latest
     container:
-      image: alpine:3.14
+      image: alpine:3.10
 
     name: Is Changelog up-to-date ?
     steps:
@@ -24,7 +24,7 @@ jobs:
           git --version
 
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - run: |
           git config --global --add safe.directory ${GITHUB_WORKSPACE}
