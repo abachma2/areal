@@ -167,20 +167,17 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlReque
      return ports;
   }
   for (int r; r<n_regions; ++r){ 
-    if (n_assem_order[r] > 0){
-      // building request portfolio for each region and recording demand
-      for (int j = 0; j < n_assem_order[r]; j++) {
-        RequestPortfolio<Material>::Ptr port(new RequestPortfolio<Material>());
-        std::string commod = fuel_incommods[r];
-        cyclus::Composition::Ptr recipe = context()->GetRecipe(fuel_inrecipes[r]);
-        m = Material::CreateUntracked(assem_size[r], recipe);
+    // building request portfolio for each region and recording demand
+    for (int j = 0; j < n_assem_order[r]; j++) {
+      RequestPortfolio<Material>::Ptr port(new RequestPortfolio<Material>());
+      std::string commod = fuel_incommods[r];
+      cyclus::Composition::Ptr recipe = context()->GetRecipe(fuel_inrecipes[r]);
+      m = Material::CreateUntracked(assem_size[r], recipe);
 
-        Request<Material>* req = port->AddRequest(m, this, commod, 1.0, true);
-        cyclus::toolkit::RecordTimeSeries<double>("demand"+fuel_incommods[r], this,
-                                              assem_size[r]) ;
-
-        ports.insert(port);
-      }
+      Request<Material>* req = port->AddRequest(m, this, commod, 1.0, true);
+      cyclus::toolkit::RecordTimeSeries<double>("demand"+fuel_incommods[r], this,
+                                            assem_size[r]) ;
+      ports.insert(port);
     }
   }
 
