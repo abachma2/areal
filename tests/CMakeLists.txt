@@ -1,3 +1,5 @@
+#SPDX-FileCopyrightText: 2025 UChicago-Argonne, LLC
+#SPFX-License-Identifier: BSD-3-Clause
 # Find tests generated in the binary directory
 message("GENERATED TESTS DIR ${CMAKE_CURRENT_BINARY_DIR}")
 message("GENERATED TESTS ${GENERATED_FILTER_LIST}")

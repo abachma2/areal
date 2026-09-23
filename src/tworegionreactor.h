@@ -1,3 +1,5 @@
+//SPDX-FileCopyrightText: 2025 UChicago-Argonne, LLC
+//SPFX-License-Identifier: BSD-3-Clause
 #ifndef AREAL_SRC_TWOREGIONREACTOR_H_
 #define AREAL_SRC_TWOREGIONREACTOR_H_
 

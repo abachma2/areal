@@ -1,3 +1,5 @@
+#SPDX-FileCopyrightText: 2025 UChicago-Argonne, LLC
+#SPFX-License-Identifier: BSD-3-Clause
 # ------------------- Add all Concrete Agents ----------------------------
 
 CONFIGURE_FILE(areal_version.h.in "${CMAKE_CURRENT_SOURCE_DIR}/areal_version.h" @ONLY)
