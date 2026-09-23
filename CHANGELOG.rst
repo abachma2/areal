@@ -11,16 +11,18 @@ Since last release:
 * Testing infrastructure (#3)
 * TwoRegionReactor archetype and associated unit tests (#4)
 * LICENSE from Argonne/UChicago-Argonne LLC (#5)
-* 
+* LICENSE SPDX to source files (#11)
 
 
 
 **Changed:**
 * Build edited to match the Cycamore build process (#4)
 * Variable names for each region, put ResBufs into pointers to put loops into the code, place some loops into separate functions, commodity demand time series recording (#9)
+* Update alpine version in CI to latest version (#10)
 * Updated docstrings for TwoRegionReactor (TRR) archetype (#10)
 * Changed `example_tworegion_reactor.xml` to `example_archetype_inputs.xml`,
   and added optional input parameters for TRR to be used as a user guide. 
+
 
 
 
