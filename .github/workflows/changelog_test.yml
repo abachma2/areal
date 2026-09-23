@@ -15,7 +15,7 @@ jobs:
     name: Is Changelog up-to-date ?
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - run: |
           git config --global --add safe.directory ${GITHUB_WORKSPACE}
