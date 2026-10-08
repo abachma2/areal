@@ -413,9 +413,9 @@ void TwoRegionReactor::Retired() {
       if (!decom_transmute_all){
         transmute_fraction = 0.5;
       }
-        for (int r=0; r<n_regions; r++){
-          Transmute(ceil(n_assem_region[r]*transmute_fraction), r);
-        }
+      for (int r=0; r<n_regions; r++){
+        Transmute(ceil(n_assem_region[r]*transmute_fraction), r);
+      }
     }
     // discharging fuel from each core region. This needs to be in 
     // separate loops because if the regions have different numbers of 
