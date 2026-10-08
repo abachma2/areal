@@ -15,8 +15,8 @@ TwoRegionReactor::TwoRegionReactor(cyclus::Context* ctx)
       cycle_step(0),
       power_cap(0),
       power_name("power"),
-      discharged1(false),
-      discharged2(false),
+      dischargedA(false),
+      dischargedB(false),
       keep_packaging(true) {}
 
 
@@ -102,8 +102,12 @@ void TwoRegionReactor::EnterNotify() {
 }
 
 bool TwoRegionReactor::CheckDecommissionCondition() {
-  return core1.count() == 0 && spent1.count() == 0 &&
-  core2.count() == 0 && spent2.count() == 0;
+  for (int r; r<n_regions; ++r){
+    if (core_vector[r] != 0 || spent_vector[r] != 0){
+      return false;
+    }
+  }
+  return true;
 }
 
 void TwoRegionReactor::Tick() {
@@ -122,9 +126,9 @@ void TwoRegionReactor::Tick() {
     Record("CYCLE_END", "");
   }
 
-  if (cycle_step >= cycle_time && !discharged1 && !discharged2) {
-    discharged1 = Discharge(regionA_ID);
-    discharged2 = Discharge(regionB_ID);
+  if (cycle_step >= cycle_time && !dischargedA && !dischargedB) {
+    dischargedA = Discharge(regionA_ID);
+    dischargedB = Discharge(regionB_ID);
   }
   if (cycle_step >= cycle_time) {
     for (int r; r<n_regions; ++r) {
@@ -163,7 +167,9 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlReque
     }
   }
   
-  if ( (n_assem_order[regionA_ID] == 0 && n_assem_order[regionB_ID] == 0) || retired()) {
+  int total_assem_order = std::accumulate(n_assem_order.begin(), n_assem_order.end(), decltype(n_assem_order)::value_type(0));
+
+  if (total_assem_order == 0 || retired()) {
      return ports;
   }
   for (int r; r<n_regions; ++r){ 
@@ -237,15 +243,14 @@ void TwoRegionReactor::AcceptMatlTrades(const std::vector<
       std::string commod = trade->first.request->commodity();
       Material::Ptr m = trade->second;
       index_res(m, commod);
-        if (commod == fuel_incommods[r]){
-          if (core_vector[r]->count() < n_assem_region[r]) {
-            core_vector[r]->Push(m);
-          } else {
-            fresh_vector[r]->Push(m);
-          }
+      if (commod == fuel_incommods[r]){
+        if (core_vector[r]->count() < n_assem_region[r]) {
+          core_vector[r]->Push(m);
+        } else {
+          fresh_vector[r]->Push(m);
         }
       }
-
+    }
   }
 }
 
@@ -313,9 +318,9 @@ void TwoRegionReactor::Tock() {
   // Check that irradiation and refueling periods are over, that 
   // the core is full and that fuel was successfully discharged in this refueling time.
   // If this is the case, then a new cycle will be initiated.
-  if (ReadyToRefuel() && FullRegions() && discharged1 == true && discharged2 == true) {
-    discharged1 = false;
-    discharged2 = false; 
+  if (ReadyToRefuel() && FullRegions() && dischargedA == true && dischargedB == true) {
+    dischargedA = false;
+    dischargedB = false; 
     cycle_step = 0;
   }
 
@@ -413,9 +418,9 @@ void TwoRegionReactor::Retired() {
       if (!decom_transmute_all){
         transmute_fraction = 0.5;
       }
-        for (int r=0; r<n_regions; r++){
-          Transmute(ceil(n_assem_region[r]*transmute_fraction), r);
-        }
+      for (int r=0; r<n_regions; r++){
+        Transmute(ceil(n_assem_region[r]*transmute_fraction), r);
+      }
     }
     // discharging fuel from each core region. This needs to be in 
     // separate loops because if the regions have different numbers of 
@@ -533,14 +538,12 @@ bool TwoRegionReactor::ReadyToRefuel() {
 }
 
 bool TwoRegionReactor::FullRegions() {
-  bool full_region;
   for (int r; r<n_regions; ++r){
-    full_region = core_vector[r]->count() == n_assem_region[r];
-    if (full_region == false){
-      break;
+    if (core_vector[r]->count() != n_assem_region[r]){
+      return false;
     }
   }
-  return full_region;
+  return true;
 }
 
 void TwoRegionReactor::Record(std::string name, std::string val) {
