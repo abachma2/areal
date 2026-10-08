@@ -19,7 +19,8 @@ Since last release:
 
 
 **Removed:**
-
+* Alpine from CI Changelog test (#10)
 
 **Fixed:**
+* Cyclus images in CI tests
 
