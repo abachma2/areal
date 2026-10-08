@@ -15,8 +15,8 @@ TwoRegionReactor::TwoRegionReactor(cyclus::Context* ctx)
       cycle_step(0),
       power_cap(0),
       power_name("power"),
-      discharged1(false),
-      discharged2(false),
+      dischargedA(false),
+      dischargedB(false),
       keep_packaging(true) {}
 
 
@@ -126,9 +126,9 @@ void TwoRegionReactor::Tick() {
     Record("CYCLE_END", "");
   }
 
-  if (cycle_step >= cycle_time && !discharged1 && !discharged2) {
-    discharged1 = Discharge(regionA_ID);
-    discharged2 = Discharge(regionB_ID);
+  if (cycle_step >= cycle_time && !dischargedA && !dischargedB) {
+    dischargedA = Discharge(regionA_ID);
+    dischargedB = Discharge(regionB_ID);
   }
   if (cycle_step >= cycle_time) {
     for (int r; r<n_regions; ++r) {
@@ -318,9 +318,9 @@ void TwoRegionReactor::Tock() {
   // Check that irradiation and refueling periods are over, that 
   // the core is full and that fuel was successfully discharged in this refueling time.
   // If this is the case, then a new cycle will be initiated.
-  if (ReadyToRefuel() && FullRegions() && discharged1 == true && discharged2 == true) {
-    discharged1 = false;
-    discharged2 = false; 
+  if (ReadyToRefuel() && FullRegions() && dischargedA == true && dischargedB == true) {
+    dischargedA = false;
+    dischargedB = false; 
     cycle_step = 0;
   }
 

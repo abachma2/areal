@@ -377,12 +377,12 @@ class TwoRegionReactor : public cyclus::Facility,
   #pragma cyclus var {"default": 0, "doc": "This should NEVER be set manually",\
                       "internal": True \
   }
-  bool discharged1;
+  bool dischargedA;
 
   #pragma cyclus var {"default": 0, "doc": "This should NEVER be set manually",\
                       "internal": True \
   }
-  bool discharged2;
+  bool dischargedB;
 
   //#pragma cyclus var {}
   //std::vector<bool> discharged3;
