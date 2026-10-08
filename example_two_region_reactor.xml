@@ -1,14 +1,14 @@
 <simulation>
   <control>
-    <duration>10</duration>
+    <duration>50</duration>
     <startmonth>1</startmonth>
     <startyear>2000</startyear>
   </control>
 
   <archetypes>
     <spec><lib>areal</lib><name>TwoRegionReactor</name></spec>
-    <spec><lib>cycamore</lib><name>Source</name></spec>
-    <spec><lib>cycamore</lib><name>Sink</name></spec>
+    <spec><lib>agents</lib><name>Source</name></spec>
+    <spec><lib>agents</lib><name>Sink</name></spec>
     <spec><lib>agents</lib><name>NullInst</name></spec>
     <spec><lib>agents</lib><name>NullRegion</name></spec>
   </archetypes>
@@ -17,21 +17,25 @@
     <name>USource</name>
     <config>
       <Source>
-        <outcommod>fresh_u</outcommod>
+        <commod>fresh_u</commod>
+        <capacity>2e100</capacity>
       </Source>
     </config>
   </facility>
+
   <facility>
     <name>BlanketSource</name>
     <config>
       <Source>
-        <outcommod>fresh_blanket</outcommod>
+        <commod>fresh_blanket</commod>
+        <capacity>2e100</capacity>
       </Source>
     </config>
   </facility>
 
   <facility>
     <name>OneFacility</name>
+    <lifetime>36</lifetime>
     <config>
       <TwoRegionReactor>
         <fuel_incommods> 
@@ -50,7 +54,7 @@
           <val>spent_uranium</val>
           <val>spent_blanket</val>
         </fuel_outrecipes>
-        <cycle_time>1</cycle_time>
+        <cycle_time>6</cycle_time>
         <refuel_time>0</refuel_time>
         <assem_size> 
           <val>100</val>
@@ -58,7 +62,7 @@
         </assem_size>
         <n_assem_region>
           <val>3</val>
-          <val>3</val>
+          <val>2</val>
         </n_assem_region>
         <n_assem_batch>
           <val>1</val>
@@ -76,6 +80,7 @@
         <in_commods>
           <val>spent_u</val>
         </in_commods>
+        <capacity>2e100</capacity>
       </Sink>
     </config>
   </facility>
@@ -87,6 +92,7 @@
         <in_commods>
           <val>spent_blanket</val>
         </in_commods>
+        <capacity>2e100</capacity>
       </Sink>
     </config>
   </facility>
