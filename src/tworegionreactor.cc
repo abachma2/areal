@@ -163,7 +163,9 @@ std::set<cyclus::RequestPortfolio<Material>::Ptr> TwoRegionReactor::GetMatlReque
     }
   }
   
-  if ( (n_assem_order[regionA_ID] == 0 && n_assem_order[regionB_ID] == 0) || retired()) {
+  int total_assem_order = std::accumulate(n_assem_order.begin(), n_assem_order.end(), decltype(n_assem_order)::value_type(0));
+
+  if (total_assem_order == 0 || retired()) {
      return ports;
   }
   for (int r; r<n_regions; ++r){ 
@@ -533,14 +535,12 @@ bool TwoRegionReactor::ReadyToRefuel() {
 }
 
 bool TwoRegionReactor::FullRegions() {
-  bool full_region;
   for (int r; r<n_regions; ++r){
-    full_region = core_vector[r]->count() == n_assem_region[r];
-    if (full_region == false){
-      break;
+    if (core_vector[r]->count() != n_assem_region[r]){
+      return false;
     }
   }
-  return full_region;
+  return true;
 }
 
 void TwoRegionReactor::Record(std::string name, std::string val) {
