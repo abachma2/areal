@@ -102,8 +102,12 @@ void TwoRegionReactor::EnterNotify() {
 }
 
 bool TwoRegionReactor::CheckDecommissionCondition() {
-  return core1.count() == 0 && spent1.count() == 0 &&
-  core2.count() == 0 && spent2.count() == 0;
+  for (int r; r<n_regions; ++r){
+    if (core_vector[r] != 0 || spent_vector[r] != 0){
+      return false;
+    }
+  }
+  return true;
 }
 
 void TwoRegionReactor::Tick() {
@@ -239,15 +243,14 @@ void TwoRegionReactor::AcceptMatlTrades(const std::vector<
       std::string commod = trade->first.request->commodity();
       Material::Ptr m = trade->second;
       index_res(m, commod);
-        if (commod == fuel_incommods[r]){
-          if (core_vector[r]->count() < n_assem_region[r]) {
-            core_vector[r]->Push(m);
-          } else {
-            fresh_vector[r]->Push(m);
-          }
+      if (commod == fuel_incommods[r]){
+        if (core_vector[r]->count() < n_assem_region[r]) {
+          core_vector[r]->Push(m);
+        } else {
+          fresh_vector[r]->Push(m);
         }
       }
-
+    }
   }
 }
 
