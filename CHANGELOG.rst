@@ -16,11 +16,12 @@ Since last release:
 
 **Changed:**
 * Build edited to match the Cycamore build process (#4)
+* Docker image for CI to one in abachmann Hub (#10)
 
 
 **Removed:**
 * Alpine from CI Changelog test (#10)
 
 **Fixed:**
-* Cyclus images in CI tests
+
 
