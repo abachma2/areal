@@ -3,7 +3,8 @@
 [![Build/Test for PR and collaborator push](https://github.com/abachma2/areal/actions/workflows/build_test.yml/badge.svg)](https://github.com/abachma2/areal/actions/workflows/build_test.yml)
 
 Archetype library for use with [Cyclus](fuelcycle.org) to 
-model reactors beyond the [Cycamore Reactor archetype](https://fuelcycle.org/user/cycamoreagents.html#cycamore-reactor).
+model reactors beyond the capabilities in the 
+[Cycamore Reactor archetype library](https://fuelcycle.org/user/cycamoreagents.html#cycamore-reactor).
 
 ## Dependencies:
 
