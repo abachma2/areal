@@ -29,7 +29,6 @@ jobs:
         ]
         cyclus_tag: [
           latest,
-          stable,
         ]
     services:
       registry:
@@ -44,7 +43,7 @@ jobs:
           driver-opts: network=host
 
       - name: Checkout Areal
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Build and test Areal
         id: build-areal
@@ -88,7 +87,7 @@ jobs:
     if: github.event_name == 'pull_request'
     steps:
       - name: Checkout Areal
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Save PR number to file
         run: |
