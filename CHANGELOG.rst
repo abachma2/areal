@@ -18,14 +18,15 @@ Since last release:
 **Changed:**
 * Build edited to match the Cycamore build process (#4)
 * Variable names for each region, put ResBufs into pointers to put loops into the code, place some loops into separate functions, commodity demand time series recording (#9)
-* Updated docstrings for TwoRegionReactor (TRR) archetype (#10)
+* Docker image for CI to one in abachmann Hub (#10)
+* Updated docstrings for TwoRegionReactor (TRR) archetype (#11)
 * Changed `example_tworegion_reactor.xml` to `example_archetype_inputs.xml`,
-  and added optional input parameters for TRR to be used as a user guide. 
-
+  and added optional input parameters for TRR to be used as a user guide (#11). 
 
 
 **Removed:**
-* Files generated during build process (#9)
+* Alpine from CI Changelog test (#10)
 
 **Fixed:**
+
 
