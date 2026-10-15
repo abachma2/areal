@@ -29,7 +29,6 @@ jobs:
         ]
         cyclus_tag: [
           latest,
-          stable,
         ]
     services:
       registry:

@@ -7,8 +7,8 @@
 
   <archetypes>
     <spec><lib>areal</lib><name>TwoRegionReactor</name></spec>
-    <spec><lib>cycamore</lib><name>Source</name></spec>
-    <spec><lib>cycamore</lib><name>Sink</name></spec>
+    <spec><lib>agents</lib><name>Source</name></spec>
+    <spec><lib>agents</lib><name>Sink</name></spec>
     <spec><lib>agents</lib><name>NullInst</name></spec>
     <spec><lib>agents</lib><name>NullRegion</name></spec>
   </archetypes>
@@ -17,7 +17,9 @@
     <name>USource</name>
     <config>
       <Source>
-        <outcommod>fresh_u</outcommod>
+        <commod>fresh_u</commod>
+        <recipe_name>fresh_uranium</recipe_name>
+        <capacity>1e299</capacity>
       </Source>
     </config>
   </facility>
@@ -25,7 +27,9 @@
     <name>BlanketSource</name>
     <config>
       <Source>
-        <outcommod>fresh_blanket</outcommod>
+        <commod>fresh_blanket</commod>
+        <recipe_name>fresh_blanket</recipe_name>
+        <capacity>1e299</capacity>
       </Source>
     </config>
   </facility>
@@ -65,6 +69,7 @@
           <val>1</val>
         </n_assem_batch>
         <power_cap>100</power_cap>
+        
         <!-- Optional inputs, with defaults
         <n_assem_fresh>
           <val>0</val>
@@ -75,9 +80,8 @@
           <val>1e9</val>
         </n_assem_spent>
         <decom_transmute_all>0</decom_transmute_all>
-        
         -->
-        
+
       </TwoRegionReactor>
     </config>
   </facility>
@@ -89,6 +93,7 @@
         <in_commods>
           <val>spent_u</val>
         </in_commods>
+        <capacity>1e299</capacity>
       </Sink>
     </config>
   </facility>
@@ -100,6 +105,7 @@
         <in_commods>
           <val>spent_blanket</val>
         </in_commods>
+        <capacity>1e299</capacity>
       </Sink>
     </config>
   </facility>
