@@ -1,2 +1,5 @@
 build/*
 tests/__pycache__/
+*.sqlite 
+src/areal_version.h
+tests/run_inputs.py
