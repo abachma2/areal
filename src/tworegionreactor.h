@@ -12,10 +12,11 @@ namespace areal {
 /// movement and depletion for two regions of a core. The depletion is 
 /// based on static compositional transformations to model fuel burnup. 
 ///
-/// The user must specify an input fuel commodity name, input fuel recipe,
+/// For each of the two regions in the reactor, the user must specify an input 
+/// fuel commodity name, input fuel recipe,
 /// output fuel commodity, output fuel recipe, assembly mass size (in kg), 
-/// number of assemblies total, and number of assemblies per batch for 
-/// each of the two regions in the reactor. The fuel_incommods, 
+/// number of assemblies total, and number of assemblies per batch. The 
+/// fuel_incommods, 
 /// fuel_inrecipes, fuel_outcommods, fuel_outrecipe inputs, assem_size,
 /// n_assem_region, and n_assem_batch
 /// are vectors that must have a length of 2. The first item in these vectors 
@@ -85,13 +86,14 @@ class TwoRegionReactor : public cyclus::Facility,
   " each region, consisting of the n_assem_batch and assem_size input that"\
   " corresponds to that region. The"\
   " reactor also has a specifiable refueling time period following the end of"\
-  " each cycle at the end of which it will resume operation on the next cycle"\
-  " *if* it has enough fuel to fill both regions; otherwise it waits until it has"\
-  " enough fresh fuel assemblies. The refueling time is the same for both regions."\
+   " each cycle. At the end of the refueling period, it will resume operation on the next"\ 
+   " cycle *if* it has enough fuel to fill both regions. If either region does not have"\ 
+   " enough fuel, it will wait until it has enough fresh fuel assemblies. The refueling"\
+   " time is the same for both regions."
   " \n\n "\
   " In addition to its core, the reactor has an on-hand fresh fuel inventory"\
   " and a spent fuel inventory for each region, whose capacities are specified"\ 
-  " by n_assem_fresh the fresh fuel and n_assem_spent for the spent fuel."\
+  " by n_assem_fresh for the fresh fuel and n_assem_spent for the spent fuel."\
   " Both of these variables are vectors of length 2, and must be of length 2"\
   " when defined by a user. n_assem_fresh has a default value of 0 for both"\
   " regions. n_assem_spent has a default value of 1,000,000,000 for both regions."\
@@ -108,7 +110,7 @@ class TwoRegionReactor : public cyclus::Facility,
   " material from its core and trade away all its spent fuel as quickly as"\
   " possible.  Full decommissioning will be delayed until all spent fuel is"\
   " gone.  If the reactor has a full core when it is decommissioned (i.e. is"\
-  " mid-cycle) when the reactor is decommissioned, half (rounded up to nearest"\
+  " mid-cycle), half (rounded up to nearest"\
   " int) of its assemblies are transmuted to their respective burnt"\
   " compositions" \
   "", \
