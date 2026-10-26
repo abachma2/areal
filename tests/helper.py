@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2025 UChicago Argonne, LLC
+# SPDX-License-Identifier: BSD-3-Clause
 """A set of tools for use in integration tests."""
 import os
 import tempfile

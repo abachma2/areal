@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2025 UChicago Argonne, LLC
+# SPDX-License-Identifier: BSD-3-Clause
 #! /usr/bin/env python3
 import os
 import uuid
