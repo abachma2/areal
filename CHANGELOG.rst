@@ -28,5 +28,6 @@ Since last release:
 * Alpine from CI Changelog test (#10)
 
 **Fixed:**
+* Wrong syntax in TRR documentation (#12)
 
 
