@@ -13,8 +13,6 @@ Since last release:
 * LICENSE from Argonne/UChicago-Argonne LLC (#5)
 * LICENSE SPDX to source files (#12)
 
-
-
 **Changed:**
 * Build edited to match the Cycamore build process (#4)
 * Variable names for each region, put ResBufs into pointers to put loops into the code, place some loops into separate functions, commodity demand time series recording (#9)
@@ -23,11 +21,9 @@ Since last release:
 * Changed `example_tworegion_reactor.xml` to `example_archetype_inputs.xml`,
   and added optional input parameters for TRR to be used as a user guide (#11). 
 
-
 **Removed:**
 * Alpine from CI Changelog test (#10)
+* Files created during build from git (#12)
 
 **Fixed:**
 * Wrong syntax in TRR documentation (#12)
-
-
