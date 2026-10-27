@@ -11,6 +11,7 @@ Since last release:
 * Testing infrastructure (#3)
 * TwoRegionReactor archetype and associated unit tests (#4)
 * LICENSE from Argonne/UChicago-Argonne LLC (#5)
+* LICENSE SPDX to source files (#12)
 
 **Changed:**
 * Build edited to match the Cycamore build process (#4)
@@ -22,7 +23,7 @@ Since last release:
 
 **Removed:**
 * Alpine from CI Changelog test (#10)
+* Files created during build from git (#12)
 
 **Fixed:**
-
-
+* Wrong syntax in TRR documentation (#12)

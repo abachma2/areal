@@ -1,3 +1,5 @@
+//SPDX-FileCopyrightText: 2025 UChicago Argonne, LLC
+//SPDX-License-Identifier: BSD-3-Clause
 #ifndef AREAL_SRC_TWOREGIONREACTOR_H_
 #define AREAL_SRC_TWOREGIONREACTOR_H_
 
@@ -84,13 +86,13 @@ class TwoRegionReactor : public cyclus::Facility,
   " each region, consisting of the n_assem_batch and assem_size input that"\
   " corresponds to that region. The"\
   " reactor also has a specifiable refueling time period following the end of"\
-   " each cycle. At the end of the refueling period, it will resume operation on the next"\ 
-   " cycle *if* it has enough fuel to fill both regions. If either region does not have"\ 
-   " enough fuel, it will wait until it has enough fresh fuel assemblies. The refueling"\
-   " time is the same for both regions."
+  " each cycle. At the end of the refueling period, it will resume operation on the next"\
+  " cycle *if* it has enough fuel to fill both regions. If either region does not have"\
+  " enough fuel, it will wait until it has enough fresh fuel assemblies. The refueling"\
+  " time is the same for both regions."\
   " \n\n "\
   " In addition to its core, the reactor has an on-hand fresh fuel inventory"\
-  " and a spent fuel inventory for each region, whose capacities are specified"\ 
+  " and a spent fuel inventory for each region, whose capacities are specified"\
   " by n_assem_fresh for the fresh fuel and n_assem_spent for the spent fuel."\
   " Both of these variables are vectors of length 2, and must be of length 2"\
   " when defined by a user. n_assem_fresh has a default value of 0 for both"\
@@ -99,7 +101,7 @@ class TwoRegionReactor : public cyclus::Facility,
   " acquire enough fresh fuel to fill its fresh fuel inventory (and its core if"\
   " the core isn't currently full).  If the fresh fuel inventory has zero"\
   " capacity, fuel will be ordered just-in-time after the end of each"\
-  " operational cycle before the next begins.  If the spent fuel inventory for"\ 
+  " operational cycle before the next begins.  If the spent fuel inventory for"\
   " either region becomes full, the reactor will halt operation at the end of"\
   " the next cycle until there is more room.  Each time step, the reactor will"\
   " try to trade away as much of its spent fuel inventory as possible."\
